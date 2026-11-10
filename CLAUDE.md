@@ -42,7 +42,7 @@ Yours to build: the game logic, voice and sound, saved progress, a parent screen
 - No timers, no lives, no penalties, no "wrong" sounds or red crosses. A wrong tap fades that bubble and brings up a counting hint.
 - Only the right answer ever glows.
 - Orange (`#FF9A3D`) means "tap me" or "you got it" and nothing else. Sister colors appear only on the sisters.
-- Nothing that moves crosses a face, a label or an answer bubble.
+- Nothing that moves crosses a face, a label or an answer bubble. (One parent-approved amendment: in the Tide Pool the answer bubbles themselves swim — fish carry them, and catching the right one is the game.)
 - Controls stay 24px from every edge of the 800x600 design space. Neighbours sit at least 16px apart, answer bubbles at least 26px.
 - In number recognition the prompt never shows the digit. It says and spells the word ("Find the number four!"), so the child has to recognise the numeral herself.
 - Wrap all motion in `@media (prefers-reduced-motion: no-preference)`.

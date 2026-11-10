@@ -26,10 +26,14 @@ struct TidePoolScreen: View {
     var onOpenChest: () -> Void = {}
 
     @Environment(\.stage) private var m
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    /// The clock time when the right fish was caught, so it freezes to pop.
+    @State private var caughtAt: Double?
 
     var body: some View {
         MotionClock { t in
             let s = m.scale
+            let depth = Double(state.pearls) / 10   // the dive gets deeper as pearls fill
             ZStack {
                 // Scenery behind the crab (bleeds to the physical edges)
                 Group {
@@ -66,8 +70,20 @@ struct TidePoolScreen: View {
                         .stage(x: 766, y: 580, w: 24, h: 24)
                     RisingBubble(t: t, duration: 15, delay: 6, scale: s)
                         .stage(x: 46, y: 590, w: 20, h: 20)
+
+                    // The treasure chest comes into view in the distance
+                    // once the dive is seven pearls deep.
+                    if state.pearls >= 7 {
+                        let w = 44 + 8 * CGFloat(state.pearls - 7)
+                        ArtImage("scenes/treasure-chest/chest-box.png")
+                            .saturation(0.8)
+                            .opacity(0.5 + 0.16 * Double(state.pearls - 7))
+                            .stage(x: 618 - w / 2, y: 505 - w * 0.64, w: w, h: w * 0.64)
+                            .transition(.opacity)
+                    }
                 }
                 .bleed()
+                .scaleEffect(1 + depth * 0.06)   // swimming deeper: the scene drifts closer
 
                 // The crab: the whole puppet replays the prompt
                 Button(action: onReplay) {
@@ -82,15 +98,31 @@ struct TidePoolScreen: View {
                               from: -1.4, to: 1.6, duration: 5.5, pivot: UnitPoint(x: 1, y: 1),
                               rotate: true)
                         .stage(x: 580, y: 0, w: 220, h: 600)
+                    // Deeper water is darker water
+                    Rectangle()
+                        .fill(Tokens.Palette.midnight)
+                        .opacity(depth * 0.22)
+                        .stage(x: 0, y: 0, w: 800, h: 600)
                     Vignette()
                         .stage(x: 0, y: 0, w: 800, h: 600)
                 }
                 .bleed()
+                .allowsHitTesting(false)
 
                 // Controls (inside the guaranteed 800x600)
                 MapButton(scale: s, action: onMap)
                     .stage(x: 22, y: 20, w: 66, h: 66)
+                // The counter gives a little bounce as each pearl arrives
                 PearlCounter(filled: state.pearls, scale: s)
+                    .keyframeAnimator(initialValue: 1.0, trigger: reduceMotion ? 0 : state.pearls) { content, v in
+                        content.scaleEffect(v, anchor: .top)
+                    } keyframes: { _ in
+                        KeyframeTrack {
+                            LinearKeyframe(1.0, duration: 0.72)
+                            LinearKeyframe(1.12, duration: 0.1, timingCurve: .easeOut)
+                            LinearKeyframe(1.0, duration: 0.2, timingCurve: .easeIn)
+                        }
+                    }
                     .stageTopRight(right: 24, y: 26)
                 SpeechBubbleTail()
                     .stage(x: 180, y: 176, w: 70, h: 54)
@@ -103,17 +135,37 @@ struct TidePoolScreen: View {
                 )
                 .stageTopLeft(x: 196, y: 96)
 
-                HStack(spacing: Tokens.Space.answerGap * s) {
-                    ForEach(state.choices, id: \.self) { n in
-                        AnswerBubble(
-                            number: n,
-                            state: bubbleState(for: n),
-                            scale: s,
-                            tap: { onAnswer(n) }
-                        )
-                    }
+                // The answers swim on the fish themselves; catching the right
+                // one is the game. The caught fish hands off to CatchFlight,
+                // which carries its numeral up to the pearl counter.
+                ForEach(Array(state.choices.enumerated()), id: \.offset) { i, n in
+                    let xc = FishLanes.x(i, t)
+                    AnswerFish(
+                        t: t,
+                        lane: i,
+                        number: n,
+                        state: bubbleState(for: n),
+                        scale: s,
+                        shakeTrigger: state.faded.contains(n) ? 1 : 0,
+                        tap: { onAnswer(n) }
+                    )
+                    .stage(x: xc - FishLanes.fishW / 2, y: FishLanes.centerY[i] - FishLanes.fishH / 2,
+                           w: FishLanes.fishW, h: FishLanes.fishH)
                 }
-                .stageTopLeft(x: 288, y: 230)
+
+                // The catch: splash, arc to the counter, bubble trail
+                let goldLane = state.choices.firstIndex(of: state.target) ?? 1
+                CatchFlight(
+                    trigger: state.pearls,
+                    number: state.target,
+                    from: CGPoint(
+                        x: FishLanes.x(goldLane, caughtAt ?? t),
+                        y: FishLanes.centerY[goldLane]
+                    ),
+                    to: CGPoint(x: 486 + CGFloat(max(1, min(state.pearls, 10)) - 1) * 28, y: 48),
+                    scale: s
+                )
+                .stage(x: 0, y: 0, w: 800, h: 600)
 
                 if state.diveComplete {
                     SolvedPanel(
@@ -129,6 +181,9 @@ struct TidePoolScreen: View {
                         .stageBottomCenter(bottom: 24)
                         .transition(.opacity)
                 }
+            }
+            .onChange(of: state.solved) { _, isSolved in
+                caughtAt = isSolved ? t : nil
             }
         }
     }

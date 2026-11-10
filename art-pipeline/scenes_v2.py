@@ -184,13 +184,27 @@ def scene_map_layers():
     return {n: s.svg_layer(n) for n in ('bg', 'kelp_far', 'kelp_mid', 'floor', 'grass')}
 
 def scene_props_layers():
-    """Small painted objects used by the screens: the padlock for a locked zone, and the two countable shells."""
+    """Small painted objects used by the screens: the padlock for a locked zone,
+    the two countable shells, and the Tide Pool's big answer fish (it carries a
+    numeral on its pale belly patch; the face stays crisp on a vector layer)."""
     from chars import shell
     s = LS(5, 300, -230, 1000)
     gold = s.lin([(0, '#fff0b0', 1), (.5, '#ffcf5a', 1), (1, '#c9882a', 1)])
     s.layer('lock').add(f'<path d="M172 150 V124 a28 28 0 0 1 56 0 V150" fill="none" stroke="#e0aa42" stroke-width="13" stroke-linecap="round"/><path d="M172 150 V124 a28 28 0 0 1 56 0 V150" fill="none" stroke="#fff0b0" stroke-width="4" stroke-linecap="round" opacity=".7"/>'
                         f'<rect x="150" y="146" width="100" height="78" rx="16" fill="{gold}" stroke="#a86a14" stroke-width="3"/><circle cx="200" cy="178" r="10" fill="#3a1a0a"/><path d="M194 180 L206 180 L203 204 L197 204 Z" fill="#3a1a0a"/><ellipse cx="176" cy="160" rx="18" ry="6" fill="#ffffff" opacity=".5"/>')
-    return {'lock': s.svg_layer('lock')}
+    body = s.lin([(0, '#ff6a24', 1), (.45, '#ff9433', 1), (1, '#ffc96a', 1)])
+    tail = s.lin([(0, '#ff7a2e', 1), (1, '#ffb347', .85)], x2=1, y2=0)
+    s.layer('afish').add(
+        f'<path d="M446 292 L484 258 C474 282 474 302 484 326 L446 296 Z" fill="{tail}"/>'
+        f'<path d="M366 256 C378 232 410 234 420 258 Z" fill="#ff7226"/>'
+        f'<path d="M330 292 C338 248 446 246 454 292 C446 338 338 336 330 292 Z" fill="{body}"/>'
+        f'<path d="M378 312 C386 332 406 332 414 318 Z" fill="#ffa64d"/>'
+        f'<ellipse cx="392" cy="298" rx="40" ry="27" fill="#fff6e0"/>')
+    s.layer('afish_face').add(
+        '<circle cx="352" cy="280" r="10" fill="#ffffff"/><circle cx="350.5" cy="281" r="6" fill="#1b1030"/><circle cx="348" cy="278" r="2.4" fill="#ffffff"/>'
+        '<path d="M340 300 Q349 308 358 302" fill="none" stroke="#7a3d12" stroke-width="3" stroke-linecap="round"/>'
+        '<ellipse cx="364" cy="299" rx="6" ry="4" fill="#ff9ecb" opacity=".5"/>')
+    return {name: s.svg_layer(name) for name in ('lock', 'afish', 'afish_face')}
 
 from frame import scene_home_layers
 
@@ -200,5 +214,5 @@ SCENES2 = {
     'chest': (scene_chest_layers, dict(bg='bg', kelp_far='far', kelp_mid='mid', fg='fg', chest_lid='piece', chest_box='piece', lamp='prop', lamp_face='vector', grass='grass')),
     'grotto': (scene_grotto_layers, dict(bg='bg', floor='fg', walls='fg', curtain='mid', bed='piece', lights='prop', lamp='prop', lamp_face='vector')),
     'map': (scene_map_layers, dict(bg='bg', kelp_far='far', kelp_mid='mid', floor='fg', grass='grass')),
-    'props': (scene_props_layers, dict(lock='prop')),
+    'props': (scene_props_layers, dict(lock='prop', afish='prop', afish_face='vector')),
 }

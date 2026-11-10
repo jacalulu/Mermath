@@ -6,6 +6,7 @@ final class SoundPlayer {
     enum Effect: String, CaseIterable {
         case chime
         case fanfare
+        case pop
     }
 
     private var players: [Effect: AVAudioPlayer] = [:]

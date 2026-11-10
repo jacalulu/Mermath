@@ -99,7 +99,13 @@ final class DiveSession {
             showHint = false
             pearls += 1
         }
-        sounds.play(.chime)
+        // The catch: pop right away, chime as the pearl lands in the counter
+        sounds.play(.pop)
+        let sounds = self.sounds
+        Task {
+            try? await Task.sleep(nanoseconds: 600_000_000)
+            sounds.play(.chime)
+        }
 
         // Coral Reef shell fading: quick, unhinted answers grow the streak
         if case .addition = question.presentation {

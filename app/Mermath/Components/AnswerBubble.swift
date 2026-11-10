@@ -12,9 +12,12 @@ struct AnswerBubble: View {
     let number: Int
     let state: AnswerBubbleState
     let scale: CGFloat
+    /// Design-space size; the Tide Pool's swimming bubbles are smaller than
+    /// the reference's static 140px circles.
+    var size: CGFloat = Tokens.Space.answerBubble
     let tap: () -> Void
 
-    private var diameter: CGFloat { Tokens.Space.answerBubble * scale }
+    private var diameter: CGFloat { size * scale }
 
     var body: some View {
         Button(action: tap) {
@@ -40,9 +43,9 @@ struct AnswerBubble: View {
                 Circle()
                     .stroke(Color.white, lineWidth: 3 * scale)
                 Text("\(number)")
-                    .font(baloo(Tokens.TypeScale.answerNumeral, weight: 700, scale: scale))
+                    .font(baloo(Tokens.TypeScale.answerNumeral * size / Tokens.Space.answerBubble, weight: 700, scale: scale))
                     .foregroundStyle(Tokens.Palette.midnight)
-                    .padding(.top, 10 * scale)
+                    .padding(.top, 10 * scale * size / Tokens.Space.answerBubble)
             }
             .frame(width: diameter, height: diameter)
             .shadow(color: Tokens.Palette.midnight.opacity(0.3), radius: 11 * scale, y: 10 * scale)
