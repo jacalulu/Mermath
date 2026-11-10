@@ -1,7 +1,9 @@
 import SwiftUI
 
-/// "Where shall we dive?" Any unlocked zone is tappable; the child's usual
-/// zone glows brighter. Deep Sea stays locked (its questions are not designed).
+/// "Where shall we dive?" One painted seabed steps down from the bright
+/// shallows to the dark deep, with a place on each step. The crab waits at the
+/// Tide Pool, the picked sister floats over the Coral Reef, and a pearl trail
+/// twinkles along the open stretch. Ported from reference/html/reef-map.html.
 struct ReefMapScreen: View {
     let child: ChildID
     var onDive: (Zone) -> Void = { _ in }
@@ -11,168 +13,157 @@ struct ReefMapScreen: View {
 
     var body: some View {
         let s = m.scale
-        let usual = (child == .ophelia) ? Zone.coralReef : Zone.tidePool
-        ZStack {
-            Group {
-                ArtImage("scenes/map/bg.jpg")
-                    .stage(x: 0, y: 0, w: 800, h: 600)
+        MotionClock { t in
+            ZStack {
+                // Scenery (bleeds to the physical edges)
+                Group {
+                    ArtImage("scenes/reef-map/bg.jpg")
+                        .stage(x: 0, y: 0, w: 800, h: 600)
+                    LightShimmer(t: t)
+                        .stage(x: 0, y: 0, w: 800, h: 340)
+                    KelpLayer(t: t, path: "scenes/reef-map/kelp-far.png",
+                              from: -0.8, to: 0.9, duration: 7, pivot: UnitPoint(x: 0.5, y: 1))
+                        .opacity(0.75)
+                        .stage(x: 192, y: 0, w: 504, h: 600)
+                    KelpLayer(t: t, path: "scenes/reef-map/kelp-mid.png",
+                              from: 1.3, to: -1.4, duration: 6, pivot: UnitPoint(x: 0.5, y: 1))
+                        .stage(x: 0, y: 0, w: 800, h: 600)
+                    FishSwim(t: t, travel: 940, bobDown: 5, bobUp: 6, duration: 32, delay: -4, scale: s)
+                        .stage(x: 830, y: 86, w: 40, h: 25)
+                    FishSwim(t: t, travel: 940, bobDown: 5, bobUp: 6, duration: 36, delay: -18, scale: s)
+                        .stage(x: 830, y: 104, w: 30, h: 19)
+                    ArtImage("scenes/reef-map/seabed.png")
+                        .stage(x: 0, y: 206, w: 800, h: 394)
+                    KelpLayer(t: t, path: "scenes/reef-map/seagrass.png",
+                              from: -7, to: 7, duration: 2.8, pivot: UnitPoint(x: 0.5, y: 1))
+                        .stage(x: 92, y: 548, w: 520, h: 52)
+                    RisingBubble(t: t, duration: 9, scale: s)
+                        .stage(x: 300, y: 560, w: 26, h: 26)
+                    RisingBubble(t: t, duration: 12, delay: 3, scale: s)
+                        .stage(x: 586, y: 580, w: 22, h: 22)
+                }
+                .bleed()
+
+                // Pearl trail: the open stretch twinkles, the locked one sits still
+                ForEach(Array([(252.0, 376.0), (274, 388), (296, 400), (318, 410)].enumerated()), id: \.offset) { i, dot in
+                    TrailDot(opacity: Wave.alternate(t, from: 0.55, to: 1, duration: 1, delay: Double(i) * 0.25), scale: s)
+                        .stage(x: dot.0, y: dot.1, w: 11, h: 11)
+                }
+                ForEach(Array([(560.0, 436.0), (582, 450), (604, 464), (626, 476)].enumerated()), id: \.offset) { _, dot in
+                    TrailDot(opacity: 0.4, scale: s, shadow: false)
+                        .stage(x: dot.0, y: dot.1, w: 11, h: 11)
+                }
+
+                // Tide Pool: the crab on his rock, label below, soft pulsing glow
+                Button(action: { onDive(.tidePool) }) {
+                    Color.clear.contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .stage(x: 14, y: 208, w: 256, h: 252)
+                GlowPulse(t: t)
+                    .stage(x: 36, y: 304, w: 220, h: 100)
+                CrabView(t: t, scale: s, blinkCycle: 5.1, bobTo: -3)
+                    .frame(width: 104 * s, height: 88 * s)
+                    .allowsHitTesting(false)
+                    .stage(x: 10, y: 216, w: 104, h: 88)
+                ZoneLabel(name: "Tide Pool", subtitle: "Find the number", scale: s)
+                    .stage(x: 142, y: 400, w: 0, h: 0)
+
+                // Coral Reef: the picked sister floats on the coral
+                Button(action: { onDive(.coralReef) }) {
+                    Color.clear.contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .stage(x: 306, y: 90, w: 262, h: 436)
+                GlowPulse(t: t, delay: -0.8)
+                    .stage(x: 320, y: 374, w: 234, h: 100)
+                SisterView(spec: child.puppet, t: t, scale: s)
+                    .frame(width: 158 * s, height: 181 * s)
+                    .allowsHitTesting(false)
+                    .stage(x: 358, y: 90, w: 158, h: 181)
+                ZoneLabel(name: "Coral Reef", subtitle: "Adding to 10", scale: s)
+                    .stage(x: 436, y: 468, w: 0, h: 0)
+
+                // Deep Sea: locked, no glow
+                ArtImage("ui/padlock.png")
+                    .shadow(color: Tokens.Palette.midnight.opacity(0.5), radius: 4 * s, y: 4 * s)
+                    .stage(x: 678, y: 408, w: 52, h: 67)
+                ZoneLabel(name: "Deep Sea", subtitle: "Counting by 2s and 5s", scale: s, locked: true)
+                    .stage(x: 700, y: 516, w: 0, h: 0)
+
                 Vignette()
                     .stage(x: 0, y: 0, w: 800, h: 600)
+                    .bleed()
+
+                // Title and switch
+                Button(action: onSwitchMermaid) {
+                    Text("Switch mermaid")
+                        .font(baloo(18, weight: 600, scale: s))
+                        .foregroundStyle(Tokens.Palette.midnight)
+                        .padding(.top, 7 * s)
+                        .padding(.bottom, 3 * s)
+                        .padding(.horizontal, 18 * s)
+                        .background(Capsule().fill(Tokens.Palette.pearl))
+                        .shadow(color: Tokens.Palette.midnight.opacity(0.28), radius: 7 * s, y: 6 * s)
+                }
+                .buttonStyle(.plain)
+                .stageTopLeft(x: 24, y: 24)
+
+                Text("Where shall we dive?")
+                    .font(baloo(24, weight: 700, scale: s))
+                    .foregroundStyle(Tokens.Palette.midnight)
+                    .padding(.top, 6 * s)
+                    .padding(.bottom, 2 * s)
+                    .padding(.horizontal, 24 * s)
+                    .background(Capsule().fill(Tokens.Palette.pearl))
+                    .shadow(color: Tokens.Palette.midnight.opacity(0.28), radius: 7 * s, y: 6 * s)
+                    .stageTopCenter(y: 24)
             }
-            .bleed()
-
-            Text("Where shall we dive?")
-                .font(baloo(Tokens.TypeScale.nameTag, weight: 700, scale: s))
-                .foregroundStyle(Tokens.Palette.midnight)
-                .padding(.top, 6 * s)
-                .padding(.bottom, 2 * s)
-                .padding(.horizontal, 22 * s)
-                .background(Capsule().fill(Tokens.Palette.pearl))
-                .shadow(color: Tokens.Palette.midnight.opacity(0.28), radius: 7 * s, y: 6 * s)
-                .stageTopLeft(x: 24, y: 26)
-
-            GoldButton(title: "Switch mermaid", scale: s, action: onSwitchMermaid)
-                .stageTopRight(right: 24, y: 24)
-
-            ZoneCircle(
-                name: "Tide Pool",
-                subtitle: "Find the number",
-                sample: "1 2 3",
-                ring: Color(hex: 0x8FE9DF),
-                highlighted: usual == .tidePool,
-                scale: s,
-                action: { onDive(.tidePool) }
-            )
-            .stage(x: 52, y: 150, w: 214, h: 214)
-
-            ZoneCircle(
-                name: "Coral Reef",
-                subtitle: "Adding to 10",
-                sample: "3 + 2",
-                ring: Tokens.Palette.goldfish,
-                highlighted: usual == .coralReef,
-                scale: s,
-                action: { onDive(.coralReef) }
-            )
-            .stage(x: 306, y: 242, w: 228, h: 228)
-
-            LockedZoneCircle(
-                name: "Deep Sea",
-                subtitle: "Counting by 2s and 5s",
-                scale: s
-            )
-            .stage(x: 568, y: 338, w: 186, h: 186)
         }
     }
 }
 
-private struct ZoneFill: View {
+/// One 11px pearl dot of the trail between places.
+private struct TrailDot: View {
+    let opacity: Double
+    let scale: CGFloat
+    var shadow = true
+
     var body: some View {
-        Circle().fill(
-            RadialGradient(
-                stops: [
-                    .init(color: Color.white.opacity(0.85), location: 0),
-                    .init(color: Color.white.opacity(0.14), location: 0.11),
-                    .init(color: Tokens.Palette.midnight.opacity(0.54), location: 0.38),
-                    .init(color: Tokens.Palette.midnight.opacity(0.68), location: 1),
-                ],
-                center: UnitPoint(x: 0.26, y: 0.17),
-                startRadius: 0,
-                endRadius: 150
-            )
+        Circle()
+            .fill(Tokens.Palette.pearl)
+            .shadow(color: shadow ? Tokens.Palette.midnight.opacity(0.35) : .clear, radius: 2 * scale, y: 2 * scale)
+            .opacity(opacity)
+    }
+}
+
+/// The two-line place pill, centered on its stage point. Locked places get the
+/// Midnight panel treatment instead of Pearl.
+private struct ZoneLabel: View {
+    let name: String
+    let subtitle: String
+    let scale: CGFloat
+    var locked = false
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Text(name)
+                .font(baloo(locked ? 22 : 24, weight: 700, scale: scale))
+                .foregroundStyle(locked ? Tokens.Palette.pearl : Tokens.Palette.midnight)
+            Text(subtitle)
+                .font(baloo(locked ? 14 : 15, weight: 500, scale: scale))
+                .foregroundStyle(locked ? Tokens.Palette.pearl.opacity(0.85) : Color(hex: 0x17617A))
+        }
+        .padding(.top, 7 * scale)
+        .padding(.bottom, 4 * scale)
+        .padding(.horizontal, (locked ? 18 : 20) * scale)
+        .background(
+            RoundedRectangle(cornerRadius: 22 * scale)
+                .fill(locked ? Color(hex: 0x061A33, opacity: 0.8) : Tokens.Palette.pearl)
         )
-    }
-}
-
-struct ZoneCircle: View {
-    let name: String
-    let subtitle: String
-    let sample: String
-    let ring: Color
-    let highlighted: Bool
-    let scale: CGFloat
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            ZStack {
-                ZoneFill()
-                Circle().strokeBorder(ring, lineWidth: 4 * scale)
-                VStack(spacing: 3 * scale) {
-                    Text(name)
-                        .font(baloo(30, weight: 700, scale: scale))
-                        .foregroundStyle(Tokens.Palette.pearl)
-                    Text(subtitle)
-                        .font(baloo(16, weight: 700, scale: scale))
-                        .foregroundStyle(Tokens.Palette.pearl)
-                    Text(sample)
-                        .font(baloo(42, weight: 700, scale: scale))
-                        .foregroundStyle(ring)
-                }
-                .shadow(color: Tokens.Palette.midnight.opacity(0.8), radius: 5 * scale, y: 2 * scale)
-            }
-            .shadow(color: ring.opacity(highlighted ? 0.85 : 0.45), radius: (highlighted ? 26 : 16) * scale)
-            .scaleEffect(highlighted ? 1.04 : 1)
-        }
-        .buttonStyle(.plain)
-    }
-}
-
-struct LockedZoneCircle: View {
-    let name: String
-    let subtitle: String
-    let scale: CGFloat
-
-    private let gold = Color(hex: 0xFFD27A)
-
-    var body: some View {
-        ZStack {
-            ZoneFill().opacity(0.85)
-            Circle()
-                .strokeBorder(style: StrokeStyle(lineWidth: 3 * scale, dash: [9 * scale, 7 * scale]))
-                .foregroundStyle(gold)
-            VStack(spacing: 3 * scale) {
-                LockGlyph(color: gold)
-                    .frame(width: 30 * scale, height: 30 * scale)
-                Text(name)
-                    .font(baloo(26, weight: 700, scale: scale))
-                    .foregroundStyle(gold)
-                Text(subtitle)
-                    .font(baloo(14, weight: 700, scale: scale))
-                    .foregroundStyle(Tokens.Palette.pearl)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 14 * scale)
-            }
-            .shadow(color: Tokens.Palette.midnight.opacity(0.8), radius: 5 * scale, y: 2 * scale)
-        }
-        .shadow(color: gold.opacity(0.35), radius: 14 * scale)
-    }
-}
-
-/// Simple padlock strokes (placeholder until a painted lock exists).
-struct LockGlyph: View {
-    let color: Color
-
-    var body: some View {
-        GeometryReader { geo in
-            let w = geo.size.width
-            let line = w * 0.09
-            ZStack {
-                RoundedRectangle(cornerRadius: w * 0.12)
-                    .stroke(color, lineWidth: line)
-                    .frame(width: w * 0.62, height: w * 0.42)
-                    .position(x: w / 2, y: w * 0.68)
-                Path { p in
-                    p.addArc(
-                        center: CGPoint(x: w / 2, y: w * 0.42),
-                        radius: w * 0.2,
-                        startAngle: .degrees(180),
-                        endAngle: .degrees(0),
-                        clockwise: false
-                    )
-                }
-                .stroke(color, style: StrokeStyle(lineWidth: line, lineCap: .round))
-            }
-        }
+        .shadow(color: Tokens.Palette.midnight.opacity(0.28), radius: 7 * scale, y: 6 * scale)
+        .fixedSize()
+        .frame(width: 0, height: 0, alignment: .top)
+        .allowsHitTesting(false)
     }
 }

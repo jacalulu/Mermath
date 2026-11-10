@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mermath: treasure chest</title>
+<!-- Static reference exported from the Mermath storyboard. Design space is 800x600. Open in a browser to see the layers and motion; scale the stage to fit the device in the real build. -->
+<style>@font-face{font-family:'Baloo 2';font-weight:500;font-display:swap;src:url(../../assets/fonts/baloo-2-latin-500.woff2) format('woff2')}@font-face{font-family:'Baloo 2';font-weight:600;font-display:swap;src:url(../../assets/fonts/baloo-2-latin-600.woff2) format('woff2')}@font-face{font-family:'Baloo 2';font-weight:700;font-display:swap;src:url(../../assets/fonts/baloo-2-latin-700.woff2) format('woff2')}</style>
+<style>
+body{margin:0}
+a{color:#061A33}a:hover{color:#061A33}
+@keyframes mmFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes mmHairL{from{transform:rotate(-1.6deg)}to{transform:rotate(1.8deg)}}
+@keyframes mmTail{from{transform:rotate(-2.5deg)}to{transform:rotate(2.5deg)}}
+@keyframes mmFluke{from{transform:rotate(-10deg)}to{transform:rotate(9deg)}}
+@keyframes mmArm{from{transform:rotate(-7deg)}to{transform:rotate(11deg)}}
+@keyframes mmOpen{0%,92%{opacity:1}94%,98%{opacity:0}100%{opacity:1}}
+@keyframes mmShut{0%,92%{opacity:0}94%,98%{opacity:1}100%{opacity:0}}
+@keyframes mmSwayFar{from{transform:skewX(-0.8deg)}to{transform:skewX(0.9deg)}}
+@keyframes mmSwayMid{from{transform:skewX(1.3deg)}to{transform:skewX(-1.4deg)}}
+@keyframes mmSwayLeft{from{transform:skewX(-1.7deg)}to{transform:skewX(1.3deg)}}
+@keyframes mmSwayRight{from{transform:skewX(1.5deg)}to{transform:skewX(-1.4deg)}}
+@keyframes mmGrass{from{transform:skewX(-7deg)}to{transform:skewX(7deg)}}
+@keyframes mmRise{0%{transform:translate(0,0);opacity:0}8%{opacity:.9}50%{transform:translate(9px,-300px)}92%{opacity:.8}100%{transform:translate(-4px,-640px);opacity:0}}
+@keyframes mmLight{from{opacity:.05}to{opacity:.45}}
+@keyframes mmGlow{from{opacity:.45;transform:scale(.94)}to{opacity:1;transform:scale(1.05)}}
+@keyframes mmLamp{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-10px) rotate(5deg)}}
+@keyframes mmTwinkle{0%,100%{opacity:0;transform:scale(.4) rotate(0deg)}50%{opacity:1;transform:scale(1) rotate(45deg)}}
+@media (prefers-reduced-motion: no-preference){
+.mm-float1{animation:mmFloat 3.6s ease-in-out infinite}
+.mm-hairL{animation:mmHairL 3s ease-in-out infinite alternate}
+.mm-tail1{animation:mmTail 2.4s ease-in-out infinite alternate}
+.mm-fluke1{animation:mmFluke 1.2s ease-in-out infinite alternate}
+.mm-arm1{animation:mmArm 1.1s ease-in-out infinite alternate}
+.mm-open1{animation:mmOpen 4.4s linear infinite}.mm-shut1{animation:mmShut 4.4s linear infinite}
+.mm-swayFar{animation:mmSwayFar 7s ease-in-out infinite alternate}
+.mm-swayMid{animation:mmSwayMid 6s ease-in-out infinite alternate}
+.mm-swayLeft{animation:mmSwayLeft 5s ease-in-out infinite alternate}
+.mm-swayRight{animation:mmSwayRight 5.6s ease-in-out infinite alternate}
+.mm-grass{animation:mmGrass 2.8s ease-in-out infinite alternate}
+.mm-rise1{animation:mmRise 9s linear infinite}
+.mm-rise2{animation:mmRise 12s linear 3s infinite}
+.mm-light{animation:mmLight 4.5s ease-in-out infinite alternate}
+.mm-glow{animation:mmGlow 1.8s ease-in-out infinite alternate}
+.mm-lamp{animation:mmLamp 3.4s ease-in-out infinite}
+.mm-tw1{animation:mmTwinkle 2.2s ease-in-out infinite}.mm-tw2{animation:mmTwinkle 2.6s ease-in-out .7s infinite}.mm-tw3{animation:mmTwinkle 2s ease-in-out 1.2s infinite}.mm-tw4{animation:mmTwinkle 2.8s ease-in-out .3s infinite}.mm-tw5{animation:mmTwinkle 2.4s ease-in-out 1.6s infinite}
+}
+</style>
+<style>html,body{height:100%}body{display:grid;place-items:center;background:#061A33}</style>
+</head>
+<body>
+<div style="width: 800px; height: 600px; box-sizing: border-box; position: relative; overflow: hidden; background: #167C9B; font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif; color: #FFF4DC">
+<img src="../../assets/scenes/treasure-chest/bg.jpg" alt="A painted kelp clearing with warm light rising from the middle" style="position: absolute; left: 0; top: 0; width: 800px; height: 600px; object-fit: cover">
+<div class="mm-light" aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 800px; height: 340px; background: radial-gradient(ellipse at 38% 0%, rgba(255,255,255,0.6), rgba(255,255,255,0) 68%); opacity: 0.2"></div>
+<img class="mm-swayFar" src="../../assets/scenes/treasure-chest/kelp-far.webp" alt="" style="position: absolute; left: 126px; top: 0; width: 640px; height: 600px; max-width: none; opacity: 0.75; filter: blur(1px); transform-origin: 50% 100%">
+<img class="mm-swayMid" src="../../assets/scenes/treasure-chest/kelp-mid.webp" alt="" style="position: absolute; left: 36px; top: 0; width: 720px; height: 600px; max-width: none; transform-origin: 50% 100%">
+<img class="mm-swayLeft" src="../../assets/scenes/home/kelp-left.webp" alt="" style="position: absolute; left: 0; top: 0; width: 260px; height: 600px; max-width: none; transform-origin: 0% 100%">
+<img class="mm-swayRight" src="../../assets/scenes/home/kelp-right.webp" alt="" style="position: absolute; left: 540px; top: 0; width: 260px; height: 600px; max-width: none; transform-origin: 100% 100%">
+<img src="../../assets/scenes/treasure-chest/foreground.webp" alt="" style="position: absolute; left: 0; top: 442px; width: 800px; height: 158px; max-width: none">
+<img class="mm-grass" src="../../assets/scenes/treasure-chest/seagrass.png" alt="" style="position: absolute; left: 146px; top: 532px; width: 518px; height: 66px; max-width: none; transform-origin: 50% 100%">
+<img class="mm-rise1" src="../../assets/props/bubble.png" alt="" style="position: absolute; left: 596px; top: 560px; width: 28px; height: 28px; max-width: none; opacity: 0">
+<img class="mm-rise2" src="../../assets/props/bubble.png" alt="" style="position: absolute; left: 250px; top: 580px; width: 22px; height: 22px; max-width: none; opacity: 0">
+<span aria-hidden="true" class="mm-glow" style="position: absolute; left: 240px; top: 190px; width: 320px; height: 300px; border-radius: 50%; background: radial-gradient(circle at 50% 60%, rgba(255,233,168,0.85), rgba(255,210,122,0.35) 45%, rgba(255,210,122,0) 70%)"></span>
+<img src="../../assets/scenes/treasure-chest/chest-lid.png" alt="" style="position: absolute; left: 284px; top: 244px; width: 232px; height: 144px; max-width: none">
+<img src="../../assets/scenes/treasure-chest/chest-box.png" alt="An open treasure chest full of gold coins and pearls" style="position: absolute; left: 282px; top: 330px; width: 236px; height: 152px; max-width: none">
+<span class="mm-lamp" style="position: absolute; left: 334px; top: 98px; width: 132px; height: 128px; display: block">
+<span aria-hidden="true" class="mm-glow" style="position: absolute; left: -24px; top: -26px; width: 180px; height: 180px; border-radius: 50%; background: radial-gradient(circle, rgba(255,233,168,0.9), rgba(255,224,138,0) 68%)"></span>
+<img src="../../assets/scenes/treasure-chest/starfish-lamp.png" alt="A smiling starfish lamp" style="position: absolute; left: 0; top: 0; width: 132px; height: 128px; max-width: none">
+<img src="../../assets/scenes/treasure-chest/starfish-lamp-face.png" alt="" style="position: absolute; left: 46px; top: 58px; width: 40px; height: 32px; max-width: none">
+</span>
+<svg aria-hidden="true" class="mm-tw1" viewBox="0 0 20 20" style="position: absolute; left: 258px; top: 286px; width: 22px; height: 22px"><path d="M10 0 L12 8 L20 10 L12 12 L10 20 L8 12 L0 10 L8 8 Z" fill="#FFF4DC"></path></svg>
+<svg aria-hidden="true" class="mm-tw2" viewBox="0 0 20 20" style="position: absolute; left: 528px; top: 302px; width: 18px; height: 18px"><path d="M10 0 L12 8 L20 10 L12 12 L10 20 L8 12 L0 10 L8 8 Z" fill="#FFF4DC"></path></svg>
+<svg aria-hidden="true" class="mm-tw3" viewBox="0 0 20 20" style="position: absolute; left: 486px; top: 132px; width: 20px; height: 20px"><path d="M10 0 L12 8 L20 10 L12 12 L10 20 L8 12 L0 10 L8 8 Z" fill="#FFF4DC"></path></svg>
+<svg aria-hidden="true" class="mm-tw4" viewBox="0 0 20 20" style="position: absolute; left: 304px; top: 150px; width: 16px; height: 16px"><path d="M10 0 L12 8 L20 10 L12 12 L10 20 L8 12 L0 10 L8 8 Z" fill="#FFF4DC"></path></svg>
+<svg aria-hidden="true" class="mm-tw5" viewBox="0 0 20 20" style="position: absolute; left: 392px; top: 318px; width: 16px; height: 16px"><path d="M10 0 L12 8 L20 10 L12 12 L10 20 L8 12 L0 10 L8 8 Z" fill="#FFFFFF"></path></svg>
+<span class="mm-float1" style="position: absolute; left: 22px; top: 190px; width: 230px; height: 264px; display: block">
+<img class="mm-hairL" src="../../assets/characters/ophelia/hair.png" alt="" style="position: absolute; left: 0; top: 0; width: 230px; height: 264px; max-width: none; transform-origin: 48.5% 35.9%">
+<span class="mm-tail1" style="position: absolute; left: 0; top: 0; width: 230px; height: 264px; display: block; transform-origin: 48.5% 61.5%">
+<img class="mm-fluke1" src="../../assets/characters/ophelia/fluke.png" alt="" style="position: absolute; left: 0; top: 0; width: 230px; height: 264px; max-width: none; transform-origin: 72.5% 84.6%">
+<img src="../../assets/characters/ophelia/tail.png" alt="" style="position: absolute; left: 0; top: 0; width: 230px; height: 264px; max-width: none">
+</span>
+<img class="mm-arm1" src="../../assets/characters/ophelia/arm.png" alt="" style="position: absolute; left: 0; top: 0; width: 230px; height: 264px; max-width: none; transform-origin: 42.1% 51.8%">
+<img src="../../assets/characters/ophelia/body.png" alt="Ophelia the mermaid, cheering" style="position: absolute; left: 0; top: 0; width: 230px; height: 264px; max-width: none">
+<img class="mm-open1" src="../../assets/characters/ophelia/eyes-open.png" alt="" style="position: absolute; left: 0; top: 0; width: 230px; height: 264px; max-width: none">
+<img class="mm-shut1" src="../../assets/characters/ophelia/eyes-shut.png" alt="" style="position: absolute; left: 0; top: 0; width: 230px; height: 264px; max-width: none; opacity: 0">
+</span>
+<div aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 800px; height: 600px; background: radial-gradient(ellipse at 50% 45%, rgba(2,8,20,0) 55%, rgba(2,8,20,0.32) 100%); pointer-events: none"></div>
+<a href="reef-map.html" aria-label="Back to the map" style="position: absolute; left: 22px; top: 20px; width: 66px; height: 66px; display: block">
+<img src="../../assets/ui/icon-map.png" alt="" style="width: 66px; height: 66px; filter: drop-shadow(0 5px 8px rgba(6,26,51,0.4))">
+</a>
+<div style="position: absolute; left: 0; right: 0; top: 26px; display: flex; justify-content: center; pointer-events: none">
+<span style="background: #FFF4DC; color: #061A33; border-radius: 999px; padding: 7px 26px 3px; font-weight: 700; font-size: 26px; line-height: 1.2; box-shadow: 0 6px 14px rgba(6,26,51,0.28)">10 pearls! The chest is open.</span>
+</div>
+<div style="position: absolute; left: 0; right: 0; bottom: 24px; display: flex; justify-content: center">
+<div style="display: flex; align-items: center; gap: 18px; background: rgba(6,26,51,0.8); border-radius: 999px; padding: 10px 10px 10px 28px; box-shadow: 0 6px 14px rgba(6,26,51,0.28)">
+<span style="font-weight: 600; font-size: 25px; line-height: 1.1; padding-top: 3px; color: #FFF4DC">You earned a starfish lamp!</span>
+<a href="grotto.html" style="background: linear-gradient(180deg, #FFD27A, #FF9A3D); color: #061A33; text-decoration: none; font-weight: 700; font-size: 22px; line-height: 1.1; padding: 13px 24px 9px; border-radius: 999px">Put it in my grotto</a>
+</div>
+</div>
+</div>
+</body>
+</html>

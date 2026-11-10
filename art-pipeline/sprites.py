@@ -6,7 +6,8 @@ from paint import paint
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, 'out')
-ART = os.environ.get('MERMATH_ART', os.path.join(HERE, 'art-out'))
+ART = os.environ.get('MERMATH_ART') or os.path.join(HERE, 'painted')   # where finished art is written; set MERMATH_ART to change it
+os.makedirs(OUT, exist_ok=True); os.makedirs(ART, exist_ok=True)
 
 def bleed(bgr, alpha):
     idx = ndimage.distance_transform_edt(alpha <= 8, return_distances=False, return_indices=True)

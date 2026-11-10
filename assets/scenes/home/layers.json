@@ -1,0 +1,59 @@
+{
+  "designSpace": [
+    800,
+    600
+  ],
+  "order": "back to front",
+  "note": "x, y, w, h are in the 800x600 design space. Place every layer exactly here; do not eyeball positions.",
+  "layers": [
+    {
+      "file": "bg.jpg",
+      "x": 0,
+      "y": 0,
+      "w": 800,
+      "h": 600
+    },
+    {
+      "file": "kelp-far.webp",
+      "x": 100,
+      "y": 0,
+      "w": 650,
+      "h": 600
+    },
+    {
+      "file": "kelp-mid.webp",
+      "x": 0,
+      "y": 0,
+      "w": 800,
+      "h": 600
+    },
+    {
+      "file": "kelp-left.webp",
+      "x": 0,
+      "y": 0,
+      "w": 260,
+      "h": 600
+    },
+    {
+      "file": "kelp-right.webp",
+      "x": 540,
+      "y": 0,
+      "w": 260,
+      "h": 600
+    },
+    {
+      "file": "foreground.webp",
+      "x": 0,
+      "y": 440,
+      "w": 800,
+      "h": 160
+    },
+    {
+      "file": "seagrass.png",
+      "x": 0,
+      "y": 505,
+      "w": 800,
+      "h": 90
+    }
+  ]
+}

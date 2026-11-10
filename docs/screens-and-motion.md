@@ -8,7 +8,7 @@ All motion sits inside `@media (prefers-reduced-motion: no-preference)`. With re
 
 ## Screen 1: Pick your mermaid (locked)
 
-Reference: `reference/html/pick-your-mermaid.html`, `reference/screens/01-pick-your-mermaid-LOCKED.jpg`.
+Reference: `reference/html/pick-your-mermaid.html`, `reference/screens/01-pick-your-mermaid.jpg`.
 
 ### Layer order, back to front
 
@@ -60,7 +60,7 @@ Give each sister slightly different durations and start offsets so they never mo
 
 On Midnight backgrounds swap in `letters-pearl.png` and `tail-body-pearl.png`.
 
-## Screen 3: Tide Pool question (locked style frame)
+## Screen 3: Tide Pool dive
 
 Reference: `reference/html/tide-pool-question.html`, `tide-pool-hint.html`, `tide-pool-solved.html`.
 
@@ -107,8 +107,77 @@ The storyboard component (`reference/storyboard/StyleFrame.dc.html`, the `render
 - **Right tap.** The 4 turns gold and glows, the tenth pearl fills, and the panel changes to "You found four! That makes 10 pearls." with the "Open the chest" button.
 - **Replay.** Tapping the crab or the shell replays the spoken prompt and pops the speech bubble.
 
-## Screens 2, 4, 5, 6: not rebuilt yet
+## Screen 2: Reef map
 
-`reference/screens/*-old-style.jpg` and the matching files in `reference/storyboard/` show the content, the copy and a rough layout for the reef map, the Coral Reef dive, the treasure chest and the grotto. They use an earlier look (serif headings, glassy panels, single flat backgrounds, one-piece characters). Keep what is on them. Rebuild how they look to match the two locked screens: layered painted scenery that moves, Baloo 2, Pearl pills, painted icons, the spacing rules.
+Reference: `reference/html/reef-map.html`. Layers: `assets/scenes/reef-map/layers.json`.
 
-Their backgrounds and one-piece characters are in `assets/legacy/` so the old screens can be shown as they are until replaced. The countable shells for Coral Reef (`shell-orange.png`, `shell-teal.png`) are also there and need a painted version.
+One seabed steps down from the bright shallows on the left to the dark deep on the right, with a place on each step. The whole seabed, with its three places, is one static painted layer (`seabed.webp`).
+
+| Element | Where | Motion |
+|---|---|---|
+| Far kelp, mid kelp, seagrass | from `layers.json` | sway as on the other screens |
+| Fish x2 | high, tops 86 and 104, starting off screen right | swim left, 32s and 36s. They pass under the title and above the mermaid's head. |
+| Tide Pool (tappable area 256x252 at 14, 208) | the crab, 104x88, stands on the rock at 10, 216 | crab bobs 3px, waves, blinks. A soft Pearl glow pulses on the place (opacity .25 to .8, 1.6s). |
+| Coral Reef (tappable area 262x436 at 306, 90) | the chosen mermaid, 158x181, floats at 358, 90 | she floats, waves, swishes; the same glow pulses half a beat later |
+| Deep Sea (not tappable, 200x200 at 600, 380) | `ui/padlock.png`, 52x67, at 678, 408 | none. No glow. |
+| Pearl trail | four 11px Pearl dots between each pair of places | the open stretch twinkles in sequence (2s, 0.25s apart); the locked stretch sits still at 40% |
+| Place labels | two-line Pearl pills: name 700 24px, what you do there 500 15px in `#17617A`. Tops at 400, 468 and 516. | Deep Sea's label is a Midnight panel at 80% instead of Pearl, because it is locked. |
+| Title and switch | "Where shall we dive?" centered at top 24; "Switch mermaid" Pearl pill at 24, 24 | none |
+
+The mermaid shown is whichever sister was picked. In the storyboard it is Ophelia.
+
+## Screen 4: Coral Reef dive
+
+Reference: `reference/html/coral-reef-question.html`, `coral-reef-hint.html`, `coral-reef-solved.html`. Layers: `assets/scenes/coral-reef/layers.json`.
+
+It is the Tide Pool layout with a different scene and a sum in the speech bubble. Same crab, same position (15, 204), same map button, pearl counter, answer bubbles (140px, 26px apart, at 288, 240) and bottom panel.
+
+| Element | Where | Motion |
+|---|---|---|
+| Coral fans | `fan-left.webp`, `fan-right.webp`, from `layers.json` | skewX about their base: left -2.2 to 1.8deg, 4.6s; right 1.9 to -2deg, 5.2s. The right fan is kept short so it never reaches the answers. |
+| Fish x3 | low, tops 438 to 456 | swim left behind the rocks, 30 to 34s, staggered |
+| Sea stars | 404, 458, 58px and 512, 470, 46px | rock and hop, clear of the bottom panel |
+| Speech bubble | Pearl, at 196, 88 | pops on replay |
+| The sum | inside the bubble: shell button, then `3 + 2 =` in Baloo 2 700, 60px, with painted shells above each number (46x37, three `props/shell-orange.png`, two `props/shell-teal.png`) | none |
+| Answer slot | a 60px circle with a 3px dashed Midnight ring after the equals sign | when solved it becomes a small gold bubble showing 5 |
+
+States:
+
+- **Wrong tap.** That bubble fades to 45%. The panel reads "Count all the shells: 1, 2, 3 and then 4, 5", with "1, 2, 3" in soft orange and "4, 5" in soft teal to match the shells.
+- **Right tap.** The 5 turns gold, the slot fills, the tenth pearl fills, and the panel reads "3 and 2 make 5! That makes 10 pearls." with "Open the chest".
+
+The shells are meant to fade out as she gets faster. That rule is not designed yet (see `open-questions.md`).
+
+## Screen 5: Treasure chest
+
+Reference: `reference/html/treasure-chest.html`. Layers: `assets/scenes/treasure-chest/layers.json`. The side kelp is shared with the home scene (`scenes/home/kelp-left.webp` at 0, 0, 260x600 and `kelp-right.webp` at 540, 0, 260x600).
+
+| Element | Where | Motion |
+|---|---|---|
+| Warm glow | a 320x300 radial gold glow behind the chest at 240, 190 | pulses, opacity .45 to 1, 1.8s |
+| Chest | `chest-lid.png` behind, `chest-box.png` in front, from `layers.json` | none |
+| The new item | `starfish-lamp.png` with `starfish-lamp-face.png` on top, in one wrapper at 334, 98 with its own small glow | floats up 10px and tilts -5 to 5deg, 3.4s |
+| Twinkles x5 | small four-point Pearl stars around the chest and lamp | fade and turn, 2 to 2.8s, staggered |
+| The mermaid | 230x264 at 22, 190 | as on the pick screen, waving a little faster (1.1s) |
+| Title | "10 pearls! The chest is open." Pearl pill, 700 26px, centered at top 26 | none |
+| Bottom panel | "You earned a starfish lamp!" and the orange "Put it in my grotto" button | none |
+
+There is no pearl counter here; the title says it.
+
+## Screen 6: My grotto
+
+Reference: `reference/html/grotto.html`. Layers: `assets/scenes/grotto/layers.json`. Light comes from the cave mouth at the top centre, not the upper left.
+
+| Element | Where | Motion |
+|---|---|---|
+| Floor and walls | from `layers.json` | none |
+| Kelp curtain | `kelp-curtain.webp` | skewX -2.4 to 2.2deg, 4.2s, pivot at its top (50% 0%) |
+| String lights | `string-lights.png` | twinkle, opacity .72 to 1, 1.7s |
+| Starfish lamp | hangs on a 2.5px cord from the top centre; lamp, face and glow share one 180x240 wrapper at 310, 0 | the wrapper swings -3.5 to 3.5deg, 3.2s, pivot at the top centre |
+| Shell bed | `shell-bed.png` | none |
+| The mermaid | 226x259 at 118, 226 | as on the pick screen |
+| Empty slots | 92px circles with a 3px dashed Pearl ring on a Midnight wash at 46%: "Next dive", "2 more dives", "3 more dives" | none |
+| Tags | orange "New! Starfish lamp" under the lamp; small Pearl pills "Kelp curtain" and "Shell bed" | none |
+| Title and button | "My grotto" Pearl pill at 24, 24; orange "Dive again" at the top right | none |
+
+A dashed Pearl ring always means "empty, something goes here", the same as an empty pearl in the counter.

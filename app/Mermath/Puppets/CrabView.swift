@@ -6,6 +6,9 @@ struct CrabView: View {
     let t: Double
     /// Stage scale, for the bob offset.
     let scale: CGFloat
+    /// The reef map's small crab blinks a touch slower and bobs less.
+    var blinkCycle = 4.4
+    var bobTo: Double = -5
 
     var body: some View {
         ZStack {
@@ -23,11 +26,11 @@ struct CrabView: View {
                     )
                 ArtImage("characters/crab/body.png")
                 ArtImage("characters/crab/eyes-open.png")
-                    .opacity(1 - Wave.blink(t, cycle: 4.4))
+                    .opacity(1 - Wave.blink(t, cycle: blinkCycle))
                 ArtImage("characters/crab/eyes-shut.png")
-                    .opacity(Wave.blink(t, cycle: 4.4))
+                    .opacity(Wave.blink(t, cycle: blinkCycle))
             }
-            .offset(y: Wave.bob(t, from: 0, to: -5, duration: 3.2) * scale)
+            .offset(y: Wave.bob(t, from: 0, to: bobTo, duration: 3.2) * scale)
         }
     }
 }

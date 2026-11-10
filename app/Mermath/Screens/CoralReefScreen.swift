@@ -1,7 +1,9 @@
 import SwiftUI
 
-/// Coral Reef: adding to 10, with countable shells above each addend that fade
-/// as she gets quicker.
+/// Coral Reef: adding to 10. The Tide Pool layout with a reef scene, the sum
+/// in the speech bubble (painted shells over each addend, a dashed slot after
+/// the equals), and a colored counting hint. Ported from
+/// reference/html/coral-reef-*.html.
 struct CoralReefScreen: View {
     let dive: DiveSession
     var onOpenChest: () -> Void = {}
@@ -11,63 +13,105 @@ struct CoralReefScreen: View {
 
     var body: some View {
         let s = m.scale
-        ZStack {
-            Group {
-                ArtImage("scenes/coral-reef/bg.jpg")
-                    .stage(x: 0, y: 0, w: 800, h: 600)
+        MotionClock { t in
+            ZStack {
+                // Scenery behind the crab (bleeds to the physical edges)
+                Group {
+                    ArtImage("scenes/coral-reef/bg.jpg")
+                        .stage(x: 0, y: 0, w: 800, h: 600)
+                    LightShimmer(t: t)
+                        .stage(x: 0, y: 0, w: 800, h: 340)
+                    KelpLayer(t: t, path: "scenes/coral-reef/kelp-far.png",
+                              from: -0.8, to: 0.9, duration: 7, pivot: UnitPoint(x: 0.5, y: 1))
+                        .opacity(0.75)
+                        .stage(x: 184, y: 0, w: 544, h: 600)
+                    FishSwim(t: t, travel: 920, bobDown: 6, bobUp: 7, duration: 30, scale: s)
+                        .stage(x: 820, y: 438, w: 44, h: 28)
+                    FishSwim(t: t, travel: 920, bobDown: 6, bobUp: 7, duration: 30, delay: 2.5, scale: s)
+                        .stage(x: 856, y: 456, w: 33, h: 21)
+                    FishSwim(t: t, travel: 920, bobDown: 6, bobUp: 7, duration: 34, delay: 14, scale: s)
+                        .stage(x: 830, y: 446, w: 38, h: 24)
+                    KelpLayer(t: t, path: "scenes/coral-reef/fan-left.png",
+                              from: -2.2, to: 1.8, duration: 4.6, pivot: UnitPoint(x: 0.5, y: 1))
+                        .stage(x: 0, y: 148, w: 90, h: 354)
+                    KelpLayer(t: t, path: "scenes/coral-reef/fan-right.png",
+                              from: 1.9, to: -2, duration: 5.2, pivot: UnitPoint(x: 0.78, y: 1))
+                        .stage(x: 718, y: 372, w: 82, h: 162)
+                    ArtImage("scenes/coral-reef/foreground.png")
+                        .stage(x: 0, y: 272, w: 800, h: 328)
+                    KelpLayer(t: t, path: "scenes/coral-reef/seagrass.png",
+                              from: -7, to: 7, duration: 2.8, pivot: UnitPoint(x: 0.5, y: 1))
+                        .stage(x: 296, y: 540, w: 246, h: 60)
+                    RockingStar(t: t)
+                        .stage(x: 404, y: 458, w: 58, h: 58)
+                    HoppingStar(t: t, scale: s)
+                        .stage(x: 512, y: 470, w: 46, h: 46)
+                    RisingBubble(t: t, duration: 9, scale: s)
+                        .stage(x: 258, y: 560, w: 30, h: 30)
+                    RisingBubble(t: t, duration: 12, delay: 3, scale: s)
+                        .stage(x: 766, y: 580, w: 24, h: 24)
+                    RisingBubble(t: t, duration: 15, delay: 6, scale: s)
+                        .stage(x: 46, y: 590, w: 20, h: 20)
+                }
+                .bleed()
+
+                // The crab: the whole puppet replays the prompt
+                Button(action: { dive.replay() }) {
+                    CrabView(t: t, scale: s)
+                }
+                .buttonStyle(.plain)
+                .stage(x: 15, y: 204, w: 250, h: 211)
+
                 Vignette()
                     .stage(x: 0, y: 0, w: 800, h: 600)
-            }
-            .bleed()
+                    .bleed()
 
-            MapButton(scale: s, action: onMap)
-                .stage(x: 22, y: 20, w: 66, h: 66)
-            PearlCounter(filled: dive.pearls, scale: s)
-                .stageTopRight(right: 24, y: 26)
+                // Controls (inside the guaranteed 800x600)
+                MapButton(scale: s, action: onMap)
+                    .stage(x: 22, y: 20, w: 66, h: 66)
+                PearlCounter(filled: dive.pearls, scale: s)
+                    .stageTopRight(right: 24, y: 26)
+                SpeechBubbleTail()
+                    .stage(x: 180, y: 184, w: 70, h: 54)
 
-            if case let .addition(a, b, showShells) = dive.question.presentation {
-                EquationPanel(
-                    a: a, b: b,
-                    answer: dive.solved ? dive.question.target : nil,
-                    showShells: showShells,
-                    scale: s,
-                    replay: { dive.replay() }
-                )
-                .stageTopCenter(y: 100)
-            }
-
-            HStack(spacing: Tokens.Space.answerGap * s) {
-                ForEach(dive.question.choices, id: \.self) { n in
-                    AnswerBubble(
-                        number: n,
-                        state: bubbleState(for: n),
+                if case let .addition(a, b, showShells) = dive.question.presentation {
+                    ReefSpeechBubble(
+                        a: a, b: b,
+                        answer: dive.solved ? dive.question.target : nil,
+                        showShells: showShells,
                         scale: s,
-                        tap: { dive.answer(n) }
+                        popTrigger: dive.popTrigger,
+                        replay: { dive.replay() }
                     )
+                    .stageTopLeft(x: 196, y: 88)
                 }
-            }
-            .stageTopCenter(y: 300)
 
-            if dive.diveComplete {
-                SolvedPanel(
-                    text: dive.solvedText,
-                    buttonTitle: "Open the chest",
-                    scale: s,
-                    action: onOpenChest
-                )
-                .stageBottomCenter(bottom: 24)
-                .transition(.opacity)
-            } else if dive.showHint, case let .addition(a, b, _) = dive.question.presentation {
-                Text("Count all the shells: \(countText(a, b))")
-                    .font(baloo(Tokens.TypeScale.panel, weight: 600, scale: s))
-                    .foregroundStyle(Tokens.Palette.pearl)
-                    .padding(.top, 3 * s)
-                    .padding(.vertical, 12 * s)
-                    .padding(.horizontal, 26 * s)
-                    .background(Capsule().fill(Tokens.Palette.panel))
-                    .shadow(color: Tokens.Palette.midnight.opacity(0.28), radius: 7 * s, y: 6 * s)
+                HStack(spacing: Tokens.Space.answerGap * s) {
+                    ForEach(dive.question.choices, id: \.self) { n in
+                        AnswerBubble(
+                            number: n,
+                            state: bubbleState(for: n),
+                            scale: s,
+                            tap: { dive.answer(n) }
+                        )
+                    }
+                }
+                .stageTopLeft(x: 288, y: 240)
+
+                if dive.diveComplete {
+                    SolvedPanel(
+                        text: dive.solvedText,
+                        buttonTitle: "Open the chest",
+                        scale: s,
+                        action: onOpenChest
+                    )
                     .stageBottomCenter(bottom: 24)
                     .transition(.opacity)
+                } else if dive.showHint, case let .addition(a, b, _) = dive.question.presentation {
+                    ReefHintPanel(a: a, b: b, scale: s)
+                        .stageBottomCenter(bottom: 24)
+                        .transition(.opacity)
+                }
             }
         }
     }
@@ -77,81 +121,140 @@ struct CoralReefScreen: View {
         if dive.faded.contains(n) { return .faded }
         return .normal
     }
-
-    private func countText(_ a: Int, _ b: Int) -> String {
-        let first = (1...a).map(String.init).joined(separator: ", ")
-        let rest = ((a + 1)...(a + b)).map(String.init).joined(separator: ", ")
-        return "\(first) and then \(rest)"
-    }
 }
 
-/// The sum with countable shells over each addend and a gold answer box.
-struct EquationPanel: View {
+/// The sum in the speech bubble: shell replay button, countable painted shells
+/// over each addend, and a dashed answer slot that turns gold when solved.
+struct ReefSpeechBubble: View {
     let a: Int
     let b: Int
     let answer: Int?
     let showShells: Bool
     let scale: CGFloat
+    let popTrigger: Int
     let replay: () -> Void
 
     var body: some View {
-        HStack(alignment: .bottom, spacing: 20 * scale) {
+        HStack(alignment: .bottom, spacing: 14 * scale) {
+            Button(action: replay) {
+                ArtImage("ui/icon-shell.png")
+                    .frame(width: 82 * scale, height: 70 * scale)
+            }
+            .buttonStyle(.plain)
+            .padding(.bottom, 2 * scale)
             addend(a, shell: "props/shell-orange.png")
             op("+")
             addend(b, shell: "props/shell-teal.png")
             op("=")
-            Text(answer.map(String.init) ?? "?")
-                .font(baloo(64, weight: 700, scale: scale))
-                .foregroundStyle(Tokens.Palette.midnight)
-                .frame(minWidth: 76 * scale)
-                .padding(.horizontal, 12 * scale)
-                .background(
-                    RoundedRectangle(cornerRadius: 18 * scale)
-                        .fill(Tokens.Gradients.button)
-                )
-                .shadow(color: Color(hex: 0xFFAA50, opacity: 0.8), radius: 11 * scale)
-            Button(action: replay) {
-                ArtImage("ui/icon-shell.png")
-                    .frame(width: 62 * scale, height: 53 * scale)
-            }
-            .buttonStyle(.plain)
-            .padding(.bottom, 6 * scale)
+            slot
         }
-        .padding(.vertical, 14 * scale)
-        .padding(.horizontal, 30 * scale)
+        .padding(.top, 8 * scale)
+        .padding(.bottom, 6 * scale)
+        .padding(.leading, 12 * scale)
+        .padding(.trailing, 24 * scale)
         .background(
-            RoundedRectangle(cornerRadius: 32 * scale)
-                .fill(Tokens.Palette.panel)
+            RoundedRectangle(cornerRadius: Tokens.Radius.speechBubble * scale)
+                .fill(Tokens.Palette.pearl)
         )
         .shadow(color: Tokens.Palette.midnight.opacity(0.28), radius: 11 * scale, y: 10 * scale)
+        .keyframeAnimator(initialValue: 1.0, trigger: popTrigger) { content, value in
+            content.scaleEffect(value)
+        } keyframes: { _ in
+            KeyframeTrack {
+                LinearKeyframe(1.06, duration: 0.2, timingCurve: .easeOut)
+                LinearKeyframe(1.0, duration: 0.3, timingCurve: .easeOut)
+            }
+        }
     }
 
     private func addend(_ n: Int, shell: String) -> some View {
-        // Shells shrink as the addend grows so the row never squeezes the
-        // operators into clipping.
-        let w = min(32 * scale, 180 * scale / CGFloat(n))
-        return VStack(spacing: 4 * scale) {
+        // Shells shrink a little when an addend is wide, so the bubble
+        // never pushes past the stage; the reference's 46x37 is the norm.
+        let w = min(46 * scale, 240 * scale / CGFloat(n))
+        return VStack(spacing: 0) {
             if showShells {
-                HStack(spacing: 4 * scale) {
+                HStack(spacing: 3 * scale) {
                     ForEach(0..<n, id: \.self) { _ in
                         ArtImage(shell)
-                            .frame(width: w, height: w * 0.89)
+                            .frame(width: w, height: w * 0.8)
                     }
                 }
                 .transition(.opacity)
             }
             Text("\(n)")
-                .font(baloo(64, weight: 700, scale: scale))
-                .foregroundStyle(Tokens.Palette.pearl)
+                .font(baloo(60, weight: 700, scale: scale))
+                .foregroundStyle(Tokens.Palette.midnight)
                 .fixedSize()
         }
     }
 
     private func op(_ symbol: String) -> some View {
         Text(symbol)
-            .font(baloo(56, weight: 700, scale: scale))
-            .foregroundStyle(Color(hex: 0xBFEFEA))
+            .font(baloo(44, weight: 700, scale: scale))
+            .foregroundStyle(Color(hex: 0x17617A))
             .fixedSize()
-            .padding(.bottom, 2 * scale)
+            .padding(.bottom, 4 * scale)
+    }
+
+    @ViewBuilder private var slot: some View {
+        if let answer {
+            Text("\(answer)")
+                .font(baloo(42, weight: 700, scale: scale))
+                .foregroundStyle(Tokens.Palette.midnight)
+                .frame(width: 60 * scale, height: 60 * scale)
+                .background(
+                    Circle().fill(
+                        RadialGradient(
+                            stops: [
+                                .init(color: Tokens.Palette.pearl, location: 0),
+                                .init(color: Color(hex: 0xFFD27A), location: 0.42),
+                                .init(color: Color(hex: 0xFF9A3D), location: 1),
+                            ],
+                            center: UnitPoint(x: 0.32, y: 0.24),
+                            startRadius: 0,
+                            endRadius: 60 * scale
+                        )
+                    )
+                )
+                .overlay(Circle().stroke(Color.white, lineWidth: 3 * scale))
+                .shadow(color: Color(hex: 0xFFD27A, opacity: 0.95), radius: 9 * scale)
+                .padding(.bottom, 4 * scale)
+        } else {
+            Circle()
+                .strokeBorder(style: StrokeStyle(lineWidth: 3 * scale, dash: [8 * scale, 6 * scale]))
+                .foregroundStyle(Tokens.Palette.midnight.opacity(0.4))
+                .frame(width: 60 * scale, height: 60 * scale)
+                .padding(.bottom, 4 * scale)
+        }
+    }
+}
+
+/// "Count all the shells: 1, 2, 3 and then 4, 5" with each run colored to
+/// match its shells (soft orange, then soft teal).
+struct ReefHintPanel: View {
+    let a: Int
+    let b: Int
+    let scale: CGFloat
+
+    var body: some View {
+        HStack(spacing: 12 * scale) {
+            Text("Count all the shells:")
+                .font(baloo(24, weight: 600, scale: scale))
+                .foregroundStyle(Tokens.Palette.pearl)
+            Text((1...a).map(String.init).joined(separator: ", "))
+                .font(baloo(24, weight: 700, scale: scale))
+                .foregroundStyle(Color(hex: 0xFFB267))
+            Text("and then")
+                .font(baloo(24, weight: 600, scale: scale))
+                .foregroundStyle(Tokens.Palette.pearl)
+            Text(((a + 1)...(a + b)).map(String.init).joined(separator: ", "))
+                .font(baloo(24, weight: 700, scale: scale))
+                .foregroundStyle(Color(hex: 0x8FE9DF))
+        }
+        .padding(.top, 15 * scale)
+        .padding(.bottom, 12 * scale)
+        .padding(.horizontal, 28 * scale)
+        .background(Capsule().fill(Tokens.Palette.panel))
+        .shadow(color: Tokens.Palette.midnight.opacity(0.28), radius: 7 * scale, y: 6 * scale)
     }
 }

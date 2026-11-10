@@ -124,7 +124,7 @@
     "n2": {
       "fill": "teal",
       "size": 40,
-      "text": "2. Reef map\nThree zones by level. The twins start in Tide Pool, big sister in Coral Reef. Deep Sea unlocks once addition is quick.\n\nOpen question: can a kid wander into any zone, or only her own?",
+      "text": "2. Reef map (locked look)\nOne painted seabed that steps down from the bright shallows to the dark deep, with a place on each step. The crab waits at the Tide Pool, her mermaid floats over the Coral Reef, and the Deep Sea is padlocked. A trail of pearls shows the way, and the two open places glow softly.\n\nPress Play to see it move. Open question: can a kid wander into any zone, or only her own?",
       "w": 800,
       "x": 880,
       "y": 640
@@ -132,7 +132,7 @@
     "n3": {
       "fill": "orange",
       "size": 40,
-      "text": "3a. Tide Pool dive (twins)\nThe crab says the number out loud. Tap the matching bubble. A wrong tap shows dots to count, never a penalty.\n\nPress Play on this frame to try it.",
+      "text": "3a. Tide Pool dive (twins, locked look)\nThis is the locked style frame. The crab says the number out loud. Tap the matching bubble. A wrong tap shows dots to count, never a penalty.\n\nPress Play on this frame to try it.",
       "w": 800,
       "x": 1760,
       "y": 640
@@ -140,7 +140,7 @@
     "n4": {
       "fill": "orange",
       "size": 40,
-      "text": "3b. Coral Reef dive (addition)\nShells on screen can be counted. They fade out as she gets faster. No timer, no lives.\n\nPress Play on this frame to try it.",
+      "text": "3b. Coral Reef dive (addition, locked look)\nThe same crab asks the sum. Painted shells sit above each number so she can count them: three orange, two teal. They fade out as she gets faster. A wrong tap counts on across both groups. No timer, no lives.\n\nPress Play on this frame to try it.",
       "w": 800,
       "x": 0,
       "y": 1740
@@ -148,7 +148,7 @@
     "n5": {
       "fill": "purple",
       "size": 40,
-      "text": "4. Treasure chest\nTen pearls fill the shell and the chest opens with one new item for her grotto.\n\nOpen question: is the reward a surprise, or does she pick from three?",
+      "text": "4. Treasure chest (locked look)\nTen pearls and the chest opens in a kelp clearing. The new item floats up out of it, glowing, and her mermaid waves.\n\nPress Play to see it move. Open question: is the reward a surprise, or does she pick from three?",
       "w": 800,
       "x": 880,
       "y": 1740
@@ -156,7 +156,7 @@
     "n6": {
       "fill": "purple",
       "size": 40,
-      "text": "5. My grotto\nShe places what she earned. Empty spots show what is still to come. This is the reason to come back tomorrow.\n\nOpen question: decorating, collecting sea pets, or a story?",
+      "text": "5. My grotto (locked look)\nA sea cave looking out at the sunlit water. The string lights twinkle, the starfish lamp swings and the kelp curtain sways. Dashed rings mark what is still to come. This is the reason to come back tomorrow.\n\nPress Play to see it move. Open question: decorating, collecting sea pets, or a story?",
       "w": 800,
       "x": 1760,
       "y": 1740

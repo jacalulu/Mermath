@@ -4,6 +4,8 @@ import SwiftUI
 /// white 0.6 fading out by 68%, with its opacity breathing 0.05 -> 0.45 over 4.5s.
 struct LightShimmer: View {
     let t: Double
+    var center = UnitPoint(x: 0.38, y: 0)
+    var maxOpacity = 0.45
 
     var body: some View {
         EllipticalGradient(
@@ -11,12 +13,73 @@ struct LightShimmer: View {
                 .init(color: Color.white.opacity(0.6), location: 0),
                 .init(color: Color.white.opacity(0), location: 0.68),
             ],
-            center: UnitPoint(x: 0.38, y: 0),
+            center: center,
             startRadiusFraction: 0,
             endRadiusFraction: 0.9
         )
-        .opacity(Wave.alternate(t, from: 0.05, to: 0.45, duration: 4.5))
+        .opacity(Wave.alternate(t, from: 0.05, to: maxOpacity, duration: 4.5))
         .allowsHitTesting(false)
+    }
+}
+
+/// A soft Pearl-gold glow that breathes: the map's place glows (.25 -> .8,
+/// 1.6s) and the chest and lamp glows (.45 -> 1, 1.8s), per the reference CSS.
+struct GlowPulse: View {
+    let t: Double
+    var color = Color(hex: 0xFFF4DC)
+    var fromOpacity = 0.25
+    var toOpacity = 0.8
+    var duration = 1.6
+    var delay: Double = 0
+
+    var body: some View {
+        EllipticalGradient(
+            stops: [
+                .init(color: color.opacity(0.85), location: 0),
+                .init(color: color.opacity(0), location: 0.68),
+            ],
+            center: .center,
+            startRadiusFraction: 0,
+            endRadiusFraction: 0.5
+        )
+        .scaleEffect(Wave.alternate(t, from: 0.94, to: 1.05, duration: duration, delay: delay))
+        .opacity(Wave.alternate(t, from: fromOpacity, to: toOpacity, duration: duration, delay: delay))
+        .allowsHitTesting(false)
+    }
+}
+
+/// A four-point Pearl star that fades in, turns 45deg and fades out
+/// (the treasure chest's twinkles).
+struct TwinkleStar: View {
+    let t: Double
+    let duration: Double
+    var delay: Double = 0
+    var color = Color(hex: 0xFFF4DC)
+
+    var body: some View {
+        let frac = Wave.cycleFraction(t, duration: duration, delay: delay) ?? 0
+        // 0% and 100%: opacity 0, scale .4, 0deg; 50%: opacity 1, scale 1, 45deg
+        let v = Wave.keyframes(frac, [(0, 0), (0.5, 1), (1, 0)])
+        FourPointStar()
+            .fill(color)
+            .scaleEffect(0.4 + 0.6 * v)
+            .rotationEffect(.degrees(45 * v))
+            .opacity(v)
+            .allowsHitTesting(false)
+    }
+}
+
+/// Path `M10 0 L12 8 L20 10 L12 12 L10 20 L8 12 L0 10 L8 8 Z` in a unit frame.
+struct FourPointStar: Shape {
+    func path(in rect: CGRect) -> Path {
+        let sx = rect.width / 20, sy = rect.height / 20
+        var p = Path()
+        p.move(to: CGPoint(x: 10 * sx, y: 0))
+        for (x, y) in [(12, 8), (20, 10), (12, 12), (10, 20), (8, 12), (0, 10), (8, 8)] {
+            p.addLine(to: CGPoint(x: Double(x) * sx, y: Double(y) * sy))
+        }
+        p.closeSubpath()
+        return p
     }
 }
 

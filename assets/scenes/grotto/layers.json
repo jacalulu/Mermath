@@ -1,0 +1,66 @@
+{
+  "designSpace": [
+    800,
+    600
+  ],
+  "order": "back to front",
+  "note": "x, y, w, h are in the 800x600 design space. Place every layer exactly here; do not eyeball positions.",
+  "layers": [
+    {
+      "file": "bg.jpg",
+      "x": 0,
+      "y": 0,
+      "w": 800,
+      "h": 600
+    },
+    {
+      "file": "floor.webp",
+      "x": 0,
+      "y": 466,
+      "w": 800,
+      "h": 134
+    },
+    {
+      "file": "walls.webp",
+      "x": 0,
+      "y": 0,
+      "w": 800,
+      "h": 600
+    },
+    {
+      "file": "kelp-curtain.webp",
+      "x": 570,
+      "y": 54,
+      "w": 166,
+      "h": 390
+    },
+    {
+      "file": "string-lights.png",
+      "x": 142,
+      "y": 52,
+      "w": 516,
+      "h": 100
+    },
+    {
+      "file": "starfish-lamp.png",
+      "x": 348,
+      "y": 124,
+      "w": 104,
+      "h": 100
+    },
+    {
+      "file": "starfish-lamp-face.png",
+      "x": 382,
+      "y": 166,
+      "w": 36,
+      "h": 28
+    },
+    {
+      "file": "shell-bed.png",
+      "x": 394,
+      "y": 378,
+      "w": 252,
+      "h": 170
+    }
+  ]
+}

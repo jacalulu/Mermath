@@ -48,8 +48,10 @@ struct RootView: View {
 
             case let .chest(earned):
                 ChestScreen(
+                    child: model.activeChild,
                     earned: earned,
-                    onPlace: { model.placeInGrotto(earned) }
+                    onPlace: { model.placeInGrotto(earned) },
+                    onMap: { model.diveAgain() }
                 )
                 .transition(.opacity)
 

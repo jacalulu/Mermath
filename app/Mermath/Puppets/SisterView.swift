@@ -57,6 +57,8 @@ struct SisterView: View {
     let t: Double
     /// Stage scale, for the float offset.
     let scale: CGFloat
+    /// The treasure chest page waves faster (1.1s); nil keeps the spec's pace.
+    var armDuration: Double?
 
     private func art(_ piece: String) -> ArtImage {
         ArtImage("characters/\(spec.folder)/\(piece).png")
@@ -95,7 +97,7 @@ struct SisterView: View {
             )
             art("arm")
                 .rotationEffect(
-                    .degrees(Wave.alternate(t, from: -7, to: 11, duration: spec.armDuration, delay: spec.armDelay)),
+                    .degrees(Wave.alternate(t, from: -7, to: 11, duration: armDuration ?? spec.armDuration, delay: spec.armDelay)),
                     anchor: UnitPoint(x: 0.421, y: 0.518)
                 )
             art("body")

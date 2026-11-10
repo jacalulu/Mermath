@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Reef map</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#061A33}a:hover{color:#061A33}
+@keyframes mmFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes mmHairL{from{transform:rotate(-1.6deg)}to{transform:rotate(1.8deg)}}
+@keyframes mmTail{from{transform:rotate(-2.5deg)}to{transform:rotate(2.5deg)}}
+@keyframes mmFluke{from{transform:rotate(-10deg)}to{transform:rotate(9deg)}}
+@keyframes mmArm{from{transform:rotate(-7deg)}to{transform:rotate(11deg)}}
+@keyframes mmBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes mmWave{from{transform:rotate(-9deg)}to{transform:rotate(10deg)}}
+@keyframes mmWaveL{from{transform:rotate(4deg)}to{transform:rotate(-5deg)}}
+@keyframes mmOpen{0%,92%{opacity:1}94%,98%{opacity:0}100%{opacity:1}}
+@keyframes mmShut{0%,92%{opacity:0}94%,98%{opacity:1}100%{opacity:0}}
+@keyframes mmSwayFar{from{transform:skewX(-0.8deg)}to{transform:skewX(0.9deg)}}
+@keyframes mmSwayMid{from{transform:skewX(1.3deg)}to{transform:skewX(-1.4deg)}}
+@keyframes mmGrass{from{transform:skewX(-7deg)}to{transform:skewX(7deg)}}
+@keyframes mmRise{0%{transform:translate(0,0);opacity:0}8%{opacity:.9}50%{transform:translate(9px,-300px)}92%{opacity:.8}100%{transform:translate(-4px,-640px);opacity:0}}
+@keyframes mmSwim{0%{transform:translate(0,0)}25%{transform:translate(-235px,-6px)}50%{transform:translate(-470px,0)}75%{transform:translate(-705px,5px)}100%{transform:translate(-940px,0)}}
+@keyframes mmLight{from{opacity:.05}to{opacity:.45}}
+@keyframes mmPulse{from{opacity:.25;transform:scale(.94)}to{opacity:.8;transform:scale(1.04)}}
+@keyframes mmDot{0%,100%{opacity:.55}50%{opacity:1}}
+@media (prefers-reduced-motion: no-preference){
+.mm-float1{animation:mmFloat 3.6s ease-in-out infinite}
+.mm-hairL{animation:mmHairL 3s ease-in-out infinite alternate}
+.mm-tail1{animation:mmTail 2.4s ease-in-out infinite alternate}
+.mm-fluke1{animation:mmFluke 1.2s ease-in-out infinite alternate}
+.mm-arm1{animation:mmArm 1.6s ease-in-out infinite alternate}
+.mm-open1{animation:mmOpen 4.4s linear infinite}.mm-shut1{animation:mmShut 4.4s linear infinite}
+.mm-bob{animation:mmBob 3.2s ease-in-out infinite}
+.mm-wave{animation:mmWave 1.5s ease-in-out infinite alternate}
+.mm-waveL{animation:mmWaveL 2.6s ease-in-out infinite alternate}
+.mm-open{animation:mmOpen 5.1s linear infinite}.mm-shut{animation:mmShut 5.1s linear infinite}
+.mm-swayFar{animation:mmSwayFar 7s ease-in-out infinite alternate}
+.mm-swayMid{animation:mmSwayMid 6s ease-in-out infinite alternate}
+.mm-grass{animation:mmGrass 2.8s ease-in-out infinite alternate}
+.mm-rise1{animation:mmRise 9s linear infinite}
+.mm-rise2{animation:mmRise 12s linear 3s infinite}
+.mm-swim1{animation:mmSwim 32s linear -4s infinite}
+.mm-swim2{animation:mmSwim 36s linear -18s infinite}
+.mm-light{animation:mmLight 4.5s ease-in-out infinite alternate}
+.mm-pulseA{animation:mmPulse 1.6s ease-in-out infinite alternate}
+.mm-pulseB{animation:mmPulse 1.6s ease-in-out -0.8s infinite alternate}
+.mm-d1{animation:mmDot 2s ease-in-out infinite}.mm-d2{animation:mmDot 2s ease-in-out .25s infinite}.mm-d3{animation:mmDot 2s ease-in-out .5s infinite}.mm-d4{animation:mmDot 2s ease-in-out .75s infinite}
+}
+</style>
+</helmet>
+<div style="width: 800px; height: 600px; box-sizing: border-box; position: relative; overflow: hidden; background: #167C9B; font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif; color: #FFF4DC">
+<img src="/_blob/1e6ce328c3c5b61238dcb60ee27bca1a" alt="A painted seabed that steps down from bright shallows on the left to deep, dark water on the right" style="position: absolute; left: 0; top: 0; width: 800px; height: 600px; object-fit: cover">
+<div class="mm-light" aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 800px; height: 340px; background: radial-gradient(ellipse at 38% 0%, rgba(255,255,255,0.6), rgba(255,255,255,0) 68%); opacity: 0.2"></div>
+<img class="mm-swayFar" src="/_blob/70c5aede73810f30790aef690971e4ee" alt="" style="position: absolute; left: 192px; top: 0; width: 504px; height: 600px; max-width: none; opacity: 0.75; filter: blur(1px); transform-origin: 50% 100%">
+<img class="mm-swayMid" src="/_blob/32b37f7155f4fcf03b81f05c0555a974" alt="" style="position: absolute; left: 0; top: 0; width: 800px; height: 600px; max-width: none; transform-origin: 50% 100%">
+<img class="mm-swim1" src="/_blob/589aae9bd55487189267ea516ff962e8" alt="" style="position: absolute; left: 830px; top: 86px; width: 40px; height: 25px; max-width: none">
+<img class="mm-swim2" src="/_blob/589aae9bd55487189267ea516ff962e8" alt="" style="position: absolute; left: 830px; top: 104px; width: 30px; height: 19px; max-width: none">
+<img src="/_blob/4116c6e2df7440d70df945fcacc92db3" alt="" style="position: absolute; left: 0; top: 206px; width: 800px; height: 394px; max-width: none">
+<img class="mm-grass" src="/_blob/940c1abb01ad23492313877861a16b5e" alt="" style="position: absolute; left: 92px; top: 548px; width: 520px; height: 52px; max-width: none; transform-origin: 50% 100%">
+<img class="mm-rise1" src="/_blob/c1bf8ae55aa7aafb5ee62a17166bcddb" alt="" style="position: absolute; left: 300px; top: 560px; width: 26px; height: 26px; max-width: none; opacity: 0">
+<img class="mm-rise2" src="/_blob/c1bf8ae55aa7aafb5ee62a17166bcddb" alt="" style="position: absolute; left: 586px; top: 580px; width: 22px; height: 22px; max-width: none; opacity: 0">
+<span aria-hidden="true" class="mm-d1" style="position: absolute; left: 252px; top: 376px; width: 11px; height: 11px; border-radius: 50%; background: #FFF4DC; box-shadow: 0 2px 4px rgba(6,26,51,0.35)"></span>
+<span aria-hidden="true" class="mm-d2" style="position: absolute; left: 274px; top: 388px; width: 11px; height: 11px; border-radius: 50%; background: #FFF4DC; box-shadow: 0 2px 4px rgba(6,26,51,0.35)"></span>
+<span aria-hidden="true" class="mm-d3" style="position: absolute; left: 296px; top: 400px; width: 11px; height: 11px; border-radius: 50%; background: #FFF4DC; box-shadow: 0 2px 4px rgba(6,26,51,0.35)"></span>
+<span aria-hidden="true" class="mm-d4" style="position: absolute; left: 318px; top: 410px; width: 11px; height: 11px; border-radius: 50%; background: #FFF4DC; box-shadow: 0 2px 4px rgba(6,26,51,0.35)"></span>
+<span aria-hidden="true" style="position: absolute; left: 560px; top: 436px; width: 11px; height: 11px; border-radius: 50%; background: #FFF4DC; opacity: 0.4"></span>
+<span aria-hidden="true" style="position: absolute; left: 582px; top: 450px; width: 11px; height: 11px; border-radius: 50%; background: #FFF4DC; opacity: 0.4"></span>
+<span aria-hidden="true" style="position: absolute; left: 604px; top: 464px; width: 11px; height: 11px; border-radius: 50%; background: #FFF4DC; opacity: 0.4"></span>
+<span aria-hidden="true" style="position: absolute; left: 626px; top: 476px; width: 11px; height: 11px; border-radius: 50%; background: #FFF4DC; opacity: 0.4"></span>
+<a href="TidePool.dc.html" aria-label="Tide Pool: find the number" style="position: absolute; left: 14px; top: 208px; width: 256px; height: 252px; display: block; text-decoration: none">
+<span aria-hidden="true" class="mm-pulseA" style="position: absolute; left: 22px; top: 96px; width: 220px; height: 100px; border-radius: 50%; background: radial-gradient(ellipse at center, rgba(255,244,220,0.85), rgba(255,244,220,0) 68%)"></span>
+<span style="position: absolute; left: -4px; top: 8px; width: 104px; height: 88px; display: block">
+<img src="/_blob/6fdd0f167233bc8ebb1f1d66da1d42a2" alt="" style="position: absolute; left: 0; top: 0; width: 104px; height: 88px; max-width: none">
+<span class="mm-bob" style="position: absolute; left: 0; top: 0; width: 104px; height: 88px; display: block">
+<img class="mm-waveL" src="/_blob/ca8bd4da8bfc7046ce8107250860f5f4" alt="" style="position: absolute; left: 0; top: 0; width: 104px; height: 88px; max-width: none; transform-origin: 31.6% 61.1%">
+<img class="mm-wave" src="/_blob/95bc4e0f27880635ae878334cf7c63a4" alt="" style="position: absolute; left: 0; top: 0; width: 104px; height: 88px; max-width: none; transform-origin: 68.4% 61.1%">
+<img src="/_blob/6f5238f0e6dccb5521f2fd281ca513d0" alt="" style="position: absolute; left: 0; top: 0; width: 104px; height: 88px; max-width: none">
+<img class="mm-open" src="/_blob/fd51dc9f37a2b5d07c5b78ba6c498134" alt="" style="position: absolute; left: 0; top: 0; width: 104px; height: 88px; max-width: none">
+<img class="mm-shut" src="/_blob/5a8029c1468ba43a09036fe075ddce4b" alt="" style="position: absolute; left: 0; top: 0; width: 104px; height: 88px; max-width: none; opacity: 0">
+</span>
+</span>
+<span style="position: absolute; left: 128px; top: 192px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; background: #FFF4DC; color: #061A33; border-radius: 22px; padding: 7px 20px 4px; box-shadow: 0 6px 14px rgba(6,26,51,0.28); white-space: nowrap">
+<span style="font-weight: 700; font-size: 24px; line-height: 1.05">Tide Pool</span>
+<span style="font-weight: 500; font-size: 15px; line-height: 1.2; color: #17617A">Find the number</span>
+</span>
+</a>
+<a href="CoralReef.dc.html" aria-label="Coral Reef: adding to 10" style="position: absolute; left: 306px; top: 90px; width: 262px; height: 436px; display: block; text-decoration: none">
+<span aria-hidden="true" class="mm-pulseB" style="position: absolute; left: 14px; top: 284px; width: 234px; height: 100px; border-radius: 50%; background: radial-gradient(ellipse at center, rgba(255,244,220,0.85), rgba(255,244,220,0) 68%)"></span>
+<span class="mm-float1" style="position: absolute; left: 52px; top: 0; width: 158px; height: 181px; display: block">
+<img class="mm-hairL" src="/_blob/a1efd4659cb3588a1718475e8ad21ce2" alt="" style="position: absolute; left: 0; top: 0; width: 158px; height: 181px; max-width: none; transform-origin: 48.5% 35.9%">
+<span class="mm-tail1" style="position: absolute; left: 0; top: 0; width: 158px; height: 181px; display: block; transform-origin: 48.5% 61.5%">
+<img class="mm-fluke1" src="/_blob/5a35d1e9f5d04258c45f64304c8137e5" alt="" style="position: absolute; left: 0; top: 0; width: 158px; height: 181px; max-width: none; transform-origin: 72.5% 84.6%">
+<img src="/_blob/8d17984c58161afb19d710dcbf2b9d7d" alt="" style="position: absolute; left: 0; top: 0; width: 158px; height: 181px; max-width: none">
+</span>
+<img class="mm-arm1" src="/_blob/b3a266604620de6faa0dc2d92e8f2155" alt="" style="position: absolute; left: 0; top: 0; width: 158px; height: 181px; max-width: none; transform-origin: 42.1% 51.8%">
+<img src="/_blob/7f2c442270db4a7e67522e1b759f7734" alt="Ophelia the mermaid" style="position: absolute; left: 0; top: 0; width: 158px; height: 181px; max-width: none">
+<img class="mm-open1" src="/_blob/b56b9f87113625a14823299a5024e4c3" alt="" style="position: absolute; left: 0; top: 0; width: 158px; height: 181px; max-width: none">
+<img class="mm-shut1" src="/_blob/37ddf2ca20f47bba99744a4638930ce9" alt="" style="position: absolute; left: 0; top: 0; width: 158px; height: 181px; max-width: none; opacity: 0">
+</span>
+<span style="position: absolute; left: 130px; top: 378px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; background: #FFF4DC; color: #061A33; border-radius: 22px; padding: 7px 20px 4px; box-shadow: 0 6px 14px rgba(6,26,51,0.28); white-space: nowrap">
+<span style="font-weight: 700; font-size: 24px; line-height: 1.05">Coral Reef</span>
+<span style="font-weight: 500; font-size: 15px; line-height: 1.2; color: #17617A">Adding to 10</span>
+</span>
+</a>
+<div role="img" aria-label="Deep Sea: counting by 2s and 5s. Locked." style="position: absolute; left: 600px; top: 380px; width: 200px; height: 200px">
+<img src="/_blob/c95699f3f2b55545c3ba33edc21f3cdb" alt="" style="position: absolute; left: 78px; top: 28px; width: 52px; height: 67px; max-width: none; filter: drop-shadow(0 4px 8px rgba(6,26,51,0.5))">
+<span style="position: absolute; left: 100px; top: 136px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; background: rgba(6,26,51,0.8); color: #FFF4DC; border-radius: 22px; padding: 7px 18px 4px; box-shadow: 0 6px 14px rgba(6,26,51,0.28); white-space: nowrap">
+<span style="font-weight: 700; font-size: 22px; line-height: 1.05">Deep Sea</span>
+<span style="font-weight: 500; font-size: 14px; line-height: 1.2; opacity: 0.85">Counting by 2s and 5s</span>
+</span>
+</div>
+<div aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 800px; height: 600px; background: radial-gradient(ellipse at 50% 45%, rgba(2,8,20,0) 55%, rgba(2,8,20,0.32) 100%); pointer-events: none"></div>
+<a href="Main.dc.html" style="position: absolute; left: 24px; top: 24px; background: #FFF4DC; color: #061A33; text-decoration: none; border-radius: 999px; padding: 7px 18px 3px; font-weight: 600; font-size: 18px; line-height: 1.2; box-shadow: 0 6px 14px rgba(6,26,51,0.28)">Switch mermaid</a>
+<div style="position: absolute; left: 0; right: 0; top: 24px; display: flex; justify-content: center; pointer-events: none">
+<span style="background: #FFF4DC; color: #061A33; border-radius: 999px; padding: 6px 24px 2px; font-weight: 700; font-size: 24px; line-height: 1.2; box-shadow: 0 6px 14px rgba(6,26,51,0.28)">Where shall we dive?</span>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":800,"height":600}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

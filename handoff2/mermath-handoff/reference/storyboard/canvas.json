@@ -1,0 +1,219 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "Chest.dc.html": {
+      "h": 600,
+      "is_interactive": true,
+      "radius": 24,
+      "title": "4 Treasure chest",
+      "w": 800,
+      "x": 880,
+      "y": 1100
+    },
+    "CoralReef.dc.html": {
+      "h": 600,
+      "is_interactive": true,
+      "radius": 24,
+      "title": "3b Coral Reef dive (addition)",
+      "w": 800,
+      "x": 0,
+      "y": 1100
+    },
+    "Grotto.dc.html": {
+      "h": 600,
+      "is_interactive": true,
+      "radius": 24,
+      "title": "5 My grotto",
+      "w": 800,
+      "x": 1760,
+      "y": 1100
+    },
+    "Main.dc.html": {
+      "h": 600,
+      "is_interactive": true,
+      "radius": 24,
+      "title": "1 Pick your mermaid",
+      "w": 800,
+      "x": 0,
+      "y": 0
+    },
+    "Map.dc.html": {
+      "h": 600,
+      "is_interactive": true,
+      "radius": 24,
+      "title": "2 Reef map",
+      "w": 800,
+      "x": 880,
+      "y": 0
+    },
+    "Palette.dc.html": {
+      "h": 600,
+      "radius": 24,
+      "title": "Color palette",
+      "w": 800,
+      "x": 2640,
+      "y": 0
+    },
+    "StyleFrame.dc.html": {
+      "h": 600,
+      "is_interactive": true,
+      "radius": 24,
+      "title": "Style frame: Tide Pool dive",
+      "w": 800,
+      "x": 2640,
+      "y": 1290
+    },
+    "TidePool.dc.html": {
+      "h": 600,
+      "is_interactive": true,
+      "radius": 24,
+      "title": "3a Tide Pool dive (twins)",
+      "w": 800,
+      "x": 1760,
+      "y": 0
+    },
+    "TypeTest.dc.html": {
+      "h": 600,
+      "radius": 24,
+      "title": "Number shapes",
+      "w": 800,
+      "x": 3520,
+      "y": 1290
+    },
+    "Wordmark.dc.html": {
+      "h": 600,
+      "is_interactive": true,
+      "radius": 24,
+      "title": "Wordmark and icon",
+      "w": 800,
+      "x": 3520,
+      "y": 0
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-11-09T23:50:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "noteOrder": [
+    "title",
+    "n1",
+    "n2",
+    "n3",
+    "n4",
+    "n5",
+    "n6",
+    "n7",
+    "n8",
+    "n9",
+    "n10"
+  ],
+  "notes": {
+    "n1": {
+      "fill": "teal",
+      "size": 40,
+      "text": "1. Pick your mermaid (locked style)\nThe Mermath wordmark sits on top with room around it (its fin flicks and the plus pulses). Each sister is built from separate painted pieces: she floats, waves, swishes her tail and blinks. Daphne has pigtails that swing, Violet keeps her buns. The fish now pass low, behind the tails, clear of the faces and the title. No reading and no login: each kid taps her own mermaid.\n\nPress Play to see it move. Open question: do they get to name and style their mermaid?",
+      "w": 800,
+      "x": 0,
+      "y": 640
+    },
+    "n2": {
+      "fill": "teal",
+      "size": 40,
+      "text": "2. Reef map (locked look)\nOne painted seabed that steps down from the bright shallows to the dark deep, with a place on each step. The crab waits at the Tide Pool, her mermaid floats over the Coral Reef, and the Deep Sea is padlocked. A trail of pearls shows the way, and the two open places glow softly.\n\nPress Play to see it move. Open question: can a kid wander into any zone, or only her own?",
+      "w": 800,
+      "x": 880,
+      "y": 640
+    },
+    "n3": {
+      "fill": "orange",
+      "size": 40,
+      "text": "3a. Tide Pool dive (twins, locked look)\nThis is the locked style frame. The crab says the number out loud. Tap the matching bubble. A wrong tap shows dots to count, never a penalty.\n\nPress Play on this frame to try it.",
+      "w": 800,
+      "x": 1760,
+      "y": 640
+    },
+    "n4": {
+      "fill": "orange",
+      "size": 40,
+      "text": "3b. Coral Reef dive (addition, locked look)\nThe same crab asks the sum. Painted shells sit above each number so she can count them: three orange, two teal. They fade out as she gets faster. A wrong tap counts on across both groups. No timer, no lives.\n\nPress Play on this frame to try it.",
+      "w": 800,
+      "x": 0,
+      "y": 1740
+    },
+    "n5": {
+      "fill": "purple",
+      "size": 40,
+      "text": "4. Treasure chest (locked look)\nTen pearls and the chest opens in a kelp clearing. The new item floats up out of it, glowing, and her mermaid waves.\n\nPress Play to see it move. Open question: is the reward a surprise, or does she pick from three?",
+      "w": 800,
+      "x": 880,
+      "y": 1740
+    },
+    "n6": {
+      "fill": "purple",
+      "size": 40,
+      "text": "5. My grotto (locked look)\nA sea cave looking out at the sunlit water. The string lights twinkle, the starfish lamp swings and the kelp curtain sways. Dashed rings mark what is still to come. This is the reason to come back tomorrow.\n\nPress Play to see it move. Open question: decorating, collecting sea pets, or a story?",
+      "w": 800,
+      "x": 1760,
+      "y": 1740
+    },
+    "n7": {
+      "fill": "pink",
+      "size": 40,
+      "text": "Color palette (rebuilt)\nSampled from the locked style frame, with one job per color. Daphne's yellow moved to lemon and her tail no longer runs to orange, so she stays clear of the reward color.\n\nOpen question: swap or adjust any of these?",
+      "w": 800,
+      "x": 2640,
+      "y": 640
+    },
+    "n8": {
+      "fill": "green",
+      "size": 40,
+      "text": "Style frame: Tide Pool dive (third pass)\nThe scene is now ten painted layers. All the kelp sways at its own speed, the seagrass waves, the sea stars wiggle and hop at the back of the sand (clear of the bottom panel), bubbles rise, two fish pass low behind the rocks and the light shimmers. The crab bobs, waves and blinks. Numerals are in Baloo 2.\n\nPress Play to see it move. Nothing fast crosses the three answer bubbles. Tap the crab or the shell to replay the prompt (the bubble pops; the storyboard has no sound).\n\nSpacing rules for every screen: controls stay 24px from the edges, neighbours sit at least 16px apart (answer bubbles 26px), and nothing that moves crosses a face, a label or an answer.",
+      "w": 800,
+      "x": 2640,
+      "y": 1930
+    },
+    "n9": {
+      "fill": "blue",
+      "size": 40,
+      "text": "Number shapes\nFour candidate typefaces for the numerals. A has the open-top 4. B, C and D have a closed 4. All four draw 1 with a small flag and 7 without a crossbar.\n\nChosen: B, Baloo 2. It is on the style frame now.",
+      "w": 800,
+      "x": 3520,
+      "y": 1930
+    },
+    "n10": {
+      "fill": "gray",
+      "size": 40,
+      "text": "Wordmark and icon (locked)\nThe word math already has a plus in it: the t. So the t is an orange plus, and right beside it the h rises into the mermaid tail, fading from navy ink through purple into a pink fin. Plus and tail, side by side: mermaid and math. The app icon is the same pair on the painted water.\n\nPress Play to see the fin flick and the plus pulse. Capital M. The plus is always orange and always stands where the t goes.",
+      "w": 800,
+      "x": 3520,
+      "y": 640
+    },
+    "title": {
+      "kind": "title1",
+      "maxW": 2560,
+      "text": "Mermath: one dive, start to finish",
+      "w": 240,
+      "x": 0,
+      "y": -300
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Map.dc.html",
+    "TidePool.dc.html",
+    "CoralReef.dc.html",
+    "Chest.dc.html",
+    "Grotto.dc.html",
+    "Palette.dc.html",
+    "StyleFrame.dc.html",
+    "TypeTest.dc.html",
+    "Wordmark.dc.html"
+  ],
+  "pages": [],
+  "title": "Mermaid Math Storyboard"
+}

@@ -1,0 +1,73 @@
+{
+  "designSpace": [
+    800,
+    600
+  ],
+  "order": "back to front",
+  "note": "x, y, w, h are in the 800x600 design space. Place every layer exactly here; do not eyeball positions.",
+  "layers": [
+    {
+      "file": "bg.jpg",
+      "x": 0,
+      "y": 0,
+      "w": 800,
+      "h": 600
+    },
+    {
+      "file": "kelp-far.webp",
+      "x": 126,
+      "y": 0,
+      "w": 640,
+      "h": 600
+    },
+    {
+      "file": "kelp-mid.webp",
+      "x": 36,
+      "y": 0,
+      "w": 720,
+      "h": 600
+    },
+    {
+      "file": "foreground.webp",
+      "x": 0,
+      "y": 442,
+      "w": 800,
+      "h": 158
+    },
+    {
+      "file": "seagrass.png",
+      "x": 146,
+      "y": 532,
+      "w": 518,
+      "h": 66
+    },
+    {
+      "file": "chest-lid.png",
+      "x": 284,
+      "y": 244,
+      "w": 232,
+      "h": 144
+    },
+    {
+      "file": "chest-box.png",
+      "x": 282,
+      "y": 330,
+      "w": 236,
+      "h": 152
+    },
+    {
+      "file": "starfish-lamp.png",
+      "x": 334,
+      "y": 108,
+      "w": 132,
+      "h": 128
+    },
+    {
+      "file": "starfish-lamp-face.png",
+      "x": 380,
+      "y": 166,
+      "w": 40,
+      "h": 32
+    }
+  ]
+}

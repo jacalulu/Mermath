@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mermath: my grotto</title>
+<!-- Static reference exported from the Mermath storyboard. Design space is 800x600. Open in a browser to see the layers and motion; scale the stage to fit the device in the real build. -->
+<style>@font-face{font-family:'Baloo 2';font-weight:500;font-display:swap;src:url(../../assets/fonts/baloo-2-latin-500.woff2) format('woff2')}@font-face{font-family:'Baloo 2';font-weight:600;font-display:swap;src:url(../../assets/fonts/baloo-2-latin-600.woff2) format('woff2')}@font-face{font-family:'Baloo 2';font-weight:700;font-display:swap;src:url(../../assets/fonts/baloo-2-latin-700.woff2) format('woff2')}</style>
+<style>
+body{margin:0}
+a{color:#061A33}a:hover{color:#061A33}
+@keyframes mmFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes mmHairL{from{transform:rotate(-1.6deg)}to{transform:rotate(1.8deg)}}
+@keyframes mmTail{from{transform:rotate(-2.5deg)}to{transform:rotate(2.5deg)}}
+@keyframes mmFluke{from{transform:rotate(-10deg)}to{transform:rotate(9deg)}}
+@keyframes mmArm{from{transform:rotate(-7deg)}to{transform:rotate(11deg)}}
+@keyframes mmOpen{0%,92%{opacity:1}94%,98%{opacity:0}100%{opacity:1}}
+@keyframes mmShut{0%,92%{opacity:0}94%,98%{opacity:1}100%{opacity:0}}
+@keyframes mmCurtain{from{transform:skewX(-2.4deg)}to{transform:skewX(2.2deg)}}
+@keyframes mmSwing{from{transform:rotate(-3.5deg)}to{transform:rotate(3.5deg)}}
+@keyframes mmLights{from{opacity:.72}to{opacity:1}}
+@keyframes mmGlow{from{opacity:.45;transform:scale(.94)}to{opacity:1;transform:scale(1.05)}}
+@keyframes mmRise{0%{transform:translate(0,0);opacity:0}8%{opacity:.9}50%{transform:translate(9px,-300px)}92%{opacity:.8}100%{transform:translate(-4px,-640px);opacity:0}}
+@keyframes mmLight{from{opacity:.05}to{opacity:.4}}
+@media (prefers-reduced-motion: no-preference){
+.mm-float1{animation:mmFloat 3.6s ease-in-out infinite}
+.mm-hairL{animation:mmHairL 3s ease-in-out infinite alternate}
+.mm-tail1{animation:mmTail 2.4s ease-in-out infinite alternate}
+.mm-fluke1{animation:mmFluke 1.2s ease-in-out infinite alternate}
+.mm-arm1{animation:mmArm 1.6s ease-in-out infinite alternate}
+.mm-open1{animation:mmOpen 4.4s linear infinite}.mm-shut1{animation:mmShut 4.4s linear infinite}
+.mm-curtain{animation:mmCurtain 4.2s ease-in-out infinite alternate}
+.mm-swing{animation:mmSwing 3.2s ease-in-out infinite alternate}
+.mm-lights{animation:mmLights 1.7s ease-in-out infinite alternate}
+.mm-glow{animation:mmGlow 1.8s ease-in-out infinite alternate}
+.mm-rise1{animation:mmRise 10s linear infinite}
+.mm-rise2{animation:mmRise 13s linear 4s infinite}
+.mm-light{animation:mmLight 4.5s ease-in-out infinite alternate}
+}
+</style>
+<style>html,body{height:100%}body{display:grid;place-items:center;background:#061A33}</style>
+</head>
+<body>
+<div style="width: 800px; height: 600px; box-sizing: border-box; position: relative; overflow: hidden; background: #167C9B; font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif; color: #FFF4DC">
+<img src="../../assets/scenes/grotto/bg.jpg" alt="Inside a painted sea cave, looking out at sunlit teal water" style="position: absolute; left: 0; top: 0; width: 800px; height: 600px; object-fit: cover">
+<div class="mm-light" aria-hidden="true" style="position: absolute; left: 150px; top: 0; width: 500px; height: 380px; background: radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.6), rgba(255,255,255,0) 68%); opacity: 0.2"></div>
+<img src="../../assets/scenes/grotto/floor.webp" alt="" style="position: absolute; left: 0; top: 466px; width: 800px; height: 134px; max-width: none">
+<img src="../../assets/scenes/grotto/walls.webp" alt="" style="position: absolute; left: 0; top: 0; width: 800px; height: 600px; max-width: none">
+<img class="mm-curtain" src="../../assets/scenes/grotto/kelp-curtain.webp" alt="A kelp curtain" style="position: absolute; left: 570px; top: 54px; width: 166px; height: 390px; max-width: none; transform-origin: 50% 0%">
+<img class="mm-lights" src="../../assets/scenes/grotto/string-lights.png" alt="A string of little lights" style="position: absolute; left: 142px; top: 52px; width: 516px; height: 100px; max-width: none">
+<img class="mm-rise1" src="../../assets/props/bubble.png" alt="" style="position: absolute; left: 350px; top: 560px; width: 26px; height: 26px; max-width: none; opacity: 0">
+<img class="mm-rise2" src="../../assets/props/bubble.png" alt="" style="position: absolute; left: 660px; top: 580px; width: 20px; height: 20px; max-width: none; opacity: 0">
+<span class="mm-swing" style="position: absolute; left: 310px; top: 0; width: 180px; height: 240px; display: block; transform-origin: 50% 0%">
+<span aria-hidden="true" style="position: absolute; left: 89px; top: 0; width: 2.5px; height: 134px; background: #0A3444"></span>
+<span aria-hidden="true" class="mm-glow" style="position: absolute; left: 10px; top: 96px; width: 160px; height: 160px; border-radius: 50%; background: radial-gradient(circle, rgba(255,233,168,0.9), rgba(255,224,138,0) 68%)"></span>
+<img src="../../assets/scenes/grotto/starfish-lamp.png" alt="The starfish lamp" style="position: absolute; left: 38px; top: 124px; width: 104px; height: 100px; max-width: none">
+<img src="../../assets/scenes/grotto/starfish-lamp-face.png" alt="" style="position: absolute; left: 72px; top: 166px; width: 36px; height: 28px; max-width: none">
+</span>
+<img src="../../assets/scenes/grotto/shell-bed.png" alt="A pink clam shell bed" style="position: absolute; left: 394px; top: 378px; width: 252px; height: 170px; max-width: none">
+<span class="mm-float1" style="position: absolute; left: 118px; top: 226px; width: 226px; height: 259px; display: block">
+<img class="mm-hairL" src="../../assets/characters/ophelia/hair.png" alt="" style="position: absolute; left: 0; top: 0; width: 226px; height: 259px; max-width: none; transform-origin: 48.5% 35.9%">
+<span class="mm-tail1" style="position: absolute; left: 0; top: 0; width: 226px; height: 259px; display: block; transform-origin: 48.5% 61.5%">
+<img class="mm-fluke1" src="../../assets/characters/ophelia/fluke.png" alt="" style="position: absolute; left: 0; top: 0; width: 226px; height: 259px; max-width: none; transform-origin: 72.5% 84.6%">
+<img src="../../assets/characters/ophelia/tail.png" alt="" style="position: absolute; left: 0; top: 0; width: 226px; height: 259px; max-width: none">
+</span>
+<img class="mm-arm1" src="../../assets/characters/ophelia/arm.png" alt="" style="position: absolute; left: 0; top: 0; width: 226px; height: 259px; max-width: none; transform-origin: 42.1% 51.8%">
+<img src="../../assets/characters/ophelia/body.png" alt="Ophelia the mermaid at home" style="position: absolute; left: 0; top: 0; width: 226px; height: 259px; max-width: none">
+<img class="mm-open1" src="../../assets/characters/ophelia/eyes-open.png" alt="" style="position: absolute; left: 0; top: 0; width: 226px; height: 259px; max-width: none">
+<img class="mm-shut1" src="../../assets/characters/ophelia/eyes-shut.png" alt="" style="position: absolute; left: 0; top: 0; width: 226px; height: 259px; max-width: none; opacity: 0">
+</span>
+<div style="position: absolute; left: 168px; top: 158px; width: 92px; height: 92px; box-sizing: border-box; border-radius: 50%; border: 3px dashed rgba(255,244,220,0.95); background: rgba(6,26,51,0.46); display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 700; font-size: 16px; line-height: 1.1; color: #FFF4DC; padding: 8px 6px 4px">Next dive</div>
+<div style="position: absolute; left: 498px; top: 176px; width: 92px; height: 92px; box-sizing: border-box; border-radius: 50%; border: 3px dashed rgba(255,244,220,0.95); background: rgba(6,26,51,0.46); display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 700; font-size: 16px; line-height: 1.1; color: #FFF4DC; padding: 8px 6px 4px">2 more dives</div>
+<div style="position: absolute; left: 268px; top: 474px; width: 92px; height: 92px; box-sizing: border-box; border-radius: 50%; border: 3px dashed rgba(255,244,220,0.95); background: rgba(6,26,51,0.46); display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 700; font-size: 16px; line-height: 1.1; color: #FFF4DC; padding: 8px 6px 4px">3 more dives</div>
+<span style="position: absolute; left: 400px; top: 240px; transform: translateX(-50%); background: linear-gradient(180deg, #FFD27A, #FF9A3D); color: #061A33; border-radius: 999px; padding: 6px 16px 2px; font-weight: 700; font-size: 16px; line-height: 1.2; box-shadow: 0 6px 14px rgba(6,26,51,0.28); white-space: nowrap">New! Starfish lamp</span>
+<span style="position: absolute; left: 700px; top: 404px; transform: translateX(-50%); background: #FFF4DC; color: #061A33; border-radius: 999px; padding: 5px 14px 1px; font-weight: 600; font-size: 15px; line-height: 1.2; box-shadow: 0 6px 14px rgba(6,26,51,0.28); white-space: nowrap">Kelp curtain</span>
+<span style="position: absolute; left: 520px; top: 550px; transform: translateX(-50%); background: #FFF4DC; color: #061A33; border-radius: 999px; padding: 5px 14px 1px; font-weight: 600; font-size: 15px; line-height: 1.2; box-shadow: 0 6px 14px rgba(6,26,51,0.28); white-space: nowrap">Shell bed</span>
+<div aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 800px; height: 600px; background: radial-gradient(ellipse at 50% 45%, rgba(2,8,20,0) 55%, rgba(2,8,20,0.28) 100%); pointer-events: none"></div>
+<span style="position: absolute; left: 24px; top: 24px; background: #FFF4DC; color: #061A33; border-radius: 999px; padding: 7px 24px 3px; font-weight: 700; font-size: 26px; line-height: 1.2; box-shadow: 0 6px 14px rgba(6,26,51,0.28)">My grotto</span>
+<a href="reef-map.html" style="position: absolute; right: 24px; top: 24px; background: linear-gradient(180deg, #FFD27A, #FF9A3D); color: #061A33; text-decoration: none; font-weight: 700; font-size: 22px; line-height: 1.1; padding: 13px 24px 9px; border-radius: 999px; box-shadow: 0 6px 14px rgba(6,26,51,0.28)">Dive again</a>
+</div>
+</body>
+</html>

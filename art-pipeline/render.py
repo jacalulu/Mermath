@@ -5,12 +5,19 @@ from PIL import Image
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'out')
 
+def chrome():
+    """Which browser rasterizes the SVGs. Set MERMATH_CHROME to a Chrome/Chromium binary, or leave it unset to use a system Chrome if there is one, otherwise the Chromium that `playwright install chromium` provides."""
+    want = os.environ.get('MERMATH_CHROME')
+    if want and want != 'bundled': return dict(executable_path=want)
+    if not want:
+        for p in ('/usr/bin/google-chrome', '/usr/bin/chromium', '/usr/bin/chromium-browser', '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'):
+            if os.path.exists(p): return dict(executable_path=p)
+    return {}
+
 def main(jobs):
+    os.makedirs(OUT, exist_ok=True)
     with sync_playwright() as p:
-        chrome = os.environ.get('CHROME', '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome')
-        if not os.path.exists(chrome):
-            chrome = '/usr/bin/google-chrome'
-        b = p.chromium.launch(executable_path=chrome, args=['--no-sandbox'])
+        b = p.chromium.launch(args=['--no-sandbox'], **chrome())
         for job in jobs:
             name, scale, alpha = job.split(':')
             svg = open(os.path.join(OUT, name + '.svg')).read()

@@ -1,6 +1,15 @@
 # Mermath
 
-A mermaid-themed math game for three sisters, built by their parent as a side project. This folder is the design handoff: the design work is done for two screens and specified for the rest. Your job is to build the game.
+A mermaid-themed math game for three sisters, built by their parent as a side project. This folder is the design handoff. All six screens are designed and painted. Your job is to build the game around them.
+
+## The one thing to get right: the art
+
+Every screen is a stack of **painted layers**: scenery repainted with visible brush strokes, characters built from separately painted pieces, crisp faces on top, and gentle motion. That look is the product.
+
+- Use the finished art in `assets/`. All six screens are there, with a `layers.json` beside each scene saying exactly where every layer goes.
+- When you need anything new (a scene, an item, a character, an icon), follow `docs/art-recipe.md` step by step. It is three commands and takes under a minute.
+- Never substitute flat vector art, CSS-drawn scenery, emoji, stock icons, generated images, or a "painterly" filter. Never place a layer by eye.
+- A screen is not done until it passes the checklist at the end of `docs/art-recipe.md`.
 
 ## Who plays
 
@@ -14,18 +23,19 @@ None of them is expected to read. Every instruction is spoken, and every control
 
 ## Read these first
 
-1. `docs/game-design.md`: the loop, the zones, what happens on right and wrong answers.
-2. `docs/visual-language.md`: palette, type, spacing, icons, wordmark. These are rules, not suggestions.
-3. `docs/screens-and-motion.md`: layer stacks, coordinates, pivots and timings for the two locked screens.
-4. `docs/open-questions.md`: decisions the parent has not made yet. Ask before building anything that depends on one.
-5. `reference/html/*.html`: the two locked screens as plain HTML and CSS. Open them in a browser. They are the source of truth for layout and motion.
-6. `reference/screens/`: a picture of every screen. Files marked `LOCKED` are final. Files marked `old-style` show the right content in a look that has been replaced.
+1. `reference/html/*.html`: all six screens as plain HTML and CSS. Open them in a browser and watch them move. They are the source of truth for layout and motion.
+2. `reference/screens/`: a picture of every screen and state.
+3. `docs/game-design.md`: the loop, the zones, what happens on right and wrong answers.
+4. `docs/visual-language.md`: palette, type, spacing, icons, wordmark. These are rules, not suggestions.
+5. `docs/screens-and-motion.md`: layer stacks, pivots and timings.
+6. `docs/art-recipe.md`: how to make new art that matches.
+7. `docs/open-questions.md`: decisions the parent has not made yet. Ask before building anything that depends on one.
 
-## What is locked and what is not
+## What is locked and what is yours
 
-Locked (do not redesign): the name Mermath, the wordmark and app icon, the palette, Baloo 2 for all text and numerals, the painted look, the Tide Pool question screen, the pick-your-mermaid screen, the spacing rules, and the no-timers, no-lives rule.
+Locked (do not redesign): the name Mermath, the wordmark and app icon, the palette, Baloo 2 for all text and numerals, the painted look, the six screens, the spacing rules, and the no-timers, no-lives rule.
 
-Not done yet (yours to build, in the locked look): the reef map, Coral Reef dive, treasure chest and grotto screens, the game logic, voice and sound, saved progress, and a parent screen.
+Yours to build: the game logic, voice and sound, saved progress, a parent screen, the Deep Sea questions, and any further screens or items (using the art recipe).
 
 ## Hard rules
 
@@ -34,9 +44,8 @@ Not done yet (yours to build, in the locked look): the reef map, Coral Reef dive
 - Orange (`#FF9A3D`) means "tap me" or "you got it" and nothing else. Sister colors appear only on the sisters.
 - Nothing that moves crosses a face, a label or an answer bubble.
 - Controls stay 24px from every edge of the 800x600 design space. Neighbours sit at least 16px apart, answer bubbles at least 26px.
-- The prompt never shows the digit. It says and spells the word ("Find the number four!"), so the child has to recognise the numeral herself.
+- In number recognition the prompt never shows the digit. It says and spells the word ("Find the number four!"), so the child has to recognise the numeral herself.
 - Wrap all motion in `@media (prefers-reduced-motion: no-preference)`.
-- New scenery and characters must go through the brush-stroke pass in `art-pipeline/` (or match it closely). Do not mix in flat vector art, stock icons or emoji.
 
 ## Suggested build (confirm with the parent first)
 
@@ -44,7 +53,10 @@ The design space is 800x600 (4:3, landscape), which scales cleanly to a tablet. 
 
 ## Folder map
 
-- `assets/`: final painted art, organised by scene, character, prop, UI and brand. `assets/legacy/` holds the older-style art, kept for reference only; no screen uses it. `docs/art-style.md` is the style sheet every new piece must match.
+- `assets/scenes/<scene>/`: painted layers and `layers.json` for home, reef-map, tide-pool, coral-reef, treasure-chest and grotto.
+- `assets/characters/`: the three sisters and the crab, as stackable pieces.
+- `assets/props/`, `assets/ui/`, `assets/brand/`, `assets/fonts/`: small painted objects, icons, the wordmark and app icon, Baloo 2.
 - `design/tokens.json` and `design/tokens.css`: palette, type, spacing and motion values.
+- `app/`: the shipped native iPad app (SwiftUI), built from this handoff. `tools/sync-art.sh` copies `assets/` into its bundle; `tools/make-voice.py` generates the spoken prompts.
 - `reference/storyboard/`: the original storyboard source files, with `blob-map.json` mapping their image ids to files in `assets/`.
-- `art-pipeline/`: the Python scripts that drew and painted everything, plus the vector sources.
+- `art-pipeline/`: the scripts that draw and paint everything.

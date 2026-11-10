@@ -81,8 +81,11 @@ Icons are painted objects from the world, not line drawings.
 | `assets/ui/icon-shell.png` | A conch with sound lines: say it again |
 | `assets/ui/icon-map.png` | A rolled map: back to the reef map |
 | `assets/ui/pearl.png` | One pearl in the counter (empty slots are a 2px Pearl ring at 60%) |
+| `assets/ui/padlock.png` | A gold padlock: this place is locked |
 
-New icons should be drawn and painted the same way (`art-pipeline/puppet.py` has the three sources).
+New icons should be drawn and painted the same way (see `docs/art-recipe.md`).
+
+A dashed Pearl ring means "empty, something goes here": an unearned pearl, an unfilled answer slot, a grotto spot waiting for its item.
 
 ## Wordmark and app icon
 
@@ -105,4 +108,4 @@ Rules:
 
 - **The sisters.** Chibi mermaids, each built from separately painted pieces so they can move. Ophelia: long dark brown hair, brown eyes, pink tail. Daphne: red hair in pigtails with teal ties, blue eyes, lemon tail. Violet: red hair in buns, blue eyes, purple tail. All three wear a yellow star in their hair.
 - **The crab.** The guide in Tide Pool. Orange, friendly, waves, blinks. He is the one who speaks the prompt.
-- Older single-image versions of the characters are in `assets/legacy/` for the screens that have not been rebuilt. Replace them with the layered versions.
+- **The starfish lamp.** The first grotto reward. It has a face, so it is two layers: the painted star and a crisp face on top.
