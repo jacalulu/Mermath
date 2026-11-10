@@ -7,7 +7,10 @@ OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'out')
 
 def main(jobs):
     with sync_playwright() as p:
-        b = p.chromium.launch(executable_path='/usr/bin/google-chrome', args=['--no-sandbox'])
+        chrome = os.environ.get('CHROME', '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome')
+        if not os.path.exists(chrome):
+            chrome = '/usr/bin/google-chrome'
+        b = p.chromium.launch(executable_path=chrome, args=['--no-sandbox'])
         for job in jobs:
             name, scale, alpha = job.split(':')
             svg = open(os.path.join(OUT, name + '.svg')).read()

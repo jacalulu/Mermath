@@ -167,7 +167,6 @@ final class AppModel {
         v.showHint = dive.showHint
         v.solvedText = dive.solvedText
         v.popTrigger = dive.popTrigger
-        if case .match = dive.question.presentation { v.promptNumeral = dive.question.target }
         if case .count = dive.question.presentation { v.countIcons = dive.question.target }
         return v
     }

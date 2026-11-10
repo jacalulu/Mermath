@@ -12,8 +12,6 @@ struct TidePoolViewState {
     var showHint = false
     var solvedText = ""
     var popTrigger = 0
-    /// Match level: the numeral she matches, shown in the speech bubble.
-    var promptNumeral: Int?
     /// Count level: how many little bubbles to count in the speech bubble.
     var countIcons: Int?
 }
@@ -100,7 +98,6 @@ struct TidePoolScreen: View {
                     text: state.prompt,
                     scale: s,
                     popTrigger: state.popTrigger,
-                    numeral: state.promptNumeral,
                     countIcons: state.countIcons,
                     replay: onReplay
                 )

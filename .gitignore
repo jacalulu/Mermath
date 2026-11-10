@@ -11,3 +11,8 @@ app/build/
 DerivedData/
 xcuserdata/
 *.xcuserstate
+
+# Art pipeline working files
+art-pipeline/.venv/
+art-pipeline/out/
+art-pipeline/art-out/

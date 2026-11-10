@@ -22,7 +22,6 @@ enum PromptScript {
     /// The written prompt never shows the digit; it spells the word.
     static func tideWritten(_ q: Question) -> String {
         switch q.presentation {
-        case .match: return "Find this number!"
         case .listen: return "Find the number \(word(q.target))!"
         case .count: return "Count the bubbles!"
         default: return ""
@@ -31,8 +30,6 @@ enum PromptScript {
 
     static func tideSpoken(_ q: Question) -> Prompt {
         switch q.presentation {
-        case .match:
-            return Prompt(id: "tide-match-\(q.target)", text: "Find this number!")
         case .listen:
             return Prompt(id: "tide-listen-\(q.target)", text: "Find the number \(word(q.target))!")
         case .count:

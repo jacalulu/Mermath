@@ -2,7 +2,6 @@ import SwiftUI
 
 /// "Where shall we dive?" Any unlocked zone is tappable; the child's usual
 /// zone glows brighter. Deep Sea stays locked (its questions are not designed).
-/// Legacy background until the map is repainted in the locked look.
 struct ReefMapScreen: View {
     let child: ChildID
     var onDive: (Zone) -> Void = { _ in }
@@ -15,7 +14,7 @@ struct ReefMapScreen: View {
         let usual = (child == .ophelia) ? Zone.coralReef : Zone.tidePool
         ZStack {
             Group {
-                ArtImage("legacy/bg-map.jpg")
+                ArtImage("scenes/map/bg.jpg")
                     .stage(x: 0, y: 0, w: 800, h: 600)
                 Vignette()
                     .stage(x: 0, y: 0, w: 800, h: 600)

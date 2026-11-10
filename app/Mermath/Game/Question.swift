@@ -14,17 +14,15 @@ enum Zone: String, Codable, CaseIterable {
     }
 }
 
-/// The Tide Pool ladder: match -> listen -> count.
+/// The Tide Pool ladder: listen -> count. The prompt never shows the digit,
+/// so there is no "match the numeral" level; she always has to recognise it.
 enum TideLevel: Int, Codable, CaseIterable {
-    case match
     case listen
     case count
 }
 
 /// How the question presents itself in the speech bubble.
 enum QuestionPresentation: Equatable {
-    /// She sees the numeral and finds the same numeral.
-    case match
     /// She hears the number and finds the numeral (the locked style frame).
     case listen
     /// She counts objects and finds the numeral.

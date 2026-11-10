@@ -6,7 +6,7 @@ from paint import paint
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, 'out')
-ART = '/home/claude/mermaid-art'
+ART = os.environ.get('MERMATH_ART', os.path.join(HERE, 'art-out'))
 
 def bleed(bgr, alpha):
     idx = ndimage.distance_transform_edt(alpha <= 8, return_distances=False, return_indices=True)

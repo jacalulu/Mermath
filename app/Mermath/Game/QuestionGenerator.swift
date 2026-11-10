@@ -26,7 +26,6 @@ struct TidePoolGenerator {
         }
         let presentation: QuestionPresentation
         switch level {
-        case .match: presentation = .match
         case .listen: presentation = .listen
         case .count: presentation = .count
         }

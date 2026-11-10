@@ -44,7 +44,7 @@ The design space is 800x600 (4:3, landscape), which scales cleanly to a tablet. 
 
 ## Folder map
 
-- `assets/`: final painted art, organised by scene, character, prop, UI and brand. `assets/legacy/` holds the older-style art still used by the screens that have not been repainted.
+- `assets/`: final painted art, organised by scene, character, prop, UI and brand. `assets/legacy/` holds the older-style art, kept for reference only; no screen uses it. `docs/art-style.md` is the style sheet every new piece must match.
 - `design/tokens.json` and `design/tokens.css`: palette, type, spacing and motion values.
 - `reference/storyboard/`: the original storyboard source files, with `blob-map.json` mapping their image ids to files in `assets/`.
 - `art-pipeline/`: the Python scripts that drew and painted everything, plus the vector sources.

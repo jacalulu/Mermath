@@ -6,7 +6,6 @@ struct SpeechBubbleView: View {
     let text: String
     let scale: CGFloat
     let popTrigger: Int
-    var numeral: Int?
     var countIcons: Int?
     let replay: () -> Void
 
@@ -21,13 +20,6 @@ struct SpeechBubbleView: View {
                 .font(baloo(Tokens.TypeScale.prompt, weight: 700, scale: scale))
                 .foregroundStyle(Tokens.Palette.midnight)
                 .padding(.top, 4 * scale)
-            if let numeral {
-                // Match level: the numeral she is matching
-                Text("\(numeral)")
-                    .font(baloo(48, weight: 700, scale: scale))
-                    .foregroundStyle(Tokens.Palette.midnight)
-                    .padding(.leading, 2 * scale)
-            }
             if let countIcons {
                 // Count level: little bubbles to count, five per row
                 let rows = stride(from: 0, to: countIcons, by: 5).map { start in

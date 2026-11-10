@@ -67,7 +67,6 @@ struct ParentScreen: View {
     private func summary(_ p: ChildProgress) -> String {
         let level: String
         switch p.tideLevel {
-        case .match: level = "matching numerals"
         case .listen: level = "finding heard numbers"
         case .count: level = "counting objects"
         }

@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Coral Reef: adding to 10, with countable shells above each addend that fade
-/// as she gets quicker. Legacy background and shells until repainted.
+/// as she gets quicker.
 struct CoralReefScreen: View {
     let dive: DiveSession
     var onOpenChest: () -> Void = {}
@@ -13,7 +13,7 @@ struct CoralReefScreen: View {
         let s = m.scale
         ZStack {
             Group {
-                ArtImage("legacy/bg-coral.jpg")
+                ArtImage("scenes/coral-reef/bg.jpg")
                     .stage(x: 0, y: 0, w: 800, h: 600)
                 Vignette()
                     .stage(x: 0, y: 0, w: 800, h: 600)
@@ -96,9 +96,9 @@ struct EquationPanel: View {
 
     var body: some View {
         HStack(alignment: .bottom, spacing: 20 * scale) {
-            addend(a, shell: "legacy/shell-orange.png")
+            addend(a, shell: "props/shell-orange.png")
             op("+")
-            addend(b, shell: "legacy/shell-teal.png")
+            addend(b, shell: "props/shell-teal.png")
             op("=")
             Text(answer.map(String.init) ?? "?")
                 .font(baloo(64, weight: 700, scale: scale))
@@ -135,7 +135,7 @@ struct EquationPanel: View {
                 HStack(spacing: 4 * scale) {
                     ForEach(0..<n, id: \.self) { _ in
                         ArtImage(shell)
-                            .frame(width: w, height: w * 0.81)
+                            .frame(width: w, height: w * 0.89)
                     }
                 }
                 .transition(.opacity)

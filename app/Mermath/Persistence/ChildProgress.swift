@@ -18,7 +18,7 @@ enum GrottoItem: String, Codable, CaseIterable, Identifiable {
 
 struct ChildProgress: Codable {
     var child: ChildID
-    var tideLevel: TideLevel = .match
+    var tideLevel: TideLevel = .listen
     var tideRangeMax: Int = 5
     var divesCompleted: Int = 0
     var pearlsInProgress: Int = 0

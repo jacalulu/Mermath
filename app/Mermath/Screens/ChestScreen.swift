@@ -1,23 +1,40 @@
 import SwiftUI
 
-/// "10 pearls! The chest is open." The reward is a surprise.
-/// Legacy background until the chest is repainted in the locked look.
+/// "10 pearls! The chest is open." The reward is a surprise: the earned item
+/// floats in the chest's column of light.
 struct ChestScreen: View {
     let earned: GrottoItem?
     var onPlace: () -> Void = {}
 
     @Environment(\.stage) private var m
 
+    /// Where the earned item floats above the open chest (design space).
+    private func revealFrame(_ item: GrottoItem) -> CGRect {
+        switch item {
+        case .starfishLamp: return CGRect(x: 270, y: 50, width: 260, height: 260)
+        case .kelpCurtain: return CGRect(x: 359, y: 56, width: 82, height: 231)
+        case .shellBed: return CGRect(x: 260, y: 88, width: 280, height: 200)
+        }
+    }
+
     var body: some View {
         let s = m.scale
         ZStack {
             Group {
-                ArtImage("legacy/bg-chest.jpg")
+                ArtImage("scenes/chest/bg.jpg")
                     .stage(x: 0, y: 0, w: 800, h: 600)
                 Vignette()
                     .stage(x: 0, y: 0, w: 800, h: 600)
             }
             .bleed()
+
+            if let earned {
+                let f = revealFrame(earned)
+                ArtImage(earned.sprite)
+                    .shadow(color: Color(hex: 0xFFD27A, opacity: 0.7), radius: 24 * s)
+                    .stage(x: f.minX, y: f.minY, w: f.width, h: f.height)
+                    .transition(.opacity)
+            }
 
             VStack(spacing: 12 * s) {
                 Text("10 pearls! The chest is open.")

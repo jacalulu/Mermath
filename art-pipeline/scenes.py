@@ -258,7 +258,9 @@ def scene_map():
     s.finish(vig=.5)
     return s.svg()
 
-def scene_chest():
+def scene_chest(lamp=True):
+    # lamp=False leaves the reveal spot empty: the app overlays the earned
+    # item sprite there, so the chest can reveal any treasure.
     s = S(89, 400, 372, 520); r = s.r
     s.water(['#040a1e', '#0a1f44', '#123d66', '#1d5578'], [0, .4, .8, 1])
     veil = '<path d="M-40 60 C120 -20 260 180 420 90 C560 10 700 120 860 30 L860 -40 L-40 -40 Z" fill="#59c9ff" opacity=".55"/><path d="M-40 160 C140 80 300 260 470 160 C620 70 720 200 860 130 L860 60 C700 130 600 20 440 100 C280 180 140 0 -40 90 Z" fill="#8fe6ff" opacity=".48"/><path d="M-40 250 C120 190 280 320 460 240 C620 170 740 270 860 220 L860 170 C720 220 600 120 450 190 C290 260 130 130 -40 190 Z" fill="#59c9ff" opacity=".28"/>'
@@ -298,21 +300,24 @@ def scene_chest():
     s.add(f'<rect x="383" y="388" width="34" height="42" rx="9" fill="{gold}" stroke="#a86a14" stroke-width="2"/><circle cx="400" cy="404" r="5.5" fill="#3a1a0a"/><path d="M396 406 L404 406 L402 420 L398 420 Z" fill="#3a1a0a"/>')
     s.add(''.join(f'<circle cx="{x}" cy="{y}" r="3.5" fill="#fff3c4"/>' for x, y in ((300, 381), (500, 381), (340, 381), (460, 381), (312, 467), (488, 467))))
     s.add(''.join(f'<ellipse cx="{x}" cy="{y}" rx="12" ry="5" fill="#ffd866" stroke="#e09a1f" stroke-width="1.5"/>' for x, y in ((262, 492), (284, 500), (530, 494), (552, 502), (246, 504))))
-    # starfish lamp
-    s.bloom(400, 176, 150, '#ffe08a', .95)
-    sg = s.rad([(0, '#fffbe0', 1), (.45, '#ffd45e', 1), (1, '#ff9a3d', 1)])
-    s.add(f'<polygon points="{star(400, 178, 58, 27, -90)}" fill="{sg}" stroke="#ffe9a8" stroke-width="9" stroke-linejoin="round"/>')
-    for i in range(5):
-        a = math.radians(-90 + i * 72)
-        s.add(f'<circle cx="{400+30*math.cos(a):.1f}" cy="{178+30*math.sin(a):.1f}" r="3.6" fill="#fff8d6"/><circle cx="{400+44*math.cos(a):.1f}" cy="{178+44*math.sin(a):.1f}" r="2.6" fill="#fff8d6"/>')
-    s.add('<circle cx="390" cy="176" r="4" fill="#7a3d12"/><circle cx="410" cy="176" r="4" fill="#7a3d12"/><path d="M392 186 Q400 194 408 186" fill="none" stroke="#7a3d12" stroke-width="3" stroke-linecap="round"/><circle cx="391.4" cy="174.6" r="1.4" fill="#fff"/><circle cx="411.4" cy="174.6" r="1.4" fill="#fff"/>')
-    rl = ''.join(f'<path d="M{400+78*math.cos(math.radians(a)):.0f} {178+78*math.sin(math.radians(a)):.0f} L{400+104*math.cos(math.radians(a)):.0f} {178+104*math.sin(math.radians(a)):.0f}" stroke="#ffe9a8" stroke-width="4" stroke-linecap="round" opacity=".7"/>' for a in (-162, -18, 18, 54, 90, 126, 162))
-    s.add(rl)
+    if lamp:
+        # starfish lamp
+        s.bloom(400, 176, 150, '#ffe08a', .95)
+        sg = s.rad([(0, '#fffbe0', 1), (.45, '#ffd45e', 1), (1, '#ff9a3d', 1)])
+        s.add(f'<polygon points="{star(400, 178, 58, 27, -90)}" fill="{sg}" stroke="#ffe9a8" stroke-width="9" stroke-linejoin="round"/>')
+        for i in range(5):
+            a = math.radians(-90 + i * 72)
+            s.add(f'<circle cx="{400+30*math.cos(a):.1f}" cy="{178+30*math.sin(a):.1f}" r="3.6" fill="#fff8d6"/><circle cx="{400+44*math.cos(a):.1f}" cy="{178+44*math.sin(a):.1f}" r="2.6" fill="#fff8d6"/>')
+        s.add('<circle cx="390" cy="176" r="4" fill="#7a3d12"/><circle cx="410" cy="176" r="4" fill="#7a3d12"/><path d="M392 186 Q400 194 408 186" fill="none" stroke="#7a3d12" stroke-width="3" stroke-linecap="round"/><circle cx="391.4" cy="174.6" r="1.4" fill="#fff"/><circle cx="411.4" cy="174.6" r="1.4" fill="#fff"/>')
+        rl = ''.join(f'<path d="M{400+78*math.cos(math.radians(a)):.0f} {178+78*math.sin(math.radians(a)):.0f} L{400+104*math.cos(math.radians(a)):.0f} {178+104*math.sin(math.radians(a)):.0f}" stroke="#ffe9a8" stroke-width="4" stroke-linecap="round" opacity=".7"/>' for a in (-162, -18, 18, 54, 90, 126, 162))
+        s.add(rl)
     s.particles(190, 16); s.particles(60, 0, region=(250, 80, 550, 380))
     s.finish(mott=.45, streak=0)
     return s.svg()
 
-def scene_grotto():
+def scene_grotto(items=True):
+    # items=False leaves the decoration spots bare: the app overlays each
+    # earned item sprite (item_lamp / item_curtain / item_shellbed) in place.
     s = S(113, 400, -260, 1000); r = s.r
     s.add(f'<rect width="{W}" height="{H}" fill="{s.rad([(0, "#7fe6da", 1), (.35, "#1f93a6", 1), (.7, "#0c466a", 1), (1, "#061c3a", 1)], cx=.5, cy=.36, rr=.8)}"/>')
     back = '<path d="M150 620 C160 420 220 330 300 300 C330 380 330 500 320 620 Z" fill="#177f96"/><path d="M500 620 C490 480 500 370 540 310 C610 340 650 450 660 620 Z" fill="#177f96"/><path d="M330 620 C340 520 370 470 400 460 C440 470 470 520 480 620 Z" fill="#1c8ba0"/>'
@@ -322,30 +327,19 @@ def scene_grotto():
     d, top = hill(r, 520, 8)
     s.add(f'<path d="{d}" fill="{s.lin([(0, "#f1dcaa", 1), (1, "#9a7850", 1)])}"/>')
     s.add(f'<g clip-path="{s.clip(d)}"><rect width="{W}" height="{H}" filter="url(#caustic)" opacity=".35" style="mix-blend-mode:screen"/><ellipse cx="400" cy="530" rx="210" ry="50" fill="#fff6d8" opacity=".55" filter="url(#b12)"/></g>')
-    # clam shell bed
-    cx, cy = 520, 492
-    ed = f'M{cx-112} {cy} '
-    n = 8
-    for i in range(n):
-        a0 = math.pi + math.pi * i / n; a1 = math.pi + math.pi * (i + 1) / n; am = (a0 + a1) / 2
-        ed += f'Q{cx+128*math.cos(am):.0f} {cy+118*math.sin(am):.0f} {cx+112*math.cos(a1):.0f} {cy+100*math.sin(a1):.0f} '
-    ed += 'Z'
-    s.add(f'<ellipse cx="{cx}" cy="{cy+44}" rx="130" ry="14" fill="#3a2a1a" opacity=".45" filter="url(#b6)"/>')
-    s.add(f'<path d="{ed}" fill="{s.lin([(0, "#fff0fa", 1), (.6, "#f7b9e4", 1), (1, "#d98ac9", 1)])}" stroke="#c77ab8" stroke-width="3" stroke-linejoin="round"/>')
-    s.add(''.join(f'<path d="M{cx} {cy} L{cx+106*math.cos(math.pi+math.pi*i/n):.0f} {cy+96*math.sin(math.pi+math.pi*i/n):.0f}" stroke="#d98ac9" stroke-width="3" opacity=".6"/>' for i in range(1, n)))
-    s.add(f'<ellipse cx="{cx}" cy="{cy}" rx="112" ry="20" fill="#fff5fb"/><ellipse cx="{cx-10}" cy="{cy-5}" rx="88" ry="17" fill="{s.lin([(0, "#e3d4ff", 1), (1, "#b79cff", 1)])}"/><ellipse cx="{cx-30}" cy="{cy-10}" rx="40" ry="6" fill="#ffffff" opacity=".5"/>')
-    s.add(f'<path d="M{cx-114} {cy} C{cx-110} {cy+66} {cx+110} {cy+66} {cx+114} {cy} C{cx+80} {cy+20} {cx-80} {cy+20} {cx-114} {cy} Z" fill="{s.lin([(0, "#f09fd8", 1), (1, "#9a4f9f", 1)])}"/>')
-    s.add(''.join(f'<path d="M{cx+k*26} {cy+16} Q{cx+k*30} {cy+34} {cx+k*24} {cy+48}" fill="none" stroke="#7a3a82" stroke-width="2.5" opacity=".5"/>' for k in (-3, -2, -1, 0, 1, 2, 3)))
-    s.add(f'<circle cx="{cx+66}" cy="{cy-12}" r="15" fill="{s.rad([(0, "#ffffff", 1), (.6, "#fff1e2", 1), (1, "#e3c4a8", 1)], cx=.35, cy=.3, rr=.8)}"/>')
+    if items:
+        # clam shell bed
+        s.add(shellbed_svg(s, 520, 492))
     # walls
     lw = 'M-20 -20 L262 -20 C210 40 160 84 138 164 C118 244 146 300 108 384 C84 446 116 520 60 620 L-20 620 Z'
     rw = 'M820 -20 L548 -20 C600 50 656 74 674 152 C694 242 662 312 702 392 C726 452 698 530 746 620 L820 620 Z'
     s.add(f'<g filter="url(#paint)"><path d="{lw}" fill="#0b2c48"/><path d="{rw}" fill="#0b2c48"/><path d="{lw}" transform="translate(-34 0)" fill="#051426"/><path d="{rw}" transform="translate(34 0)" fill="#051426"/>')
     s.add('<path d="M262 -20 L300 70 L330 -20 Z M470 -20 L498 84 L548 -20 Z M190 -20 L214 54 L240 -20 Z M580 -20 L598 60 L620 -20 Z" fill="#051426"/></g>')
     s.add(f'<path d="M262 -20 C210 40 160 84 138 164 C118 244 146 300 108 384 C84 446 116 520 60 620" fill="none" stroke="{RIM}" stroke-width="3" opacity=".5" filter="url(#b1)"/><path d="M548 -20 C600 50 656 74 674 152 C694 242 662 312 702 392 C726 452 698 530 746 620" fill="none" stroke="{RIM}" stroke-width="3" opacity=".5" filter="url(#b1)"/>')
-    # kelp curtain
-    cur = ''.join(strand(r, x, 60 + r.uniform(0, 30), ln, '#27b592', '#5fe0b6') for x, ln in ((612, 300), (640, 350), (668, 320), (694, 270)))
-    s.add(f'<g filter="url(#b6)" opacity=".5" style="mix-blend-mode:screen">{cur}</g>{cur}')
+    if items:
+        # kelp curtain
+        cur = ''.join(strand(r, x, 60 + r.uniform(0, 30), ln, '#27b592', '#5fe0b6') for x, ln in ((612, 300), (640, 350), (668, 320), (694, 270)))
+        s.add(f'<g filter="url(#b6)" opacity=".5" style="mix-blend-mode:screen">{cur}</g>{cur}')
     # crystals
     def crystal(x, y, h, col, rot):
         return f'<g transform="translate({x} {y}) rotate({rot})"><path d="M0 0 L{-h*.2:.0f} {-h*.7:.0f} L0 {-h} L{h*.2:.0f} {-h*.7:.0f} Z" fill="{col}"/><path d="M0 0 L0 {-h} L{h*.2:.0f} {-h*.7:.0f} Z" fill="#ffffff" opacity=".45"/></g>'
@@ -359,16 +353,78 @@ def scene_grotto():
             t = i / 8; x = (1-t)**2*x0 + 2*(1-t)*t*(x0+x1)/2 + t*t*x1; y = (1-t)**2*y0 + 2*(1-t)*t*((y0+y1)/2+sag*2) + t*t*y1
             lights += f'<circle cx="{x:.0f}" cy="{y+6:.0f}" r="16" fill="url(#spark)" opacity=".9"/><circle cx="{x:.0f}" cy="{y+6:.0f}" r="4.5" fill="#fff6d8"/>'
     s.add(f'<g style="mix-blend-mode:screen">{lights}</g>')
-    # starfish lamp hanging in the shaft
-    s.add('<path d="M400 -20 L400 132" stroke="#06182c" stroke-width="2.5"/>')
-    s.bloom(400, 176, 130, '#ffe08a', .95)
-    sg = s.rad([(0, '#fffbe0', 1), (.45, '#ffd45e', 1), (1, '#ff9a3d', 1)])
-    s.add(f'<polygon points="{star(400, 178, 44, 20, -90)}" fill="{sg}" stroke="#ffe9a8" stroke-width="7" stroke-linejoin="round"/>')
-    s.add('<circle cx="392" cy="176" r="3.2" fill="#7a3d12"/><circle cx="408" cy="176" r="3.2" fill="#7a3d12"/><path d="M394 184 Q400 190 406 184" fill="none" stroke="#7a3d12" stroke-width="2.5" stroke-linecap="round"/>')
+    if items:
+        # starfish lamp hanging in the shaft
+        s.add('<path d="M400 -20 L400 132" stroke="#06182c" stroke-width="2.5"/>')
+        s.bloom(400, 176, 130, '#ffe08a', .95)
+        sg = s.rad([(0, '#fffbe0', 1), (.45, '#ffd45e', 1), (1, '#ff9a3d', 1)])
+        s.add(f'<polygon points="{star(400, 178, 44, 20, -90)}" fill="{sg}" stroke="#ffe9a8" stroke-width="7" stroke-linejoin="round"/>')
+        s.add('<circle cx="392" cy="176" r="3.2" fill="#7a3d12"/><circle cx="408" cy="176" r="3.2" fill="#7a3d12"/><path d="M394 184 Q400 190 406 184" fill="none" stroke="#7a3d12" stroke-width="2.5" stroke-linecap="round"/>')
     s.particles(130, 12); s.finish(mott=.45, streak=.18, vig=.45)
     return s.svg()
 
-SCENES = dict(bg_main=scene_main, bg_coral=scene_coral, bg_tide=scene_tide, bg_map=scene_map, bg_chest=scene_chest, bg_grotto=scene_grotto)
+def shellbed_svg(s, cx, cy):
+    """The clam shell bed, drawn around (cx, cy); shared by the grotto scene
+    and the standalone item sprite so they stay identical."""
+    n = 8
+    ed = f'M{cx-112} {cy} '
+    for i in range(n):
+        a0 = math.pi + math.pi * i / n; a1 = math.pi + math.pi * (i + 1) / n; am = (a0 + a1) / 2
+        ed += f'Q{cx+128*math.cos(am):.0f} {cy+118*math.sin(am):.0f} {cx+112*math.cos(a1):.0f} {cy+100*math.sin(a1):.0f} '
+    ed += 'Z'
+    out = f'<ellipse cx="{cx}" cy="{cy+44}" rx="130" ry="14" fill="#3a2a1a" opacity=".45" filter="url(#b6)"/>'
+    out += f'<path d="{ed}" fill="{s.lin([(0, "#fff0fa", 1), (.6, "#f7b9e4", 1), (1, "#d98ac9", 1)])}" stroke="#c77ab8" stroke-width="3" stroke-linejoin="round"/>'
+    out += ''.join(f'<path d="M{cx} {cy} L{cx+106*math.cos(math.pi+math.pi*i/n):.0f} {cy+96*math.sin(math.pi+math.pi*i/n):.0f}" stroke="#d98ac9" stroke-width="3" opacity=".6"/>' for i in range(1, n))
+    out += f'<ellipse cx="{cx}" cy="{cy}" rx="112" ry="20" fill="#fff5fb"/><ellipse cx="{cx-10}" cy="{cy-5}" rx="88" ry="17" fill="{s.lin([(0, "#e3d4ff", 1), (1, "#b79cff", 1)])}"/><ellipse cx="{cx-30}" cy="{cy-10}" rx="40" ry="6" fill="#ffffff" opacity=".5"/>'
+    out += f'<path d="M{cx-114} {cy} C{cx-110} {cy+66} {cx+110} {cy+66} {cx+114} {cy} C{cx+80} {cy+20} {cx-80} {cy+20} {cx-114} {cy} Z" fill="{s.lin([(0, "#f09fd8", 1), (1, "#9a4f9f", 1)])}"/>'
+    out += ''.join(f'<path d="M{cx+k*26} {cy+16} Q{cx+k*30} {cy+34} {cx+k*24} {cy+48}" fill="none" stroke="#7a3a82" stroke-width="2.5" opacity=".5"/>' for k in (-3, -2, -1, 0, 1, 2, 3))
+    out += f'<circle cx="{cx+66}" cy="{cy-12}" r="15" fill="{s.rad([(0, "#ffffff", 1), (.6, "#fff1e2", 1), (1, "#e3c4a8", 1)], cx=.35, cy=.3, rr=.8)}"/>'
+    return out
+
+# ---- Grotto item sprites: full-frame transparent, each item at its in-scene
+# position; render with alpha and crop in sprites.py. The app overlays them
+# only once they are earned.
+
+def item_lamp():
+    s = S(201, 400, -260)
+    s.bloom(400, 178, 118, '#ffe08a', .9)
+    sg = s.rad([(0, '#fffbe0', 1), (.45, '#ffd45e', 1), (1, '#ff9a3d', 1)])
+    s.add(f'<polygon points="{star(400, 178, 44, 20, -90)}" fill="{sg}" stroke="#ffe9a8" stroke-width="7" stroke-linejoin="round"/>')
+    s.add('<circle cx="392" cy="176" r="3.2" fill="#7a3d12"/><circle cx="408" cy="176" r="3.2" fill="#7a3d12"/><path d="M394 184 Q400 190 406 184" fill="none" stroke="#7a3d12" stroke-width="2.5" stroke-linecap="round"/><circle cx="393.2" cy="174.8" r="1.1" fill="#fff"/><circle cx="409.2" cy="174.8" r="1.1" fill="#fff"/>')
+    return s.svg()
+
+def item_curtain():
+    s = S(202, 400, -260); r = s.r
+    cur = ''.join(strand(r, x, 60 + r.uniform(0, 30), ln, '#27b592', '#5fe0b6') for x, ln in ((612, 300), (640, 350), (668, 320), (694, 270)))
+    s.add(f'<path d="M596 58 Q652 46 710 58" fill="none" stroke="#0a3c52" stroke-width="7" stroke-linecap="round"/>')
+    s.add(f'<g filter="url(#b6)" opacity=".4">{cur}</g>{cur}')
+    return s.svg()
+
+def item_shellbed():
+    s = S(203, 400, -260)
+    s.add(shellbed_svg(s, 520, 492))
+    return s.svg()
+
+def shell_svg(base, deep, rib, seed):
+    """A scallop for the Coral Reef counting rows, drawn around (400, 300)."""
+    s = S(seed, 400, -260)
+    hx, hy = 400, 356
+    body = f'M{hx} {hy} C344 344 318 300 322 254 C348 218 452 218 478 254 C482 300 456 344 {hx} {hy} Z'
+    s.add(f'<path d="{body}" fill="{s.lin([(0, base, 1), (1, deep, 1)], y1=1, y2=0)}" stroke="{deep}" stroke-width="5" stroke-linejoin="round"/>')
+    ribs = ''
+    for k in (-3, -2, -1, 0, 1, 2, 3):
+        ex = hx + k * 24; ey = 240 + abs(k) * 7
+        ribs += f'<path d="M{hx} {hy-8} Q{hx+k*16} {300+abs(k)*2} {ex} {ey}" fill="none" stroke="{rib}" stroke-width="3" opacity=".45"/>'
+    s.add(ribs)
+    s.add(f'<path d="M330 262 C356 228 444 228 470 262" fill="none" stroke="{hexmix(base, "#ffffff", .55)}" stroke-width="6" opacity=".8" stroke-linecap="round"/>')
+    s.add(f'<rect x="384" y="350" width="32" height="14" rx="5" fill="{deep}"/>')
+    return s.svg()
+
+SCENES = dict(bg_main=scene_main, bg_coral=scene_coral, bg_tide=scene_tide, bg_map=scene_map,
+              bg_chest=lambda: scene_chest(lamp=False), bg_grotto=lambda: scene_grotto(items=False),
+              item_lamp=item_lamp, item_curtain=item_curtain, item_shellbed=item_shellbed,
+              shell_orange=lambda: shell_svg('#ffb347', '#c9562b', '#7a2f12', 205),
+              shell_teal=lambda: shell_svg('#5fd6c2', '#12788c', '#0a4a5a', 206))
 
 if __name__ == '__main__':
     for name in (sys.argv[1:] or SCENES):
