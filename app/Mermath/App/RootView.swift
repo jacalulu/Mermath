@@ -18,7 +18,8 @@ struct RootView: View {
             case .pick:
                 PickMermaidScreen(
                     onPick: { model.pick($0) },
-                    onParentGate: { model.openParent() }
+                    onParentGate: { model.openParent() },
+                    onStory: { model.replayIntro() }
                 )
                 .transition(.opacity)
 

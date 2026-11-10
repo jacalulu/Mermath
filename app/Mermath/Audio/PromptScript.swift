@@ -89,6 +89,14 @@ enum PromptScript {
     static let intro3 = Prompt(id: "intro-3", text: "The sneeze swept the treasures all across the sea!")
     static let intro4 = Prompt(id: "intro-4", text: "Oh no! The treasures washed away! Who is diving today?")
 
+    /// The crab inviting the tollbooth play, once per dive.
+    static let popBubbles = Prompt(id: "pop-bubbles", text: "Pop the bubbles!")
+
+    /// Single counting words, for tapping the reef's shells one by one.
+    static func countWord(_ n: Int) -> Prompt {
+        Prompt(id: "count-\(n)", text: "\(word(n).capitalized)!")
+    }
+
     // MARK: Treasure hunt
 
     static let chestMap = Prompt(id: "chest-map", text: "And look! A treasure map!")

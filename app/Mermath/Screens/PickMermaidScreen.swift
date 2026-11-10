@@ -5,6 +5,7 @@ import SwiftUI
 struct PickMermaidScreen: View {
     var onPick: (ChildID) -> Void = { _ in }
     var onParentGate: () -> Void = {}
+    var onStory: () -> Void = {}
 
     @Environment(\.stage) private var m
 
@@ -87,6 +88,14 @@ struct PickMermaidScreen: View {
                 WordmarkView(t: t)
                     .stage(x: 248, y: 18, w: 304, h: 102)
                     .onLongPressGesture(minimumDuration: 2, perform: onParentGate)
+
+                // The little whale replays the story
+                Button(action: onStory) {
+                    WhaleView(scale: s * 92 / 568, facingRight: false)
+                        .offset(y: Wave.bob(t, from: 0, to: -4, duration: 3.4) * s)
+                }
+                .buttonStyle(.plain)
+                .stage(x: 24, y: 536, w: 92, h: 39)
 
                 Text("Who is diving today?")
                     .font(baloo(Tokens.TypeScale.pill, weight: 600, scale: s))

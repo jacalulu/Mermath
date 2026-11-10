@@ -110,7 +110,8 @@ struct CoralReefScreen: View {
                         showShells: showShells,
                         scale: s,
                         popTrigger: dive.popTrigger,
-                        replay: { dive.replay() }
+                        replay: { dive.replay() },
+                        onShellTap: { dive.speakCount($0) }
                     )
                     .stageTopLeft(x: 196, y: 88)
                 }
@@ -153,6 +154,16 @@ struct CoralReefScreen: View {
                 )
                 .stage(x: 0, y: 0, w: 800, h: 600)
 
+                // The tollbooth payout, here too
+                BonusBubbleField(
+                    t: t,
+                    trigger: dive.pearls,
+                    origin: bubbleCenter(goldLane),
+                    scale: s,
+                    playNote: { dive.playBonusNote($0) }
+                )
+                .stage(x: 0, y: 0, w: 800, h: 600)
+
                 if dive.diveComplete {
                     SolvedPanel(
                         text: dive.solvedText,
@@ -188,6 +199,8 @@ struct ReefSpeechBubble: View {
     let scale: CGFloat
     let popTrigger: Int
     let replay: () -> Void
+    /// Tapping the k-th shell (counting across both groups) counts it aloud.
+    var onShellTap: (Int) -> Void = { _ in }
 
     var body: some View {
         HStack(alignment: .bottom, spacing: 10 * scale) {
@@ -197,9 +210,9 @@ struct ReefSpeechBubble: View {
             }
             .buttonStyle(.plain)
             .padding(.bottom, 2 * scale)
-            addend(a, shell: "props/shell-orange.png")
+            addend(a, shell: "props/shell-orange.png", countOffset: 0)
             op("+")
-            addend(b, shell: "props/shell-teal.png")
+            addend(b, shell: "props/shell-teal.png", countOffset: a)
             op("=")
             slot
         }
@@ -222,20 +235,26 @@ struct ReefSpeechBubble: View {
         }
     }
 
-    private func addend(_ n: Int, shell: String) -> some View {
+    private func addend(_ n: Int, shell: String, countOffset: Int) -> some View {
         // Shells wrap five per row (like the counting bubbles), so the bubble
         // never pushes past the stage even for 7 + 3. The reference's 46px
-        // size holds while a single row fits.
+        // size holds while a single row fits. Each shell is a button that
+        // counts itself aloud, so she can count on from the first group.
         let w = n <= 5 ? min(46, 190 / CGFloat(n)) * scale : 28 * scale
         let rows = stride(from: 0, to: n, by: 5).map { min(5, n - $0) }
         return VStack(spacing: 2 * scale) {
             if showShells {
                 VStack(spacing: 3 * scale) {
-                    ForEach(Array(rows.enumerated()), id: \.offset) { _, count in
+                    ForEach(Array(rows.enumerated()), id: \.offset) { row, count in
                         HStack(spacing: 3 * scale) {
-                            ForEach(0..<count, id: \.self) { _ in
-                                ArtImage(shell)
-                                    .frame(width: w, height: w * 0.8)
+                            ForEach(0..<count, id: \.self) { i in
+                                Button {
+                                    onShellTap(countOffset + row * 5 + i + 1)
+                                } label: {
+                                    ArtImage(shell)
+                                        .frame(width: w, height: w * 0.8)
+                                }
+                                .buttonStyle(ShellBounceStyle())
                             }
                         }
                     }
@@ -287,6 +306,15 @@ struct ReefSpeechBubble: View {
                 .frame(width: 60 * scale, height: 60 * scale)
                 .padding(.bottom, 4 * scale)
         }
+    }
+}
+
+/// A tapped shell springs up a little while it is counted aloud.
+struct ShellBounceStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 1.35 : 1)
+            .animation(.spring(duration: 0.25), value: configuration.isPressed)
     }
 }
 

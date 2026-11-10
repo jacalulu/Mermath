@@ -49,6 +49,10 @@ def prompts():
             out.append((f'reef-hint-{a}-{b}', f'Count all the shells: {first}, and then {rest}!', 'crab'))
             out.append((f'reef-praise-{a}-{b}', f'{wa} and {wb} make {ws}!', 'crab'))
             out.append((f'reef-tenth-{a}-{b}', f'{wa} and {wb} make {ws}! That makes ten pearls! Open the chest!', 'crab'))
+    # Tollbooth play and counting shells
+    out.append(('pop-bubbles', 'Pop the bubbles!', 'crab'))
+    for n in range(1, 11):
+        out.append((f'count-{n}', f'{WORD[n].capitalize()}!', 'crab'))
     # Intro cinematic
     out.append(('intro-1', 'Deep under the sea, three little mermaid sisters kept their treasures in a cozy grotto.', 'narrator'))
     out.append(('intro-2', 'One day, a great big whale swam by. And then. Aaah. Aaah. AAACHOO!', 'narrator'))

@@ -12,6 +12,8 @@ struct IntroScreen: View {
 
     @Environment(\.stage) private var m
     @State private var spoken: Set<Int> = []
+    /// Clock time at first frame, so the story also plays on replays.
+    @State private var start: Double?
     @State private var finished = false
 
     private func beat(_ t: Double, _ from: Double, _ to: Double) -> Double {
@@ -21,11 +23,12 @@ struct IntroScreen: View {
     var body: some View {
         let s = m.scale
         MotionClock { t in
+            let tl = t - (start ?? t)
             ZStack {
                 // ---- Beat 1 and 2: the grotto, then the whale and the sneeze
-                if t < 13.5 {
-                    let sneeze = beat(t, 12.0, 12.15)       // the lunge
-                    let scatter = beat(t, 12.1, 13.4)       // treasures fly out
+                if tl < 13.5 {
+                    let sneeze = beat(tl, 12.0, 12.15)       // the lunge
+                    let scatter = beat(tl, 12.1, 13.4)       // treasures fly out
                     Group {
                         Group {
                             ArtImage("scenes/grotto/bg.jpg")
@@ -52,20 +55,20 @@ struct IntroScreen: View {
                             .stage(x: 394 - scatter * 780, y: 378 + scatter * 420, w: 252, h: 170)
 
                         // The whale: swims in, winds up, sneezes
-                        let enter = beat(t, 6.5, 10.0)
-                        let windup = t > 10.2 && t < 12.0
-                            ? 1 + 0.05 * sin((t - 10.2) * 3.5 * .pi) * beat(t, 10.2, 11.6)
+                        let enter = beat(tl, 6.5, 10.0)
+                        let windup = tl > 10.2 && tl < 12.0
+                            ? 1 + 0.05 * sin((tl - 10.2) * 3.5 * .pi) * beat(tl, 10.2, 11.6)
                             : 1.0
-                        if t > 6.5 {
+                        if tl > 6.5 {
                             WhaleView(scale: s)
                                 .scaleEffect(windup + sneeze * 0.08)
-                                .rotationEffect(.degrees(-6 * sneeze + 3 * beat(t, 12.15, 12.6)))
+                                .rotationEffect(.degrees(-6 * sneeze + 3 * beat(tl, 12.15, 12.6)))
                                 .stage(x: -620 + enter * 560 + sneeze * 110, y: 110 + Wave.alternate(t, from: -8, to: 8, duration: 3.1), w: 568, h: 240)
                                 .transition(.opacity)
                         }
                         // The sneeze itself: a white flash and a burst of bubbles
-                        if t > 12.0 && t < 13.2 {
-                            let burst = beat(t, 12.0, 13.2)
+                        if tl > 12.0 && tl < 13.2 {
+                            let burst = beat(tl, 12.0, 13.2)
                             Color.white
                                 .opacity(0.65 * (1 - burst))
                                 .stage(x: 0, y: 0, w: 800, h: 600)
@@ -82,13 +85,13 @@ struct IntroScreen: View {
                             .bleed()
                     }
                     // The whole room shudders with the sneeze
-                    .offset(x: t > 12.0 && t < 12.7 ? sin(t * 56) * 7 * s * (1 - beat(t, 12.0, 12.7)) : 0)
+                    .offset(x: tl > 12.0 && tl < 12.7 ? sin(t * 56) * 7 * s * (1 - beat(tl, 12.0, 12.7)) : 0)
                     .transition(.opacity)
                 }
 
                 // ---- Beat 3: the treasures scatter across the map
-                if t >= 13.5 && t < 19 {
-                    let fall = beat(t, 13.7, 17.5)
+                if tl >= 13.5 && tl < 19 {
+                    let fall = beat(tl, 13.7, 17.5)
                     Group {
                         ArtImage("scenes/reef-map/bg.jpg")
                             .stage(x: 0, y: 0, w: 800, h: 600)
@@ -115,7 +118,7 @@ struct IntroScreen: View {
                 }
 
                 // ---- Beat 4: the crab calls for help
-                if t >= 19 {
+                if tl >= 19 {
                     Group {
                         ArtImage("scenes/home/bg.jpg")
                             .stage(x: 0, y: 0, w: 800, h: 600)
@@ -125,7 +128,7 @@ struct IntroScreen: View {
                             .stage(x: 0, y: 0, w: 800, h: 600)
                     }
                     .bleed()
-                    let pop = beat(t, 19.0, 19.6)
+                    let pop = beat(tl, 19.0, 19.6)
                     CrabView(t: t, scale: s)
                         .stage(x: 275, y: 620 - pop * 310 + (1 - pop) * 0, w: 250, h: 211)
                         .transition(.opacity)
@@ -138,15 +141,16 @@ struct IntroScreen: View {
                     .stageTopRight(right: 28, y: 28)
             }
             .onChange(of: Int(t * 10)) {
+                if start == nil { start = t }
                 // Narration beats, each spoken once
                 for (i, at, prompt) in [(1, 0.3, PromptScript.intro1),
                                         (2, 6.8, PromptScript.intro2),
                                         (3, 13.7, PromptScript.intro3),
-                                        (4, 19.2, PromptScript.intro4)] where t >= at && !spoken.contains(i) {
+                                        (4, 19.2, PromptScript.intro4)] where tl >= at && !spoken.contains(i) {
                     spoken.insert(i)
                     speak(prompt)
                 }
-                if t >= 24.0 && !finished {
+                if tl >= 24.0 && !finished {
                     finished = true
                     onDone(true)
                 }

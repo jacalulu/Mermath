@@ -22,6 +22,7 @@ final class DiveSession {
     private let sounds: SoundPlayer
     private var hintsThisDive = 0
     private var hintThisQuestion = false
+    private var saidPopBubbles = false
     private var askedAt = Date()
     private var advanceTask: Task<Void, Never>?
 
@@ -127,9 +128,21 @@ final class DiveSession {
             return
         }
         speaker.speak(praisePrompt())
+
+        // The tollbooth pause: the praise finishes, the bonus bubbles get
+        // popped, and only then does the next question arrive. The Tide Pool
+        // gets the longest window; the crab invites the popping once per dive.
+        let pause: UInt64 = zone == .tidePool ? 6_000_000_000 : 4_000_000_000
+        if zone == .tidePool && !saidPopBubbles && pearls < 10 {
+            saidPopBubbles = true
+            Task { [speaker] in
+                try? await Task.sleep(nanoseconds: 1_700_000_000)
+                speaker.speak(PromptScript.popBubbles)
+            }
+        }
         advanceTask?.cancel()
         advanceTask = Task { [weak self] in
-            try? await Task.sleep(nanoseconds: 1_600_000_000)
+            try? await Task.sleep(nanoseconds: pause)
             guard let self, !Task.isCancelled else { return }
             self.nextQuestion()
         }
@@ -187,6 +200,11 @@ final class DiveSession {
     /// The tollbooth reward: popping a bonus bubble plays the next rising note.
     func playBonusNote(_ index: Int) {
         sounds.play(SoundPlayer.Effect.notes[index % SoundPlayer.Effect.notes.count])
+    }
+
+    /// Tapping the reef's shells counts them aloud, one by one.
+    func speakCount(_ n: Int) {
+        speaker.speak(PromptScript.countWord(n))
     }
 
     #if DEBUG
