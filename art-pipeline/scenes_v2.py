@@ -214,6 +214,27 @@ def scene_hunt_layers():
     return {n: s.svg_layer(n) for n in ('bg', 'kelp_far', 'fg', 'grass')}
 
 
+def scene_deep_layers():
+    """The Deep Sea: darker water, pale glowing corals, the crab's rock on the
+    left and open space on the right for the counting rings."""
+    s = LS(947, 300, -230, 1000); r = s.r
+    open_water(s, cols=('#7fd0d8', '#3d9bb0', '#1b6a8e', '#0e3f66', '#081f44'))
+    far = ''.join(kelp(r, x + r.uniform(-12, 12), 6, '#4fa8b4', (30, 56), (6, 10), (22, 38)) for x in (200, 360, 520, 680))
+    s.layer('kelp_far').add(f'<g filter="url(#b3)" opacity=".55">{far}</g>')
+    d, top = hill(r, 470, 14); s.layer('bg').add(f'<path d="{d}" fill="#1f6d88" opacity=".6" filter="url(#b3)"/>')
+    s.rays(RAYS, 1000, .4)
+    s.layer('fg'); sand(s, r, 476, 8, [(0, '#c9b58b', 1), (1, '#8a7452', 1)])
+    s.add(boulder(s, 140, 486, 310, 104) + boulder(s, 302, 548, 120, 50, moss=False))
+    s.add(boulder(s, 742, 544, 180, 70) + boulder(s, 652, 572, 90, 36, moss=False))
+    s.add(coral(r, 52, 492, '#3a7f9c', '#aef0ff', 160, 4, 14, -88) + coral(r, 760, 500, '#4a5fb0', '#bcd2ff', 150, 4, 14, -92) + coral(r, 690, 540, '#2f8c9c', '#9ff0e8', 96, 3, 11, -80))
+    sand(s, r, 574, 5, [(0, '#d6c29a', 1), (1, '#7a6648', 1)], caustic=False)
+    s.add(mound(s, 420, 598, 40, 32, '#2f9c9c', '#0e5f78') + mound(s, 560, 600, 34, 28, '#4a5fb0', '#20306e'))
+    s.add(shell_on_sand(360, 592) + seastar(500, 590, 9, '#9fd0ff', -75))
+    s.layer('grass').add(grass(r, 240, 596, 6, 22, 50, '#157c74', '#2fae9c') + grass(r, 620, 598, 6, 20, 46, '#157c74', '#2fae9c'))
+    s.layer('bg'); s.finish(mott=.3, streak=.12, vig=.25, grain=0)
+    return {n: s.svg_layer(n) for n in ('bg', 'kelp_far', 'fg', 'grass')}
+
+
 def scene_props_layers():
     """Small painted objects used by the screens: the padlock for a locked zone,
     the two countable shells, and the Tide Pool's big answer fish (it carries a
@@ -260,5 +281,6 @@ SCENES2 = {
     'grotto': (scene_grotto_layers, dict(bg='bg', floor='fg', walls='fg', curtain='mid', bed='piece', lights='prop', lamp='prop', lamp_face='vector')),
     'map': (scene_map_layers, dict(bg='bg', kelp_far='far', kelp_mid='mid', floor='fg', grass='grass')),
     'hunt': (scene_hunt_layers, dict(bg='bg', kelp_far='far', fg='fg', grass='grass')),
+    'deep': (scene_deep_layers, dict(bg='bg', kelp_far='far', fg='fg', grass='grass')),
     'props': (scene_props_layers, dict(lock='prop', afish='prop', afish_face='vector', whale='piece', whale_face='vector')),
 }

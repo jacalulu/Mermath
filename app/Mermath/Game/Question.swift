@@ -29,6 +29,9 @@ enum QuestionPresentation: Equatable {
     case count
     /// Coral Reef: a + b with countable shells over each addend.
     case addition(a: Int, b: Int, showShells: Bool)
+    /// Deep Sea: skip counting. She wears `current` and swims through the
+    /// ring that comes next when counting by `step`.
+    case skip(step: Int, current: Int)
 }
 
 struct Question: Equatable {

@@ -43,6 +43,9 @@ final class DiveSession {
         switch zone {
         case .coralReef:
             return CoralReefGenerator().next(avoiding: last, quickStreak: progress.reefQuickStreak)
+        case .deepSea:
+            // Alternate dives between counting by 2s and by 5s
+            return DeepSeaGenerator(step: progress.divesCompleted % 2 == 0 ? 2 : 5).next(after: last)
         default:
             return TidePoolGenerator(level: progress.tideLevel, rangeMax: progress.tideRangeMax)
                 .next(avoiding: last)
@@ -52,24 +55,27 @@ final class DiveSession {
     // MARK: Spoken lines
 
     var writtenPrompt: String {
-        if case let .addition(a, b, _) = question.presentation {
-            return PromptScript.reefWritten(a: a, b: b)
+        switch question.presentation {
+        case let .addition(a, b, _): return PromptScript.reefWritten(a: a, b: b)
+        case let .skip(step, current): return PromptScript.deepWritten(step: step, after: current)
+        default: return PromptScript.tideWritten(question)
         }
-        return PromptScript.tideWritten(question)
     }
 
     private var spokenPrompt: Prompt {
-        if case let .addition(a, b, _) = question.presentation {
-            return PromptScript.reefSpoken(a: a, b: b)
+        switch question.presentation {
+        case let .addition(a, b, _): return PromptScript.reefSpoken(a: a, b: b)
+        case let .skip(step, current): return PromptScript.deepSpoken(step: step, after: current)
+        default: return PromptScript.tideSpoken(question)
         }
-        return PromptScript.tideSpoken(question)
     }
 
     var solvedText: String {
-        if case let .addition(a, b, _) = question.presentation {
-            return PromptScript.reefSolvedWritten(a: a, b: b)
+        switch question.presentation {
+        case let .addition(a, b, _): return PromptScript.reefSolvedWritten(a: a, b: b)
+        case .skip: return "\(PromptScript.word(question.target).capitalized)! That makes 10 pearls."
+        default: return PromptScript.solvedWritten(question.target)
         }
-        return PromptScript.solvedWritten(question.target)
     }
 
     // MARK: Actions
@@ -136,27 +142,35 @@ final class DiveSession {
         }
         hintsThisDive += 1
         hintThisQuestion = true
-        if case let .addition(a, b, _) = question.presentation {
+        switch question.presentation {
+        case let .addition(a, b, _):
             progress.reefQuickStreak = 0
             speaker.speak(PromptScript.reefHint(a: a, b: b))
-        } else {
+        case let .skip(step, _):
+            speaker.speak(PromptScript.deepHint(step: step, target: question.target))
+        default:
             speaker.speak(PromptScript.hint(question.target))
         }
     }
 
     private func praisePrompt() -> Prompt {
-        if case let .addition(a, b, _) = question.presentation {
-            return PromptScript.reefPraise(a: a, b: b)
+        switch question.presentation {
+        case let .addition(a, b, _): return PromptScript.reefPraise(a: a, b: b)
+        case .skip: return PromptScript.deepPraise(question.target)
+        default: return PromptScript.praise(question.target)
         }
-        return PromptScript.praise(question.target)
     }
 
     private func tenthPearlPrompt() -> Prompt {
-        if case let .addition(a, b, _) = question.presentation {
+        switch question.presentation {
+        case let .addition(a, b, _):
             return Prompt(id: "reef-tenth-\(a)-\(b)",
                           text: PromptScript.reefPraise(a: a, b: b).text + " That makes ten pearls! Open the chest!")
+        case .skip:
+            return PromptScript.deepTenth(question.target)
+        default:
+            return PromptScript.tenthPearl(question.target)
         }
-        return PromptScript.tenthPearl(question.target)
     }
 
     private func nextQuestion() {

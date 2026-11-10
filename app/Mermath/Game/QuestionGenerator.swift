@@ -33,6 +33,24 @@ struct TidePoolGenerator {
     }
 }
 
+struct DeepSeaGenerator {
+    /// 2 or 5: which skip count this dive practices.
+    let step: Int
+
+    /// The chain climbs (2, 4, 6, 8 -> 10 or 5, 10, 15 -> 20), then restarts.
+    func next(after last: Int?) -> Question {
+        let maxTarget = step == 2 ? 10 : 20
+        let current = (last == nil || last! >= maxTarget) ? step : last!
+        let target = current + step
+        let distractors = [target - 1, target + step]
+        return Question(
+            target: target,
+            choices: ([target] + distractors).shuffled(),
+            presentation: .skip(step: step, current: current)
+        )
+    }
+}
+
 struct CoralReefGenerator {
     /// Shells show until she has answered several in a row quickly; a wrong tap
     /// brings them back (open-questions.md #8 default).

@@ -26,6 +26,7 @@ struct RootView: View {
                 if let child = model.activeChild {
                     ReefMapScreen(
                         child: child,
+                        deepSeaUnlocked: model.store.progress(for: child).cleanDives >= 2,
                         onDive: { model.startDive($0) },
                         onSwitchMermaid: { model.switchMermaid() }
                     )
@@ -36,6 +37,13 @@ struct RootView: View {
                 if let dive = model.session {
                     if dive.zone == .coralReef {
                         CoralReefScreen(
+                            dive: dive,
+                            onOpenChest: { model.openChest() },
+                            onMap: { model.leaveDive() }
+                        )
+                        .transition(.opacity)
+                    } else if dive.zone == .deepSea {
+                        DeepSeaScreen(
                             dive: dive,
                             onOpenChest: { model.openChest() },
                             onMap: { model.leaveDive() }
@@ -98,6 +106,7 @@ struct RootView: View {
                 case "tideHint": model.debugTideHint()
                 case "tideSolved": model.debugTideSolved()
                 case "coralReef": model.pick(.ophelia); model.startDive(.coralReef)
+                case "deepSea": model.pick(.ophelia); model.startDive(.deepSea)
                 case "map": model.pick(.daphne)
                 case "chest": model.pick(.violet); model.debugShowChest()
                 case "grotto": model.pick(.violet); model.debugShowGrotto()

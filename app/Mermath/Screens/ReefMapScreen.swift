@@ -6,6 +6,8 @@ import SwiftUI
 /// twinkles along the open stretch. Ported from reference/html/reef-map.html.
 struct ReefMapScreen: View {
     let child: ChildID
+    /// Two clean dives (no hints) open the Deep Sea.
+    var deepSeaUnlocked = false
     var onDive: (Zone) -> Void = { _ in }
     var onSwitchMermaid: () -> Void = {}
 
@@ -84,12 +86,24 @@ struct ReefMapScreen: View {
                 ZoneLabel(name: "Coral Reef", subtitle: "Adding to 10", scale: s)
                     .stage(x: 436, y: 468, w: 0, h: 0)
 
-                // Deep Sea: locked, no glow
-                ArtImage("ui/padlock.png")
-                    .shadow(color: Tokens.Palette.midnight.opacity(0.5), radius: 4 * s, y: 4 * s)
-                    .stage(x: 678, y: 408, w: 52, h: 67)
-                ZoneLabel(name: "Deep Sea", subtitle: "Counting by 2s and 5s", scale: s, locked: true)
-                    .stage(x: 700, y: 516, w: 0, h: 0)
+                // Deep Sea: padlocked until two clean dives open it
+                if deepSeaUnlocked {
+                    Button(action: { onDive(.deepSea) }) {
+                        Color.clear.contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .stage(x: 600, y: 380, w: 200, h: 200)
+                    GlowPulse(t: t, delay: -0.4)
+                        .stage(x: 620, y: 420, w: 180, h: 90)
+                    ZoneLabel(name: "Deep Sea", subtitle: "Counting by 2s and 5s", scale: s)
+                        .stage(x: 700, y: 516, w: 0, h: 0)
+                } else {
+                    ArtImage("ui/padlock.png")
+                        .shadow(color: Tokens.Palette.midnight.opacity(0.5), radius: 4 * s, y: 4 * s)
+                        .stage(x: 678, y: 408, w: 52, h: 67)
+                    ZoneLabel(name: "Deep Sea", subtitle: "Counting by 2s and 5s", scale: s, locked: true)
+                        .stage(x: 700, y: 516, w: 0, h: 0)
+                }
 
                 Vignette()
                     .stage(x: 0, y: 0, w: 800, h: 600)
