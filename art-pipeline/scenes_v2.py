@@ -270,7 +270,46 @@ def scene_props_layers():
         '<circle cx="246" cy="300" r="15" fill="#ffffff"/><circle cx="243" cy="302" r="9" fill="#1b1030"/><circle cx="239.5" cy="297.5" r="3.4" fill="#ffffff"/>'
         '<path d="M180 342 Q220 362 262 352" fill="none" stroke="#1b3a52" stroke-width="5" stroke-linecap="round"/>'
         '<ellipse cx="282" cy="334" rx="11" ry="7" fill="#ff9ecb" opacity=".45"/>')
-    return {name: s.svg_layer(name) for name in ('lock', 'afish', 'afish_face', 'whale', 'whale_face')}
+    # The pre-sneeze face: eyes squeezed shut, mouth wide open mid "aaah"
+    s.layer('whale_face_uhoh').add(
+        '<path d="M231 296 Q246 286 261 296" fill="none" stroke="#1b1030" stroke-width="6" stroke-linecap="round"/>'
+        '<ellipse cx="226" cy="344" rx="26" ry="19" fill="#5a2b3c"/><ellipse cx="226" cy="338" rx="26" ry="10" fill="#1b3a52"/>'
+        '<ellipse cx="282" cy="326" rx="12" ry="8" fill="#ff9ecb" opacity=".55"/>')
+    # The grotto's treasure hoard, Ariel style: four clusters that can each
+    # tumble away when the sneeze hits. Drawn at their grotto positions.
+    gold = s.lin([(0, '#fff0b0', 1), (.5, '#ffcf5a', 1), (1, '#c9882a', 1)])
+    pearl_fill = s.rad([(0, '#ffffff', 1), (.6, '#fff1e2', 1), (1, '#e3c4a8', 1)], cx=.35, cy=.3, rr=.8)
+    def pearls(pts, r=9):
+        return ''.join(f'<circle cx="{x}" cy="{y}" r="{r}" fill="{pearl_fill}"/>' for x, y in pts)
+    def coins(pts):
+        return ''.join(f'<ellipse cx="{x}" cy="{y}" rx="11" ry="8" fill="#ffd866" stroke="#e09a1f" stroke-width="1.5"/><ellipse cx="{x-2}" cy="{y-2}" rx="5" ry="3" fill="#fff3c4" opacity=".8"/>' for x, y in pts)
+    s.layer('hoard_left').add(
+        f'<path d="M150 468 Q196 448 244 468 L236 476 L158 476 Z" fill="#8a6a3c"/>'
+        f'<path d="M168 466 L178 420 L206 420 L216 466 Z" fill="{gold}" stroke="#a86a14" stroke-width="2"/>'
+        f'<path d="M166 418 L218 418 L212 430 L172 430 Z" fill="{gold}"/>'
+        f'<path d="M226 448 L238 428 L248 444 L258 424 L268 448 Z" fill="{gold}" stroke="#a86a14" stroke-width="2"/>'
+        + coins(((150, 466), (166, 470), (240, 468), (256, 464))) + pearls(((146, 452), (226, 460)))
+        + f'<circle cx="238" cy="436" r="4" fill="#e04a6a"/><circle cx="252" cy="436" r="4" fill="#2f9c86"/>')
+    s.layer('hoard_right').add(
+        f'<ellipse cx="610" cy="406" rx="24" ry="30" fill="#b9e8f2" stroke="{gold}" stroke-width="6"/>'
+        f'<path d="M604 436 L616 436 L614 470 L606 470 Z" fill="{gold}"/>'
+        f'<path d="M648 414 L672 414 L668 470 L652 470 Z" fill="#7fc9b8"/><path d="M652 414 L668 414 L666 404 L654 404 Z" fill="#4a9c8c"/>'
+        + coins(((588, 470), (604, 474), (636, 472), (664, 476), (680, 470))) + pearls(((582, 458), (688, 458)))
+        + f'<polygon points="{star(694, 436, 14, 6.5, -90)}" fill="#ff8f6b"/>')
+    s.layer('hoard_floor').add(
+        f'<path d="M352 540 Q400 516 448 540 L440 556 L360 556 Z" fill="#8a6a3c"/>'
+        + coins(((350, 548), (368, 554), (388, 548), (410, 554), (430, 548), (448, 552), (466, 548)))
+        + pearls(((346, 534), (402, 530), (458, 534)), 10)
+        + f'<polygon points="{star(330, 548, 15, 7, -80)}" fill="#ffd27a"/>'
+        f'<polygon points="{star(478, 552, 13, 6, -100)}" fill="#ff9ecb"/>')
+    s.layer('hoard_strings').add(
+        '<path d="M150 140 Q250 220 350 150" fill="none" stroke="#e8d8c0" stroke-width="2"/>'
+        + pearls([(150 + i * 25, 140 + 76 * (1 - abs(i - 4) / 4) ** 1.2) for i in range(9)], 7)
+        + '<path d="M470 130 Q560 210 650 140" fill="none" stroke="#e8d8c0" stroke-width="2"/>'
+        + pearls([(470 + i * 22.5, 130 + 74 * (1 - abs(i - 4) / 4) ** 1.2) for i in range(9)], 7))
+    return {name: s.svg_layer(name) for name in (
+        'lock', 'afish', 'afish_face', 'whale', 'whale_face',
+        'whale_face_uhoh', 'hoard_left', 'hoard_right', 'hoard_floor', 'hoard_strings')}
 
 from frame import scene_home_layers
 
@@ -282,5 +321,7 @@ SCENES2 = {
     'map': (scene_map_layers, dict(bg='bg', kelp_far='far', kelp_mid='mid', floor='fg', grass='grass')),
     'hunt': (scene_hunt_layers, dict(bg='bg', kelp_far='far', fg='fg', grass='grass')),
     'deep': (scene_deep_layers, dict(bg='bg', kelp_far='far', fg='fg', grass='grass')),
-    'props': (scene_props_layers, dict(lock='prop', afish='prop', afish_face='vector', whale='piece', whale_face='vector')),
+    'props': (scene_props_layers, dict(lock='prop', afish='prop', afish_face='vector', whale='piece', whale_face='vector',
+                                       whale_face_uhoh='vector', hoard_left='prop', hoard_right='prop',
+                                       hoard_floor='prop', hoard_strings='vector')),
 }

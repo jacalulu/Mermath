@@ -7,6 +7,8 @@ final class SoundPlayer {
         case chime
         case fanfare
         case pop
+        case musicbox
+        case rumble
         case note1, note2, note3, note4, note5
 
         /// The bonus-bubble melody, lowest to highest.

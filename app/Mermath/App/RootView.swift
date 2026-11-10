@@ -11,6 +11,7 @@ struct RootView: View {
             case .intro:
                 IntroScreen(
                     speak: { model.speaker.speak($0) },
+                    play: { model.sounds.play($0) },
                     onDone: { model.finishIntro(saidWho: $0) }
                 )
                 .transition(.opacity)
