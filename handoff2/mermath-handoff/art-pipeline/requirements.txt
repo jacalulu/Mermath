@@ -1,5 +1,0 @@
-numpy
-opencv-python-headless
-scipy
-pillow
-playwright

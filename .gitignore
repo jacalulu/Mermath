@@ -18,3 +18,5 @@ art-pipeline/out/
 art-pipeline/art-out/
 # Local secrets written by `elevenlabs onboard`
 /.env.local
+mermath-handoff2.zip
+handoff2/
