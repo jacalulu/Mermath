@@ -54,36 +54,63 @@ struct IntroScreen: View {
                         ArtImage("scenes/intro/home-bg.jpg")
                             .stage(x: dx - 1, y: 0, w: 802, h: 600)
 
-                        // The whale, outside the window (the wall occludes it)
-                        if tl > 12.5 && tl < 21.7 {
-                            let cruise = easeOut(beat(tl, 12.5, 16.0))
-                            let inflate = beat(tl, 17.8, 20.0)
-                            let lunge = beat(tl, 20.05, 20.3)
-                            let exitP = beat(tl, 20.8, 21.7)
-                            let scaleW = 0.62 + inflate * 0.14 + lunge * 0.06
-                            let wx = dx + 880 - cruise * 540 - lunge * 70 - exitP * 900
-                            WhaleIntroView(scale: s, uhoh: tl > 16.4 && tl < 20.6,
-                                           breathe: inflate > 0 ? sin(inflate * 3.4 * .pi) * 0.05 : 0,
-                                           facingRight: false)
+                        // The whale: approaches outside, squeezes IN through
+                        // the window, sniffs the shelves, inflates - and the
+                        // sneeze recoil rockets it backward out again.
+                        // Drawn twice: once behind the wall (seen through the
+                        // hole), once in front, clipped at the window's rim,
+                        // so it truly comes through.
+                        let whaleOn = tl > 12.5 && tl < 21.6
+                        let approach = easeOut(beat(tl, 12.5, 15.2))
+                        let through = smooth(beat(tl, 15.2, 16.8))
+                        let inflate = beat(tl, 17.8, 20.0)
+                        let lunge = beat(tl, 20.05, 20.3)
+                        let recoil = easeOut(beat(tl, 20.3, 21.5))
+                        let scaleW = 0.62 + through * 0.2 + inflate * 0.1 + lunge * 0.05 - recoil * 0.28
+                        let wx = dx + 900 - approach * 340 - through * 250 - lunge * 60 + recoil * 980
+                        let wy = 170 + through * 60 + Wave.alternate(t, from: -7, to: 7, duration: 3.1)
+                        let whaleBody = WhaleIntroView(
+                            scale: s,
+                            uhoh: tl > 16.6 && tl < 20.6,
+                            breathe: inflate > 0 ? sin(inflate * 3.4 * .pi) * 0.05 : 0,
+                            facingRight: false
+                        )
+                        if whaleOn {
+                            whaleBody
                                 .scaleEffect(scaleW)
-                                .stage(x: wx, y: 150 + Wave.alternate(t, from: -7, to: 7, duration: 3.1), w: 568, h: 240)
-                        }
-                        // The tickling frond at the window's lower rim
-                        if tl > 15.5 && tl < 20.1 {
-                            KelpLayer(t: t, path: "scenes/tide-pool/seagrass.png",
-                                      from: -16, to: 16, duration: 0.5, pivot: UnitPoint(x: 0.5, y: 1))
-                                .stage(x: dx + 500, y: 420, w: 120, h: 56)
+                                .rotationEffect(.degrees(recoil * 10))
+                                .stage(x: wx, y: wy, w: 568, h: 240)
                         }
 
                         ArtImage("scenes/intro/home-wall.png")
                             .stage(x: dx - 1, y: 0, w: 802, h: 600)
+
+                        // The front half of the whale, inside the room
+                        if whaleOn {
+                            ZStack {
+                                whaleBody
+                                    .scaleEffect(scaleW)
+                                    .rotationEffect(.degrees(recoil * 10))
+                                    .stage(x: wx, y: wy, w: 568, h: 240)
+                            }
+                            .stage(x: 0, y: 0, w: 800, h: 600)
+                            .clipShape(LeftOf(cut: (dx + 505) * s))
+                        }
+                        // The tickling frond, by the shelves it sniffs
+                        if tl > 16.2 && tl < 20.1 {
+                            KelpLayer(t: t, path: "scenes/tide-pool/seagrass.png",
+                                      from: -16, to: 16, duration: 0.5, pivot: UnitPoint(x: 0.5, y: 1))
+                                .stage(x: dx + 120, y: 420, w: 120, h: 56)
+                        }
 
                         // The shelf treasures (gone once the sneeze hits)
                         ArtImage("scenes/intro/home-items.png")
                             .opacity(1 - min(1, sc * 3))
                             .stage(x: dx + 46 + rattle, y: 106, w: 310, h: 494)
 
-                        // The hero treasures, live so they rattle and fly
+                        // The hero treasures: they rattle, then the blast
+                        // throws them - the bed bounces once, the lamp arcs
+                        // high, the curtain flutters like a ribbon.
                         Group {
                             Rectangle()
                                 .fill(Color(hex: 0x0A3444))
@@ -93,30 +120,74 @@ struct IntroScreen: View {
                                 .opacity(1 - min(1, sc * 2))
                                 .stage(x: dx + 330, y: 100, w: 140, h: 140)
                             ArtImage("scenes/grotto/starfish-lamp.png")
-                                .rotationEffect(.degrees(-sc * 240))
-                                .stage(x: dx + 348 + rattle - sc * 620, y: 118 - sc * 380, w: 104, h: 100)
+                                .rotationEffect(.degrees(-sc * 320))
+                                .stage(x: dx + 348 + rattle - sc * 620,
+                                       y: 118 + Wave.keyframes(sc, [(0, 0), (0.45, -310), (0.7, -180), (1, -540)]),
+                                       w: 104, h: 100)
                             ArtImage("scenes/grotto/kelp-curtain.png")
-                                .rotationEffect(.degrees(-sc * 160))
-                                .stage(x: dx + 424 + rattle - sc * 420, y: 0 - sc * 400, w: 118, h: 277)
+                                .rotationEffect(.degrees(-sc * 120 + sin(sc * 4 * .pi) * 35 * (sc > 0 ? 1 : 0)))
+                                .stage(x: dx + 424 + rattle - sc * 440, y: 0 - sc * 420, w: 118, h: 277)
                             ArtImage("scenes/grotto/shell-bed.png")
-                                .rotationEffect(.degrees(-sc * 120))
-                                .stage(x: dx + 212 + rattle - sc * 760, y: 442 + sc * 320, w: 220, h: 148)
+                                .rotationEffect(.degrees(-sc * 140))
+                                .stage(x: dx + 212 + rattle - sc * 800,
+                                       y: 442 + Wave.keyframes(sc, [(0, 0), (0.35, 230), (0.52, 150), (1, 480)]),
+                                       w: 220, h: 148)
                         }
 
-                        // Pearls and sparkles spray with the sneeze
+                        // THE BLAST: shock rings, debris waves, pearls on
+                        // gravity arcs, spinning gold stars
                         if sc > 0 && sc < 1 {
-                            ForEach(0..<10, id: \.self) { i in
-                                let a = Double(i) / 10 * 2 * .pi + 0.4
+                            ForEach(0..<2, id: \.self) { ring in
+                                let rp = max(0, min(1, (beat(tl, 20.05, 20.75) - Double(ring) * 0.18) / 0.82))
+                                if rp > 0 {
+                                    Circle()
+                                        .stroke(Tokens.Palette.pearl, lineWidth: 7 * s * (1 - rp))
+                                        .opacity((1 - rp) * 0.9)
+                                        .stage(x: dx + 150 - 330 * rp, y: 320 - 330 * rp,
+                                               w: 660 * rp + 30, h: 660 * rp + 30)
+                                }
+                            }
+                            // Shelf debris, launched across the room
+                            ArtImage("props/hoard-strings.png")
+                                .rotationEffect(.degrees(-sc * 60))
+                                .opacity(1 - sc * sc)
+                                .stage(x: dx + 50 - sc * 330, y: 120 - sc * 380, w: 264, h: 57)
+                            ArtImage("props/hoard-left.png")
+                                .rotationEffect(.degrees(-sc * 280))
+                                .stage(x: dx + 90 - sc * 540, y: 205 + Wave.keyframes(sc, [(0, 0), (0.4, 200), (0.56, 130), (1, 390)]), w: 110, h: 56)
+                            ArtImage("props/hoard-right.png")
+                                .rotationEffect(.degrees(sc * 260))
+                                .stage(x: dx + 120 - sc * 480, y: 345 - sc * 300, w: 111, h: 95)
+                            ArtImage("props/hoard-floor.png")
+                                .rotationEffect(.degrees(sc * 180))
+                                .stage(x: dx + 110 - sc * 580, y: 478 + sc * 250, w: 140, h: 42)
+                            // Pearls on gravity arcs
+                            ForEach(0..<12, id: \.self) { i in
+                                let a = Double(i) / 12 * 2 * .pi + 0.3
+                                let sp = 1 + Double(i % 3) * 0.35
                                 ArtImage("ui/pearl.png")
-                                    .opacity(1 - sc)
-                                    .stage(x: dx + 420 + cos(a) * 430 * sc - 9,
-                                           y: 300 + sin(a) * 330 * sc - 9, w: 18, h: 18)
+                                    .opacity(min(1, (1 - sc) * 1.6))
+                                    .stage(x: dx + 160 + cos(a) * 420 * sc * sp - 9,
+                                           y: 310 + sin(a) * 260 * sc * sp + 200 * sc * sc - 9,
+                                           w: 18, h: 18)
+                            }
+                            // Spinning gold stars
+                            ForEach(0..<6, id: \.self) { i in
+                                let a = Double(i) / 6 * 2 * .pi + 1.1
+                                FourPointStar()
+                                    .fill(Color(hex: 0xFFD27A))
+                                    .rotationEffect(.degrees(sc * 540 + Double(i) * 60))
+                                    .opacity(min(1, (1 - sc) * 1.4))
+                                    .stage(x: dx + 170 + cos(a) * 470 * sc - 12,
+                                           y: 300 + sin(a) * 320 * sc - 12, w: 24, h: 24)
                             }
                         }
                         if tl > 20.1 && tl < 23.5 {
                             TwinkleStar(t: t, duration: 1.4).stage(x: 200, y: 180, w: 24, h: 24)
                             TwinkleStar(t: t, duration: 1.7, delay: 0.4).stage(x: 540, y: 140, w: 20, h: 20)
                             TwinkleStar(t: t, duration: 1.5, delay: 0.8).stage(x: 380, y: 340, w: 22, h: 22)
+                            TwinkleStar(t: t, duration: 1.6, delay: 1.1).stage(x: 640, y: 420, w: 20, h: 20)
+                            TwinkleStar(t: t, duration: 1.3, delay: 0.2).stage(x: 120, y: 420, w: 22, h: 22)
                         }
 
                         // The lone pearl that rolls to a stop in the quiet
@@ -162,7 +233,9 @@ struct IntroScreen: View {
                             .stage(x: 0, y: 0, w: 800, h: 600)
                             .bleed()
                     }
-                    .offset(x: tl > 20.05 && tl < 20.8 ? sin(t * 56) * 8 * s * (1 - beat(tl, 20.05, 20.8)) : 0,
+                    // The camera itself flinches with the sneeze
+                    .scaleEffect(1 + 0.07 * sin(.pi * beat(tl, 20.05, 20.5)))
+                    .offset(x: tl > 20.05 && tl < 20.8 ? sin(t * 56) * 9 * s * (1 - beat(tl, 20.05, 20.8)) : 0,
                             y: bob * s)
                     .transition(.opacity)
                 }
@@ -248,6 +321,18 @@ struct IntroScreen: View {
             finished = true
             onDone(spoken.contains(4))
         }
+    }
+}
+
+/// Clips to everything left of `cut` (in container points): the window plane,
+/// so the whale's front half renders inside the room while its back half
+/// stays outside.
+struct LeftOf: Shape {
+    var cut: CGFloat
+
+    func path(in rect: CGRect) -> Path {
+        Path(CGRect(x: rect.minX - 400, y: rect.minY - 200,
+                    width: cut + 400, height: rect.height + 400))
     }
 }
 
