@@ -1,4 +1,14 @@
-# Mermath: design handoff
+# Mermath
+
+## The app
+
+The game is a native iPad app (SwiftUI, landscape, iOS 17+) in `app/`.
+
+- `tools/sync-art.sh` regenerates `app/Art/` from `assets/` (WebP to PNG, pre-baked kelp blur). Run it after changing any art.
+- Build: open `app/Mermath.xcodeproj` in Xcode, or `xcodebuild -project app/Mermath.xcodeproj -scheme Mermath -destination 'platform=iOS Simulator,name=iPad Pro 13-inch (M4)'`.
+- Needs Xcode 26 on macOS 26. To record the real voice later, drop `<prompt id>.m4a` files (ids in `app/Mermath/Audio/PromptScript.swift`) into a bundled `Voice` folder; synthesis is the stand-in.
+
+# Design handoff
 
 Everything Claude Code needs to build the game, from the design session.
 
