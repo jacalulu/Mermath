@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mermath: Tide Pool dive, hint state (locked)</title>
+<!-- Static reference exported from the Mermath storyboard. Design space is 800x600. Open in a browser to see the layers and motion; scale the stage to fit the device in the real build. -->
+<style>@font-face{font-family:'Baloo 2';font-weight:500;font-display:swap;src:url(../../assets/fonts/baloo-2-latin-500.woff2) format('woff2')}@font-face{font-family:'Baloo 2';font-weight:600;font-display:swap;src:url(../../assets/fonts/baloo-2-latin-600.woff2) format('woff2')}@font-face{font-family:'Baloo 2';font-weight:700;font-display:swap;src:url(../../assets/fonts/baloo-2-latin-700.woff2) format('woff2')}</style>
+<style>
+body{margin:0}
+a{color:#061A33}a:hover{color:#061A33}
+button{font-family:inherit;cursor:pointer}
+@keyframes mmBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes mmWave{from{transform:rotate(-9deg)}to{transform:rotate(10deg)}}
+@keyframes mmWaveL{from{transform:rotate(4deg)}to{transform:rotate(-5deg)}}
+@keyframes mmOpen{0%,92%{opacity:1}94%,98%{opacity:0}100%{opacity:1}}
+@keyframes mmShut{0%,92%{opacity:0}94%,98%{opacity:1}100%{opacity:0}}
+@keyframes mmSway{from{transform:rotate(-1.4deg)}to{transform:rotate(1.6deg)}}
+@keyframes mmSwayFar{from{transform:skewX(-0.8deg)}to{transform:skewX(0.9deg)}}
+@keyframes mmSwayMid{from{transform:skewX(1.3deg)}to{transform:skewX(-1.4deg)}}
+@keyframes mmSwayLeft{from{transform:skewX(-1.7deg)}to{transform:skewX(1.3deg)}}
+@keyframes mmGrass{from{transform:skewX(-7deg)}to{transform:skewX(7deg)}}
+@keyframes mmStarA{from{transform:rotate(-10deg)}to{transform:rotate(10deg)}}
+@keyframes mmStarB{0%,70%,100%{transform:translateY(0) rotate(0deg)}78%{transform:translateY(-10px) rotate(-12deg)}86%{transform:translateY(0) rotate(5deg)}92%{transform:translateY(-4px) rotate(0deg)}}
+@keyframes mmRise{0%{transform:translate(0,0);opacity:0}8%{opacity:.9}50%{transform:translate(9px,-300px)}92%{opacity:.8}100%{transform:translate(-4px,-640px);opacity:0}}
+@keyframes mmSwim{0%{transform:translate(0,0)}25%{transform:translate(-230px,-7px)}50%{transform:translate(-460px,0)}75%{transform:translate(-690px,6px)}100%{transform:translate(-920px,0)}}
+@keyframes mmLight{from{opacity:.05}to{opacity:.45}}
+@keyframes mmPopA{0%,100%{transform:scale(1)}40%{transform:scale(1.06)}}
+@keyframes mmPopB{0%,100%{transform:scale(1)}40%{transform:scale(1.06)}}
+@media (prefers-reduced-motion: no-preference){
+.mm-bob{animation:mmBob 3.2s ease-in-out infinite}
+.mm-wave{animation:mmWave 1.5s ease-in-out infinite alternate}
+.mm-waveL{animation:mmWaveL 2.6s ease-in-out infinite alternate}
+.mm-open{animation:mmOpen 4.4s linear infinite}
+.mm-shut{animation:mmShut 4.4s linear infinite}
+.mm-sway{animation:mmSway 5.5s ease-in-out infinite alternate}
+.mm-swayFar{animation:mmSwayFar 7s ease-in-out infinite alternate}
+.mm-swayMid{animation:mmSwayMid 6s ease-in-out infinite alternate}
+.mm-swayLeft{animation:mmSwayLeft 5s ease-in-out infinite alternate}
+.mm-grass{animation:mmGrass 2.8s ease-in-out infinite alternate}
+.mm-starA{animation:mmStarA 2.2s ease-in-out infinite alternate}
+.mm-starB{animation:mmStarB 5s ease-in-out infinite}
+.mm-rise1{animation:mmRise 9s linear infinite}
+.mm-rise2{animation:mmRise 12s linear 3s infinite}
+.mm-rise3{animation:mmRise 15s linear 6s infinite}
+.mm-swim1{animation:mmSwim 30s linear infinite}
+.mm-swim2{animation:mmSwim 30s linear 2.5s infinite}
+.mm-light{animation:mmLight 4.5s ease-in-out infinite alternate}
+.mm-popA{animation:mmPopA .5s ease-out}
+.mm-popB{animation:mmPopB .5s ease-out}
+}
+</style>
+<style>html,body{height:100%}body{display:grid;place-items:center;background:#061A33}</style>
+</head>
+<body>
+<div style="width: 800px; height: 600px; box-sizing: border-box; position: relative; overflow: hidden; background: #1B86A1; font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif; color: #FFF4DC">
+<img src="../../assets/scenes/tide-pool/bg.jpg" alt="A painted tide pool: sunlight through teal water over sand and mossy rocks, framed by kelp" style="position: absolute; left: 0; top: 0; width: 800px; height: 600px; object-fit: cover">
+<div class="mm-light" aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 800px; height: 340px; background: radial-gradient(ellipse at 38% 0%, rgba(255,255,255,0.6), rgba(255,255,255,0) 68%); opacity: 0.2"></div>
+<img class="mm-swayFar" src="../../assets/scenes/tide-pool/kelp-far.webp" alt="" style="position: absolute; left: 200px; top: 0; width: 560px; height: 600px; max-width: none; opacity: 0.75; filter: blur(1px); transform-origin: 50% 100%">
+<img class="mm-swayMid" src="../../assets/scenes/tide-pool/kelp-mid.webp" alt="" style="position: absolute; left: 0; top: 0; width: 800px; height: 600px; max-width: none; transform-origin: 50% 100%">
+<img class="mm-swim1" src="../../assets/props/fish.png" alt="" style="position: absolute; left: 820px; top: 430px; width: 44px; height: 28px; max-width: none">
+<img class="mm-swim2" src="../../assets/props/fish.png" alt="" style="position: absolute; left: 856px; top: 448px; width: 33px; height: 21px; max-width: none">
+<img class="mm-swayLeft" src="../../assets/scenes/tide-pool/kelp-left.webp" alt="" style="position: absolute; left: 0; top: 0; width: 240px; height: 600px; max-width: none; transform-origin: 0% 100%">
+<img src="../../assets/scenes/tide-pool/foreground.webp" alt="" style="position: absolute; left: 0; top: 350px; width: 800px; height: 250px; max-width: none">
+<img class="mm-grass" src="../../assets/scenes/tide-pool/seagrass.png" alt="" style="position: absolute; left: 0; top: 480px; width: 800px; height: 102px; max-width: none; transform-origin: 50% 100%">
+<img class="mm-starA" src="../../assets/props/sea-star-pink.png" alt="" style="position: absolute; left: 392px; top: 452px; width: 66px; height: 66px; max-width: none">
+<img class="mm-starB" src="../../assets/props/sea-star-orange.png" alt="" style="position: absolute; left: 498px; top: 468px; width: 52px; height: 52px; max-width: none">
+<img class="mm-rise1" src="../../assets/props/bubble.png" alt="" style="position: absolute; left: 258px; top: 560px; width: 30px; height: 30px; max-width: none; opacity: 0">
+<img class="mm-rise2" src="../../assets/props/bubble.png" alt="" style="position: absolute; left: 766px; top: 580px; width: 24px; height: 24px; max-width: none; opacity: 0">
+<img class="mm-rise3" src="../../assets/props/bubble.png" alt="" style="position: absolute; left: 46px; top: 590px; width: 20px; height: 20px; max-width: none; opacity: 0">
+<button aria-label="Hear it again" style="position: absolute; left: 15px; top: 204px; width: 250px; height: 211px; padding: 0; border: none; background: none">
+<img src="../../assets/characters/crab/legs.png" alt="" style="position: absolute; left: 0; top: 0; width: 250px; height: 211px; max-width: none">
+<span class="mm-bob" style="position: absolute; left: 0; top: 0; width: 250px; height: 211px; display: block">
+<img class="mm-waveL" src="../../assets/characters/crab/arm-left.png" alt="" style="position: absolute; left: 0; top: 0; width: 250px; height: 211px; max-width: none; transform-origin: 31.6% 61.1%">
+<img class="mm-wave" src="../../assets/characters/crab/arm-right.png" alt="" style="position: absolute; left: 0; top: 0; width: 250px; height: 211px; max-width: none; transform-origin: 68.4% 61.1%">
+<img src="../../assets/characters/crab/body.png" alt="A smiling orange crab" style="position: absolute; left: 0; top: 0; width: 250px; height: 211px; max-width: none">
+<img class="mm-open" src="../../assets/characters/crab/eyes-open.png" alt="" style="position: absolute; left: 0; top: 0; width: 250px; height: 211px; max-width: none">
+<img class="mm-shut" src="../../assets/characters/crab/eyes-shut.png" alt="" style="position: absolute; left: 0; top: 0; width: 250px; height: 211px; max-width: none; opacity: 0">
+</span>
+</button>
+<img class="mm-sway" src="../../assets/scenes/tide-pool/kelp-right.webp" alt="" style="position: absolute; left: 580px; top: 0; width: 220px; height: 600px; max-width: none; transform-origin: 100% 100%">
+<div aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 800px; height: 600px; background: radial-gradient(ellipse at 50% 45%, rgba(2,8,20,0) 55%, rgba(2,8,20,0.32) 100%); pointer-events: none"></div>
+<a href="#" aria-label="Back to the map" style="position: absolute; left: 22px; top: 20px; width: 66px; height: 66px; display: block">
+<img src="../../assets/ui/icon-map.png" alt="" style="width: 66px; height: 66px; filter: drop-shadow(0 5px 8px rgba(6,26,51,0.4))">
+</a>
+<div role="img" aria-label="9 of 10 pearls" style="position: absolute; right: 24px; top: 26px; display: flex; align-items: center; gap: 6px; background: rgba(6,26,51,0.76); padding: 11px 16px; border-radius: 999px; box-shadow: 0 6px 14px rgba(6,26,51,0.28)">
+
+<img src="../../assets/ui/pearl.png" alt="" style="width: 22px; height: 22px">
+
+<img src="../../assets/ui/pearl.png" alt="" style="width: 22px; height: 22px">
+
+<img src="../../assets/ui/pearl.png" alt="" style="width: 22px; height: 22px">
+
+<img src="../../assets/ui/pearl.png" alt="" style="width: 22px; height: 22px">
+
+<img src="../../assets/ui/pearl.png" alt="" style="width: 22px; height: 22px">
+
+<img src="../../assets/ui/pearl.png" alt="" style="width: 22px; height: 22px">
+
+<img src="../../assets/ui/pearl.png" alt="" style="width: 22px; height: 22px">
+
+<img src="../../assets/ui/pearl.png" alt="" style="width: 22px; height: 22px">
+
+<img src="../../assets/ui/pearl.png" alt="" style="width: 22px; height: 22px">
+
+
+<span style="width: 22px; height: 22px; box-sizing: border-box; border-radius: 50%; border: 2px solid rgba(255,244,220,0.6)"></span>
+
+</div>
+<svg aria-hidden="true" viewBox="0 0 70 54" style="position: absolute; left: 180px; top: 176px; width: 70px; height: 54px"><path d="M34 0 L66 0 L4 52 Z" fill="#FFF4DC"></path></svg>
+<div class="" style="position: absolute; left: 196px; top: 96px; display: flex; align-items: center; gap: 12px; background: #FFF4DC; color: #061A33; border-radius: 30px; padding: 9px 26px 9px 12px; box-shadow: 0 10px 22px rgba(6,26,51,0.28)">
+<button aria-label="Hear it again" style="width: 82px; height: 70px; padding: 0; border: none; background: none; display: flex; align-items: center; justify-content: center">
+<img src="../../assets/ui/icon-shell.png" alt="" style="width: 82px; height: 70px">
+</button>
+<span style="font-weight: 700; font-size: 29px; line-height: 1.1; padding-top: 4px">Find the number four!</span>
+</div>
+<div style="position: absolute; left: 288px; top: 230px; display: flex; gap: 26px">
+
+<button onClick="" style="width: 140px; height: 140px; box-sizing: border-box; padding: 10px 0 0; border-radius: 50%; border: 3px solid #FFFFFF; background: radial-gradient(circle at 32% 24%, #FFFFFF 0%, #F2FFFB 22%, #CFF5EE 60%, #9FE8DE 100%); color: #061A33; opacity: 1; font-weight: 700; font-size: 96px; line-height: 1; box-shadow: 0 10px 22px rgba(6,26,51,0.3), inset 0 -10px 18px rgba(23,135,156,0.25)">2</button>
+
+<button onClick="" style="width: 140px; height: 140px; box-sizing: border-box; padding: 10px 0 0; border-radius: 50%; border: 3px solid #FFFFFF; background: radial-gradient(circle at 32% 24%, #FFFFFF 0%, #F2FFFB 22%, #CFF5EE 60%, #9FE8DE 100%); color: #061A33; opacity: 1; font-weight: 700; font-size: 96px; line-height: 1; box-shadow: 0 10px 22px rgba(6,26,51,0.3), inset 0 -10px 18px rgba(23,135,156,0.25)">4</button>
+
+<button onClick="" style="width: 140px; height: 140px; box-sizing: border-box; padding: 10px 0 0; border-radius: 50%; border: 3px solid #FFFFFF; background: radial-gradient(circle at 32% 24%, #FFFFFF 0%, #F2FFFB 22%, #CFF5EE 60%, #9FE8DE 100%); color: #061A33; opacity: 0.45; font-weight: 700; font-size: 96px; line-height: 1; box-shadow: 0 10px 22px rgba(6,26,51,0.3), inset 0 -10px 18px rgba(23,135,156,0.25)">7</button>
+
+</div>
+<div style="position: absolute; left: 0; right: 0; bottom: 24px; display: flex; justify-content: center">
+
+<div style="background: rgba(6,26,51,0.8); border-radius: 999px; padding: 12px 26px; display: flex; align-items: center; gap: 14px; box-shadow: 0 6px 14px rgba(6,26,51,0.28)">
+<span style="font-weight: 600; font-size: 24px; line-height: 1.1; padding-top: 3px; color: #FFF4DC">Count with me</span>
+<span style="width: 26px; height: 26px; border-radius: 50%; background: #FF9A3D"></span>
+<span style="width: 26px; height: 26px; border-radius: 50%; background: #FF9A3D"></span>
+<span style="width: 26px; height: 26px; border-radius: 50%; background: #FF9A3D"></span>
+<span style="width: 26px; height: 26px; border-radius: 50%; background: #FF9A3D"></span>
+</div>
+
+
+</div>
+</div>
+</body>
+</html>

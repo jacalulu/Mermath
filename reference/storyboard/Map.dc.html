@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Reef map</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;800&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#FFF4DC}a:hover{color:#FFD27A}
+</style>
+</helmet>
+<div style="width: 800px; height: 600px; box-sizing: border-box; position: relative; overflow: hidden; background: #0C4F70; font-family: 'Nunito', system-ui, sans-serif; color: #FFF4DC; padding: 34px 48px; display: flex; flex-direction: column; gap: 16px">
+<img src="/_blob/4cda8aa9825139f9d1fc1657e0a0a7cc" alt="" style="position: absolute; left: 0; top: 0; width: 800px; height: 600px; object-fit: cover">
+<div style="position: relative; display: flex; justify-content: space-between; align-items: center">
+<h1 style="margin: 0; font-family: 'Fraunces', Georgia, serif; font-weight: 800; font-size: 42px; line-height: 1.1; color: #FFF4DC; text-shadow: 0 2px 14px #061A33, 0 0 22px rgba(6,26,51,0.8)">Where shall we dive?</h1>
+<a href="Main.dc.html" style="background: rgba(6,26,51,0.62); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border: 1.5px solid #FFD27A; color: #FFF4DC; text-decoration: none; font-weight: 800; font-size: 17px; padding: 11px 20px; border-radius: 999px">Switch mermaid</a>
+</div>
+<div style="position: relative; flex-grow: 1">
+<a href="TidePool.dc.html" style="position: absolute; left: 4px; top: 44px; width: 214px; height: 214px; box-sizing: border-box; border-radius: 50%; background: radial-gradient(circle at 26% 17%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.14) 11%, rgba(6,26,51,0.54) 38%, rgba(6,26,51,0.68) 100%); border: 4px solid #8FE9DF; color: #FFF4DC; text-decoration: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; box-shadow: 0 0 44px rgba(143,233,223,0.75), inset 0 0 36px rgba(143,233,223,0.5); text-shadow: 0 2px 10px #061A33">
+<span style="font-family: 'Fraunces', Georgia, serif; font-weight: 800; font-size: 30px; line-height: 1.1">Tide Pool</span>
+<span style="font-size: 16px; font-weight: 800">Find the number</span>
+<span style="font-family: 'Fraunces', Georgia, serif; font-weight: 800; font-size: 42px; line-height: 1; color: #8FE9DF">1 2 3</span>
+</a>
+<a href="CoralReef.dc.html" style="position: absolute; left: 258px; top: 136px; width: 228px; height: 228px; box-sizing: border-box; border-radius: 50%; background: radial-gradient(circle at 26% 17%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.14) 11%, rgba(6,26,51,0.54) 38%, rgba(6,26,51,0.68) 100%); border: 4px solid #FF9A3D; color: #FFF4DC; text-decoration: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; box-shadow: 0 0 48px rgba(255,154,61,0.75), inset 0 0 36px rgba(255,154,61,0.45); text-shadow: 0 2px 10px #061A33">
+<span style="font-family: 'Fraunces', Georgia, serif; font-weight: 800; font-size: 32px; line-height: 1.1">Coral Reef</span>
+<span style="font-size: 16px; font-weight: 800">Adding to 10</span>
+<span style="font-family: 'Fraunces', Georgia, serif; font-weight: 800; font-size: 44px; line-height: 1; color: #FF9A3D">3 + 2</span>
+</a>
+<div style="position: absolute; left: 520px; top: 232px; width: 186px; height: 186px; box-sizing: border-box; border-radius: 50%; background: radial-gradient(circle at 30% 22%, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.08) 17%, rgba(6,26,51,0.74) 44%, rgba(6,26,51,0.86) 100%); border: 3px dashed #FFD27A; color: #FFF4DC; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; box-shadow: 0 0 32px rgba(255,210,122,0.4), inset 0 0 30px rgba(255,210,122,0.22)">
+<svg role="img" aria-label="Locked" viewBox="0 0 24 24" style="width: 34px; height: 34px" fill="none" stroke="#FFD27A"><rect x="5" y="11" width="14" height="9" rx="2" style="stroke-width: 2px"></rect><path d="M8 11 V8 a4 4 0 0 1 8 0 V11" style="stroke-width: 2px; stroke-linecap: round"></path></svg>
+<span style="font-family: 'Fraunces', Georgia, serif; font-weight: 800; font-size: 28px; line-height: 1.1; color: #FFD27A">Deep Sea</span>
+<span style="font-size: 15px; font-weight: 800; text-align: center">Counting by 2s and 5s</span>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":800,"height":600}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>
