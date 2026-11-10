@@ -1,15 +1,35 @@
 import SwiftUI
 
-/// Smoke-test root: Midnight background with the pearl wordmark.
-/// Replaced by the route switch as screens are built.
+/// Temporary root while the screens come up: shows the Tide Pool with the
+/// reference style-frame state (2 / 4 / 7, target 4, nine pearls) and the
+/// StyleFrame tap logic. Replaced by the route switch and DiveSession.
 struct RootView: View {
+    @State private var state = TidePoolViewState(
+        prompt: "Find the number four!",
+        choices: [2, 4, 7],
+        target: 4,
+        pearls: 9
+    )
+
     var body: some View {
-        ZStack {
-            Color(red: 6 / 255, green: 26 / 255, blue: 51 / 255)
-                .ignoresSafeArea()
-            ArtImage("brand/wordmark-pearl.png")
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 456)
+        StageView {
+            TidePoolScreen(
+                state: state,
+                onAnswer: { n in
+                    withAnimation(.easeOut(duration: 0.35)) {
+                        if n == state.target {
+                            state.solved = true
+                            state.showHint = false
+                            state.pearls = 10
+                            state.solvedText = "You found four! That makes 10 pearls."
+                        } else {
+                            state.faded.insert(n)
+                            state.showHint = true
+                        }
+                    }
+                },
+                onReplay: { state.popTrigger += 1 }
+            )
         }
     }
 }
