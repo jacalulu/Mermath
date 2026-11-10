@@ -1,20 +1,24 @@
 import SwiftUI
 import Observation
+import UIKit
 
 /// Root game state: who is playing, which screen is up, the running dive.
 @MainActor
 @Observable
 final class AppModel {
     enum Route: Equatable {
+        case intro
         case pick
         case map
         case dive
         case chest(GrottoItem?)
+        case hunt(GrottoItem?)
         case grotto
         case parent
     }
 
-    private(set) var route: Route = .pick
+    /// The story plays on launch; with Reduce Motion it is skipped entirely.
+    private(set) var route: Route = UIAccessibility.isReduceMotionEnabled ? .pick : .intro
     private(set) var activeChild: ChildID?
     private(set) var session: DiveSession?
 
@@ -29,7 +33,18 @@ final class AppModel {
     }
 
     func appeared() {
-        speaker.speak(PromptScript.whoIsDiving)
+        if route == .pick {
+            speaker.speak(PromptScript.whoIsDiving)
+        }
+    }
+
+    /// The intro ended (or was tapped away). The crab's last line already asks
+    /// who is diving, so only ask again when it never played.
+    func finishIntro(saidWho: Bool) {
+        go(.pick)
+        if !saidWho {
+            speaker.speak(PromptScript.whoIsDiving)
+        }
     }
 
     func pick(_ child: ChildID) {
@@ -65,6 +80,23 @@ final class AppModel {
         sounds.play(.fanfare)
         speaker.speak(PromptScript.chestOpen)
         go(.chest(earned))
+        // The map reveal lands right after the pearls drain into the lock
+        Task { [weak self] in
+            try? await Task.sleep(nanoseconds: 2_600_000_000)
+            guard let self, case .chest = self.route else { return }
+            self.speaker.speak(PromptScript.chestMap)
+        }
+    }
+
+    /// The chest held a map: follow it to the treasure garden. With nothing
+    /// left to earn, head home instead.
+    func followMap(_ earned: GrottoItem?) {
+        guard earned != nil else {
+            go(.grotto)
+            return
+        }
+        speaker.speak(PromptScript.huntIntro)
+        go(.hunt(earned))
     }
 
     func placeInGrotto(_ item: GrottoItem?) {
@@ -110,6 +142,8 @@ final class AppModel {
                         dive.debugAnswerRight()
                     }
                 } else if case let .chest(item) = self.route {
+                    self.followMap(item)
+                } else if case let .hunt(item) = self.route {
                     self.placeInGrotto(item)
                 } else {
                     timer.invalidate()

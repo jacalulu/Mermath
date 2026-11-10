@@ -170,6 +170,11 @@ final class DiveSession {
         begin()
     }
 
+    /// The tollbooth reward: popping a bonus bubble plays the next rising note.
+    func playBonusNote(_ index: Int) {
+        sounds.play(SoundPlayer.Effect.notes[index % SoundPlayer.Effect.notes.count])
+    }
+
     #if DEBUG
     func debugAnswerWrong() {
         if let wrong = question.choices.first(where: { $0 != question.target }) {

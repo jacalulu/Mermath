@@ -1,0 +1,37 @@
+{
+ "designSpace": [
+  800,
+  600
+ ],
+ "order": "back to front",
+ "layers": [
+  {
+   "file": "bg.jpg",
+   "x": 0,
+   "y": 0,
+   "w": 800,
+   "h": 600
+  },
+  {
+   "file": "kelp-far.webp",
+   "x": 100,
+   "y": 0,
+   "w": 700,
+   "h": 600
+  },
+  {
+   "file": "foreground.webp",
+   "x": 0,
+   "y": 266,
+   "w": 800,
+   "h": 334
+  },
+  {
+   "file": "seagrass.png",
+   "x": 128,
+   "y": 528,
+   "w": 598,
+   "h": 72
+  }
+ ]
+}

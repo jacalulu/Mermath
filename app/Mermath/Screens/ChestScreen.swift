@@ -10,19 +10,16 @@ struct ChestScreen: View {
     var onMap: () -> Void = {}
 
     @Environment(\.stage) private var m
-
-    /// Where the floating reveal wrapper sits for each item (design space).
-    private func revealFrame(_ item: GrottoItem) -> CGRect {
-        switch item {
-        case .starfishLamp: return CGRect(x: 334, y: 98, width: 132, height: 128)
-        case .kelpCurtain: return CGRect(x: 358, y: 70, width: 85, height: 200)
-        case .shellBed: return CGRect(x: 305, y: 110, width: 190, height: 128)
-        }
-    }
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    /// Clock time when the screen appeared: drives the opening overture
+    /// (pearls drain into the lock, sparkles count down, then the reveal).
+    @State private var t0: Double?
 
     var body: some View {
         let s = m.scale
         MotionClock { t in
+            // Overture progress: 0 -> 1 over ~2s (instant under Reduce Motion)
+            let ov = reduceMotion ? 1.0 : min(1, max(0, (t - (t0 ?? t)) / 2.0))
             ZStack {
                 // Scenery (bleeds to the physical edges)
                 Group {
@@ -63,12 +60,47 @@ struct ChestScreen: View {
                 ArtImage("scenes/treasure-chest/chest-box.png")
                     .stage(x: 282, y: 330, w: 236, h: 152)
 
-                // The earned item, floating and tilting in the light
-                if let earned {
-                    let f = revealFrame(earned)
-                    ItemReveal(t: t, item: earned, scale: s)
-                        .frame(width: f.width * s, height: f.height * s)
-                        .stage(x: f.minX, y: f.minY, w: f.width, h: f.height)
+                // The overture: the ten pearls you earned drain one by one
+                // into the chest's lock, sparkles build, then the reveal.
+                if ov < 1 {
+                    ForEach(0..<10, id: \.self) { i in
+                        let p = min(1, max(0, (ov * 2.0 - Double(i) * 0.09) / 0.55))
+                        if p > 0 && p < 1 {
+                            let fx = 486.0 + Double(i) * 28
+                            let ease = p * p * (3 - 2 * p)
+                            ArtImage("ui/pearl.png")
+                                .shadow(color: Tokens.Palette.pearl.opacity(0.9), radius: 6 * s)
+                                .stage(x: fx + (400 - fx) * ease - 11,
+                                       y: 48 + (402 - 48) * ease - sin(.pi * p) * 60 - 11,
+                                       w: 22, h: 22)
+                        }
+                    }
+                    // Sparkle countdown at the lock as the last pearls land
+                    if ov > 0.55 {
+                        let k = (ov - 0.55) / 0.45
+                        FourPointStar()
+                            .fill(Tokens.Palette.pearl)
+                            .scaleEffect(0.5 + abs(sin(k * 3 * .pi)) * 0.9)
+                            .opacity(0.4 + abs(sin(k * 3 * .pi)) * 0.6)
+                            .stage(x: 378, y: 380, w: 44, h: 44)
+                    }
+                    // The flash as it bursts open
+                    if ov > 0.92 {
+                        Color.white
+                            .opacity((ov - 0.92) / 0.08 * 0.7)
+                            .stage(x: 0, y: 0, w: 800, h: 600)
+                            .bleed()
+                            .allowsHitTesting(false)
+                    }
+                }
+
+                // What the chest holds: not the treasure itself, but the map
+                // to it, floating and tilting in the column of light.
+                if earned != nil && ov >= 1 {
+                    MapReveal(t: t, scale: s)
+                        .frame(width: 140 * s, height: 140 * s)
+                        .stage(x: 330, y: 95, w: 140, h: 140)
+                        .transition(.opacity)
                 }
 
                 // Twinkles around the chest and lamp
@@ -103,23 +135,25 @@ struct ChestScreen: View {
                     .stageTopCenter(y: 26)
 
                 SolvedPanel(
-                    text: earned.map { "You earned a \($0.displayName.lowercased())!" }
-                        ?? "Your grotto is full of treasures!",
-                    buttonTitle: earned == nil ? "See my grotto" : "Put it in my grotto",
+                    text: earned == nil ? "Your grotto is full of treasures!" : "You found a treasure map!",
+                    buttonTitle: earned == nil ? "See my grotto" : "Follow the map",
                     scale: s,
                     action: onPlace
                 )
+                .opacity(ov >= 1 ? 1 : 0)
                 .stageBottomCenter(bottom: 24)
+            }
+            .onChange(of: Int(t * 20)) {
+                if t0 == nil { t0 = t }
             }
         }
     }
 }
 
-/// The floating reveal: glow, item art, and (for the lamp) its face on top.
-/// The wrapper floats up 10px and tilts -5 to 5deg over 3.4s, per the CSS.
-private struct ItemReveal: View {
+/// The floating map: glow behind, gentle rise and tilt, per the lamp's old
+/// reveal motion (up 10px, -5 to 5deg, 3.4s).
+private struct MapReveal: View {
     let t: Double
-    let item: GrottoItem
     let scale: CGFloat
 
     var body: some View {
@@ -127,15 +161,8 @@ private struct ItemReveal: View {
         ZStack {
             GlowPulse(t: t, color: Color(hex: 0xFFE9A8), fromOpacity: 0.45, toOpacity: 1, duration: 1.8)
                 .scaleEffect(1.8)
-            if item == .starfishLamp {
-                // Lamp art and face at their reference offsets within 132x128
-                ArtImage("scenes/treasure-chest/starfish-lamp.png")
-                ArtImage("scenes/treasure-chest/starfish-lamp-face.png")
-                    .frame(width: 40 * scale, height: 32 * scale)
-                    .offset(x: (46 + 20 - 66) * scale, y: (58 + 16 - 64) * scale)
-            } else {
-                ArtImage(item.sprite)
-            }
+            ArtImage("ui/icon-map.png")
+                .frame(width: 110 * scale, height: 110 * scale)
         }
         .offset(y: Wave.keyframes(frac, [(0, 0), (0.5, -10), (1, 0)]) * scale)
         .rotationEffect(.degrees(Wave.keyframes(frac, [(0, -5), (0.5, 5), (1, -5)])))

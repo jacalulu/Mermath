@@ -18,17 +18,29 @@ struct TidePoolViewState {
 
 /// The locked Tide Pool screen, ported from reference/html/tide-pool-*.html.
 /// All coordinates are the 800x600 design space.
+/// A tappable reward bubble from the tollbooth burst: no math, pure fun.
+private struct BonusBubble: Identifiable {
+    let id: Int
+    let x: CGFloat
+    let y: CGFloat
+    let born: Double
+}
+
 struct TidePoolScreen: View {
     let state: TidePoolViewState
     var onAnswer: (Int) -> Void = { _ in }
     var onReplay: () -> Void = {}
     var onMap: () -> Void = {}
     var onOpenChest: () -> Void = {}
+    var onBonusPop: (Int) -> Void = { _ in }
 
     @Environment(\.stage) private var m
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     /// The clock time when the right fish was caught, so it freezes to pop.
     @State private var caughtAt: Double?
+    /// The tollbooth burst: every catch pays out a few poppable bubbles.
+    @State private var bonus: [BonusBubble] = []
+    @State private var bonusPops = 0
 
     var body: some View {
         MotionClock { t in
@@ -167,6 +179,30 @@ struct TidePoolScreen: View {
                 )
                 .stage(x: 0, y: 0, w: 800, h: 600)
 
+                // The tollbooth reward: a shower of poppable bonus bubbles.
+                // Each pop plays the next rising note. No math, no stakes -
+                // the catch bought a few seconds of pure play.
+                ForEach(bonus) { b in
+                    if t >= b.born && t < b.born + 6 {
+                        let age = t - b.born
+                        Button {
+                            onBonusPop(bonusPops)
+                            bonusPops += 1
+                            withMotion(.easeOut(duration: 0.2)) {
+                                bonus.removeAll { $0.id == b.id }
+                            }
+                        } label: {
+                            ArtImage("props/bubble.png")
+                                .opacity(age > 5 ? (6 - age) : 1)
+                        }
+                        .buttonStyle(.plain)
+                        .transition(.scale.combined(with: .opacity))
+                        .stage(x: b.x - 26 + sin(t * 2 + Double(b.id)) * 8,
+                               y: b.y - 26 - age * 16,
+                               w: 52, h: 52)
+                    }
+                }
+
                 if state.diveComplete {
                     SolvedPanel(
                         text: state.solvedText,
@@ -184,6 +220,20 @@ struct TidePoolScreen: View {
             }
             .onChange(of: state.solved) { _, isSolved in
                 caughtAt = isSolved ? t : nil
+            }
+            .onChange(of: state.pearls) { old, new in
+                // A catch pays out six bonus bubbles around the catch point
+                guard new > old, !reduceMotion else { return }
+                let lane = state.choices.firstIndex(of: state.target) ?? 1
+                let ox = min(max(FishLanes.x(lane, caughtAt ?? t), 120), 680)
+                let oy = FishLanes.centerY[lane]
+                let spread: [(CGFloat, CGFloat)] = [(-85, -10), (70, -45), (-25, 55), (95, 35), (-120, 60), (35, 100)]
+                bonus = spread.enumerated().map { i, d in
+                    BonusBubble(id: new * 10 + i,
+                                x: min(max(ox + d.0, 60), 740),
+                                y: min(max(oy + d.1, 150), 540),
+                                born: t + Double(i) * 0.1)
+                }
             }
         }
     }

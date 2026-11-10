@@ -11,6 +11,15 @@ extension GrottoItem {
         }
     }
 
+    /// Height over width of the sprite art, for aspect-correct previews.
+    var spriteAspect: CGFloat {
+        switch self {
+        case .starfishLamp: return 100.0 / 104
+        case .kelpCurtain: return 390.0 / 166
+        case .shellBed: return 170.0 / 252
+        }
+    }
+
     /// Where this item's label pill sits in the grotto (centered on x, top y).
     var labelSpot: CGPoint {
         switch self {

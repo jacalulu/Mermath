@@ -21,7 +21,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 VOICE_DIR = os.path.join(ROOT, 'app', 'Mermath', 'Resources', 'Voice')
 
 WORD = {1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five',
-        6: 'six', 7: 'seven', 8: 'eight', 9: 'nine', 10: 'ten'}
+        6: 'six', 7: 'seven', 8: 'eight', 9: 'nine', 10: 'ten',
+        11: 'eleven', 12: 'twelve', 13: 'thirteen', 14: 'fourteen', 15: 'fifteen',
+        16: 'sixteen', 17: 'seventeen', 18: 'eighteen', 19: 'nineteen', 20: 'twenty'}
 
 CHILDREN = {'ophelia': 'Ophelia', 'daphne': 'Daphne', 'violet': 'Violet'}
 ITEMS = {'starfishLamp': 'starfish lamp', 'kelpCurtain': 'kelp curtain', 'shellBed': 'shell bed'}
@@ -47,6 +49,27 @@ def prompts():
             out.append((f'reef-hint-{a}-{b}', f'Count all the shells: {first}, and then {rest}!', 'crab'))
             out.append((f'reef-praise-{a}-{b}', f'{wa} and {wb} make {ws}!', 'crab'))
             out.append((f'reef-tenth-{a}-{b}', f'{wa} and {wb} make {ws}! That makes ten pearls! Open the chest!', 'crab'))
+    # Intro cinematic
+    out.append(('intro-1', 'Deep under the sea, three little mermaid sisters kept their treasures in a cozy grotto.', 'narrator'))
+    out.append(('intro-2', 'One day, a great big whale swam by. And then. Aaah. Aaah. AAACHOO!', 'narrator'))
+    out.append(('intro-3', 'The sneeze swept the treasures all across the sea!', 'narrator'))
+    out.append(('intro-4', 'Oh no! The treasures washed away! Who is diving today?', 'crab'))
+    # Treasure hunt
+    out.append(('chest-map', 'And look! A treasure map!', 'narrator'))
+    out.append(('hunt-intro', 'Follow the map! Can you find all the treasures?', 'crab'))
+    out.append(('hunt-found', 'You found them all! Hooray!', 'crab'))
+    # Deep Sea: counting by 2s and 5s
+    out.append(('deep-intro', 'Welcome to the Deep Sea! Swim through the right ring!', 'crab'))
+    for step, currents in ((2, (2, 4, 6, 8)), (5, (5, 10, 15))):
+        by = 'twos' if step == 2 else 'fives'
+        for c in currents:
+            t2 = c + step
+            out.append((f'deep-{step}-{c}', f'Count by {by}! What comes after {WORD[c]}?', 'crab'))
+            counting = ', '.join(WORD[i] for i in range(step, t2 + 1, step))
+            out.append((f'deep-hint-{step}-{t2}', f'Count with me: {counting}!', 'crab'))
+    for t2 in (4, 6, 8, 10, 15, 20):
+        out.append((f'deep-praise-{t2}', f"That's it! {WORD[t2].capitalize()}!", 'crab'))
+        out.append((f'deep-tenth-{t2}', f'{WORD[t2].capitalize()}! That makes ten pearls! Open the chest!', 'crab'))
     out.append(('who-is-diving', 'Who is diving today?', 'narrator'))
     for key, name in CHILDREN.items():
         out.append((f'hello-{key}', f'Hello {name}! Where shall we dive?', 'narrator'))

@@ -183,6 +183,37 @@ def scene_map_layers():
     s.layer('bg'); s.finish(mott=.26, streak=.14, vig=0, grain=0)
     return {n: s.svg_layer(n) for n in ('bg', 'kelp_far', 'kelp_mid', 'floor', 'grass')}
 
+def scene_hunt_layers():
+    """The treasure garden for the hidden-object hunt: a sunken rowboat on a
+    bright sandy clearing, with boulders, corals and grass to tuck little
+    treasures beside. The findables themselves are app overlays."""
+    s = LS(733, 300, -230, 1000); r = s.r
+    open_water(s)
+    far = ''.join(kelp(r, x + r.uniform(-12, 12), 6, '#6fd0cd', (30, 56), (6, 10), (22, 38)) for x in (160, 300, 470, 620, 740))
+    s.layer('kelp_far').add(f'<g filter="url(#b3)" opacity=".6">{far}</g>')
+    d, top = hill(r, 450, 16); s.layer('bg').add(f'<path d="{d}" fill="#4fb8bd" opacity=".65" filter="url(#b3)"/>')
+    s.rays(RAYS, 1000, .5)
+    s.layer('fg'); sand(s, r, 452, 9, SAND)
+    # The wreck: an old rowboat, resting at a tilt in the sand
+    hull = s.lin([(0, '#8a5c34', 1), (1, '#573418', 1)])
+    planks = ''.join(f'<path d="M{308+i*4} {466-i*15} C370 {450-i*15} 530 {450-i*15} {588-i*3} {464-i*15}" fill="none" stroke="#3f2410" stroke-width="3" opacity=".5"/>' for i in (1, 2, 3))
+    s.add(f'<g transform="rotate(-7 420 470)">'
+          f'<path d="M300 470 C310 430 330 414 352 410 L520 410 C560 416 588 438 596 470 C560 500 340 504 300 470 Z" fill="{hull}"/>'
+          f'{planks}'
+          f'<path d="M300 470 C340 504 560 500 596 470 L592 482 C540 510 350 514 306 482 Z" fill="#3f2410" opacity=".8"/>'
+          f'<circle cx="394" cy="446" r="13" fill="#2b4a5e" stroke="#a87648" stroke-width="5"/>'
+          f'<path d="M520 410 L548 338 L566 342 L540 412 Z" fill="#6a4426"/>'
+          f'</g>')
+    s.add(boulder(s, 96, 500, 220, 86) + boulder(s, 724, 520, 200, 80) + boulder(s, 640, 556, 100, 42, moss=False))
+    s.add(coral(r, 60, 486, '#b03070', '#ff9ecb', 150, 4, 14, -86) + coral(r, 756, 470, '#5a3aa8', '#d2b4ff', 160, 4, 15, -94) + coral(r, 688, 520, '#b23a2a', '#ffb347', 100, 3, 12, -80))
+    sand(s, r, 560, 6, SAND2, caustic=False)
+    s.add(mound(s, 206, 592, 42, 34, '#35c6a8', '#12788c') + mound(s, 560, 596, 38, 30, '#ffb347', '#c9562b'))
+    s.add(shell_on_sand(250, 588) + shell_on_sand(480, 592))
+    s.layer('grass').add(grass(r, 150, 594, 7, 26, 60, '#1f9c7c', '#3fc79a') + grass(r, 420, 598, 6, 24, 52, '#1f9c7c', '#3fc79a') + grass(r, 700, 596, 7, 26, 58, '#1f9c7c', '#3fc79a'))
+    s.layer('bg'); s.finish(mott=.26, streak=.14, vig=0, grain=0)
+    return {n: s.svg_layer(n) for n in ('bg', 'kelp_far', 'fg', 'grass')}
+
+
 def scene_props_layers():
     """Small painted objects used by the screens: the padlock for a locked zone,
     the two countable shells, and the Tide Pool's big answer fish (it carries a
@@ -204,7 +235,21 @@ def scene_props_layers():
         '<circle cx="352" cy="280" r="10" fill="#ffffff"/><circle cx="350.5" cy="281" r="6" fill="#1b1030"/><circle cx="348" cy="278" r="2.4" fill="#ffffff"/>'
         '<path d="M340 300 Q349 308 358 302" fill="none" stroke="#7a3d12" stroke-width="3" stroke-linecap="round"/>'
         '<ellipse cx="364" cy="299" rx="6" ry="4" fill="#ff9ecb" opacity=".5"/>')
-    return {name: s.svg_layer(name) for name in ('lock', 'afish', 'afish_face')}
+    # The great big whale from the intro: friendly, huge, about to sneeze.
+    back = s.lin([(0, '#2e6e94', 1), (.55, '#3d85ac', 1), (1, '#6fb3cc', 1)])
+    belly = s.lin([(0, '#cfe9ef', 1), (1, '#9fcfdd', 1)])
+    s.layer('whale').add(
+        f'<path d="M150 320 C180 230 330 200 460 228 C560 248 620 300 628 332 C600 318 584 316 566 322 C590 338 602 362 600 388 C560 420 420 446 300 436 C210 428 150 380 150 320 Z" fill="{back}"/>'
+        f'<path d="M628 332 C652 300 676 288 706 284 C694 310 692 326 698 352 C692 378 668 392 640 396 C620 380 606 360 600 388 C602 362 590 338 566 322 C584 316 600 318 628 332 Z" fill="{back}"/>'
+        f'<path d="M160 340 C220 384 420 416 560 392 C540 416 420 442 300 436 C216 428 166 386 160 340 Z" fill="{belly}"/>'
+        f'<path d="M190 354 C260 392 420 412 540 396" fill="none" stroke="#8fc3d4" stroke-width="5" opacity=".7"/>'
+        f'<path d="M206 372 C276 404 420 420 520 408" fill="none" stroke="#8fc3d4" stroke-width="5" opacity=".6"/>'
+        f'<path d="M330 404 C350 436 400 444 430 424 C410 452 350 452 330 404 Z" fill="#2e6e94"/>')
+    s.layer('whale_face').add(
+        '<circle cx="246" cy="300" r="15" fill="#ffffff"/><circle cx="243" cy="302" r="9" fill="#1b1030"/><circle cx="239.5" cy="297.5" r="3.4" fill="#ffffff"/>'
+        '<path d="M180 342 Q220 362 262 352" fill="none" stroke="#1b3a52" stroke-width="5" stroke-linecap="round"/>'
+        '<ellipse cx="282" cy="334" rx="11" ry="7" fill="#ff9ecb" opacity=".45"/>')
+    return {name: s.svg_layer(name) for name in ('lock', 'afish', 'afish_face', 'whale', 'whale_face')}
 
 from frame import scene_home_layers
 
@@ -214,5 +259,6 @@ SCENES2 = {
     'chest': (scene_chest_layers, dict(bg='bg', kelp_far='far', kelp_mid='mid', fg='fg', chest_lid='piece', chest_box='piece', lamp='prop', lamp_face='vector', grass='grass')),
     'grotto': (scene_grotto_layers, dict(bg='bg', floor='fg', walls='fg', curtain='mid', bed='piece', lights='prop', lamp='prop', lamp_face='vector')),
     'map': (scene_map_layers, dict(bg='bg', kelp_far='far', kelp_mid='mid', floor='fg', grass='grass')),
-    'props': (scene_props_layers, dict(lock='prop', afish='prop', afish_face='vector')),
+    'hunt': (scene_hunt_layers, dict(bg='bg', kelp_far='far', fg='fg', grass='grass')),
+    'props': (scene_props_layers, dict(lock='prop', afish='prop', afish_face='vector', whale='piece', whale_face='vector')),
 }

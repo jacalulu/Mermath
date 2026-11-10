@@ -8,6 +8,13 @@ struct RootView: View {
     var body: some View {
         StageView {
             switch model.route {
+            case .intro:
+                IntroScreen(
+                    speak: { model.speaker.speak($0) },
+                    onDone: { model.finishIntro(saidWho: $0) }
+                )
+                .transition(.opacity)
+
             case .pick:
                 PickMermaidScreen(
                     onPick: { model.pick($0) },
@@ -40,7 +47,8 @@ struct RootView: View {
                             onAnswer: { dive.answer($0) },
                             onReplay: { dive.replay() },
                             onMap: { model.leaveDive() },
-                            onOpenChest: { model.openChest() }
+                            onOpenChest: { model.openChest() },
+                            onBonusPop: { dive.playBonusNote($0) }
                         )
                         .transition(.opacity)
                     }
@@ -50,8 +58,17 @@ struct RootView: View {
                 ChestScreen(
                     child: model.activeChild,
                     earned: earned,
-                    onPlace: { model.placeInGrotto(earned) },
+                    onPlace: { model.followMap(earned) },
                     onMap: { model.diveAgain() }
+                )
+                .transition(.opacity)
+
+            case let .hunt(earned):
+                HuntScreen(
+                    earned: earned,
+                    onDone: { model.placeInGrotto(earned) },
+                    onFind: { model.sounds.play(SoundPlayer.Effect.notes[$0 % SoundPlayer.Effect.notes.count]) },
+                    speakFound: { model.speaker.speak(PromptScript.huntFound) }
                 )
                 .transition(.opacity)
 

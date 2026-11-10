@@ -7,6 +7,10 @@ final class SoundPlayer {
         case chime
         case fanfare
         case pop
+        case note1, note2, note3, note4, note5
+
+        /// The bonus-bubble melody, lowest to highest.
+        static let notes: [Effect] = [.note1, .note2, .note3, .note4, .note5]
     }
 
     private var players: [Effect: AVAudioPlayer] = [:]

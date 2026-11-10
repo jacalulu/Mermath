@@ -13,6 +13,8 @@ enum PromptScript {
     static let numberWords: [Int: String] = [
         1: "one", 2: "two", 3: "three", 4: "four", 5: "five",
         6: "six", 7: "seven", 8: "eight", 9: "nine", 10: "ten",
+        11: "eleven", 12: "twelve", 13: "thirteen", 14: "fourteen", 15: "fifteen",
+        16: "sixteen", 17: "seventeen", 18: "eighteen", 19: "nineteen", 20: "twenty",
     ]
 
     static func word(_ n: Int) -> String { numberWords[n] ?? "\(n)" }
@@ -78,6 +80,45 @@ enum PromptScript {
 
     static func reefSolvedWritten(a: Int, b: Int) -> String {
         "\(a) and \(b) make \(a + b)! That is 10 pearls."
+    }
+
+    // MARK: Intro cinematic
+
+    static let intro1 = Prompt(id: "intro-1", text: "Deep under the sea, three little mermaid sisters kept their treasures in a cozy grotto.")
+    static let intro2 = Prompt(id: "intro-2", text: "One day, a great big whale swam by. And then. Aaah. Aaah. AAACHOO!")
+    static let intro3 = Prompt(id: "intro-3", text: "The sneeze swept the treasures all across the sea!")
+    static let intro4 = Prompt(id: "intro-4", text: "Oh no! The treasures washed away! Who is diving today?")
+
+    // MARK: Treasure hunt
+
+    static let chestMap = Prompt(id: "chest-map", text: "And look! A treasure map!")
+    static let huntIntro = Prompt(id: "hunt-intro", text: "Follow the map! Can you find all the treasures?")
+    static let huntFound = Prompt(id: "hunt-found", text: "You found them all! Hooray!")
+
+    // MARK: Deep Sea (counting by 2s and 5s)
+
+    static let deepIntro = Prompt(id: "deep-intro", text: "Welcome to the Deep Sea! Swim through the right ring!")
+
+    static func deepSpoken(step: Int, after current: Int) -> Prompt {
+        Prompt(id: "deep-\(step)-\(current)",
+               text: "Count by \(step == 2 ? "twos" : "fives")! What comes after \(word(current))?")
+    }
+
+    static func deepWritten(step: Int, after current: Int) -> String {
+        "Count by \(step == 2 ? "2s" : "5s")!"
+    }
+
+    static func deepPraise(_ target: Int) -> Prompt {
+        Prompt(id: "deep-praise-\(target)", text: "That's it! \(word(target).capitalized)!")
+    }
+
+    static func deepHint(step: Int, target: Int) -> Prompt {
+        let counting = stride(from: step, through: target, by: step).map { word($0) }.joined(separator: ", ")
+        return Prompt(id: "deep-hint-\(step)-\(target)", text: "Count with me: \(counting)!")
+    }
+
+    static func deepTenth(_ target: Int) -> Prompt {
+        Prompt(id: "deep-tenth-\(target)", text: "\(word(target).capitalized)! That makes ten pearls! Open the chest!")
     }
 
     // MARK: Screens
