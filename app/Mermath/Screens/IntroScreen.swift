@@ -86,8 +86,10 @@ struct IntroScreen: View {
                         ArtImage("scenes/intro/home-wall.png")
                             .stage(x: dx - 1, y: 0, w: 802, h: 600)
 
-                        // The front half of the whale, inside the room
-                        if whaleOn {
+                        // The front half of the whale, inside the room - only
+                        // once it has actually crossed the window plane, so
+                        // the approach stays properly behind the rim
+                        if whaleOn && tl > 15.35 && tl < 20.95 {
                             ZStack {
                                 whaleBody
                                     .scaleEffect(scaleW)
@@ -195,13 +197,14 @@ struct IntroScreen: View {
                                 .stage(x: CGFloat(i) * 560 + 60 - cam * 1.45,
                                        y: 0, w: i % 2 == 0 ? 234 : 168, h: 600)
                         }
-                        // Drifting motes, closest of all
+                        // Drifting motes, closest of all - floating upward
                         if tl < 12.5 {
                             ForEach(0..<7, id: \.self) { i in
+                                let rise = (t * 34 + Double(i) * 131).truncatingRemainder(dividingBy: 560)
                                 ArtImage("props/bubble.png")
                                     .opacity(0.5)
-                                    .stage(x: CGFloat(i) * 560 - cam * 1.8 + 110,
-                                           y: 80 + CGFloat((i * 137) % 400) + bob * 2,
+                                    .stage(x: CGFloat(i) * 560 - cam * 1.8 + 110 + sin(t * 1.6 + Double(i)) * 10,
+                                           y: 620 - rise,
                                            w: 15 + CGFloat(i % 3) * 7, h: 15 + CGFloat(i % 3) * 7)
                             }
                         }
@@ -230,20 +233,14 @@ struct IntroScreen: View {
                 if tl >= 21.4 && tl < 30.4 {
                     let camJ = smooth(beat(tl, 21.7, 29.8)) * 1600
                     Group {
-                        // The three zones as one panning strip
+                        // A different part of the ocean: a bright open reef
                         Group {
-                            ArtImage("scenes/tide-pool/bg.jpg")
+                            ArtImage("scenes/journey/strip-a.jpg")
                                 .stage(x: 0 - camJ - 1, y: 0, w: 802, h: 600)
-                            ArtImage("scenes/tide-pool/foreground.png")
-                                .stage(x: 0 - camJ - 1, y: 350, w: 802, h: 250)
-                            ArtImage("scenes/coral-reef/bg.jpg")
+                            ArtImage("scenes/journey/strip-b.jpg")
                                 .stage(x: 800 - camJ - 1, y: 0, w: 802, h: 600)
-                            ArtImage("scenes/coral-reef/foreground.png")
-                                .stage(x: 800 - camJ - 1, y: 272, w: 802, h: 328)
-                            ArtImage("scenes/deep-sea/bg.jpg")
+                            ArtImage("scenes/journey/strip-c.jpg")
                                 .stage(x: 1600 - camJ - 1, y: 0, w: 802, h: 600)
-                            ArtImage("scenes/deep-sea/foreground.png")
-                                .stage(x: 1600 - camJ - 1, y: 292, w: 802, h: 308)
                         }
 
                         // Each hero treasure splashes down in its own water
@@ -281,16 +278,13 @@ struct IntroScreen: View {
                             }
                         }
 
-                        // Passing pillars hide the zone seams
-                        ArtImage("props/pillar-b.png")
-                            .stage(x: 716 - camJ, y: 0, w: 168, h: 600)
-                        ArtImage("props/pillar-a.png")
-                            .stage(x: 1484 - camJ, y: 0, w: 234, h: 600)
-                        // And nearer ones sweep by for depth
+                        // Big coral fans sweep by in the foreground for depth
                         ForEach(0..<4, id: \.self) { i in
-                            ArtImage(i % 2 == 0 ? "props/pillar-a.png" : "props/pillar-b.png")
-                                .stage(x: CGFloat(i) * 760 + 300 - camJ * 1.4,
-                                       y: 0, w: i % 2 == 0 ? 234 : 168, h: 600)
+                            ArtImage(i % 2 == 0 ? "props/coral-fan-a.png" : "props/coral-fan-b.png")
+                                .stage(x: CGFloat(i) * 740 + 240 - camJ * 1.4,
+                                       y: i % 2 == 0 ? 180 : 260,
+                                       w: i % 2 == 0 ? 430 : 536,
+                                       h: i % 2 == 0 ? 576 : 514)
                         }
                         Vignette()
                             .stage(x: 0, y: 0, w: 800, h: 600)

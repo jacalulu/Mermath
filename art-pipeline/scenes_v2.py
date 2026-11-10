@@ -446,6 +446,56 @@ def scene_ihome_layers():
     return {n: s.svg_layer(n) for n in ('bg', 'wall', 'items')}
 
 
+# ---- The scatter journey: a bright open coral reef the camera pans across,
+# a different part of the ocean from the grotto. Segments tile behind an
+# identical coral-cluster edge (not the grotto's rock pillars).
+
+_REEF_EDGE_L = None  # built once below
+
+
+def _reef_edge(s, r):
+    out = boulder(s, 10, 540, 180, 90) + boulder(s, -6, 580, 120, 60, moss=False)
+    out += coral(r, 6, 470, '#7a2f6a', '#e89ad0', 190, 4, 15, -88)
+    return out
+
+
+def _reefstrip(seed):
+    """One 800x600 segment of the open reef: bright water, vivid coral."""
+    s = LS(seed, 300, -200, 1000); r = s.r
+    s.layer('bg')
+    open_water(s, cols=('#d2f9ec', '#8ce5d2', '#3cb3bd', '#1e86a0', '#136181'))
+    far = ''.join(kelp(r, x + r.uniform(-14, 14), 6, '#6fd0cd', (28, 50), (6, 10), (22, 36)) for x in (120, 300, 480, 660))
+    s.add(f'<g filter="url(#b3)" opacity=".55">{far}</g>')
+    d, top = hill(r, 440, 16)
+    s.add(f'<path d="{d}" fill="#3fb0b8" opacity=".6" filter="url(#b3)"/>')
+    s.rays(RAYS, 1000, .5)
+    ff, nf = school(r, 14, [(760, r.uniform(120, 200)), (430, r.uniform(150, 230)), (60, r.uniform(120, 220))], 40, size=(.12, .4), heading=-8)
+    s.add(ff + nf)
+    sand(s, r, 452, 9, SAND)
+    # A big joyful coral garden, different mix per segment
+    cols = [('#b23a2a', '#ffb347'), ('#b03070', '#ff9ecb'), ('#5a3aa8', '#d2b4ff'), ('#2f9c86', '#9df0d0'), ('#c9562b', '#ffd27a')]
+    xs = sorted(r.uniform(120, 700) for _ in range(5))
+    for i, x in enumerate(xs):
+        c1, c2 = cols[(i + seed) % len(cols)]
+        s.add(coral(r, x, r.uniform(470, 520), c1, c2, r.uniform(120, 210), 4, r.uniform(11, 16), r.uniform(-98, -78)))
+    s.add(boulder(s, r.uniform(200, 380), 560, 170, 70) + boulder(s, r.uniform(500, 640), 572, 130, 56, moss=False))
+    s.add(mound(s, r.uniform(140, 300), 596, 42, 34, '#35c6a8', '#12788c') + mound(s, r.uniform(460, 660), 598, 38, 30, '#ffb347', '#c9562b'))
+    s.add(seastar(r.uniform(300, 500), 588, 11, r.choice(['#ff7fa6', '#ffa24a', '#9fd0ff']), r.uniform(-100, -70)))
+    sand(s, r, 566, 6, SAND2, caustic=False)
+    s.add(grass(r, r.uniform(120, 240), 596, 6, 24, 54, '#1f9c7c', '#3fc79a') + grass(r, r.uniform(520, 680), 598, 6, 22, 50, '#1f9c7c', '#3fc79a'))
+    # The identical seam cluster on both edges
+    import random as _rnd
+    s.add(_reef_edge(s, _rnd.Random(77)))
+    s.add(f'<g transform="translate(800 0) scale(-1 1)">{_reef_edge(s, _rnd.Random(77))}</g>')
+    s.finish(mott=.3, streak=.16, vig=.2, grain=0)
+    return {'bg': s.svg_layer('bg')}
+
+
+def scene_journeya_layers(): return _reefstrip(1501)
+def scene_journeyb_layers(): return _reefstrip(1502)
+def scene_journeyc_layers(): return _reefstrip(1503)
+
+
 def scene_props_layers():
     """Small painted objects used by the screens: the padlock for a locked zone,
     the two countable shells, and the Tide Pool's big answer fish (it carries a
@@ -481,6 +531,15 @@ def scene_props_layers():
         '<circle cx="246" cy="300" r="15" fill="#ffffff"/><circle cx="243" cy="302" r="9" fill="#1b1030"/><circle cx="239.5" cy="297.5" r="3.4" fill="#ffffff"/>'
         '<path d="M180 342 Q220 362 262 352" fill="none" stroke="#1b3a52" stroke-width="5" stroke-linecap="round"/>'
         '<ellipse cx="282" cy="334" rx="11" ry="7" fill="#ff9ecb" opacity=".45"/>')
+    # Foreground coral fans for the journey's parallax (instead of the
+    # grotto's rock pillars): deep-toned, anchored to the bottom edge.
+    for name, cx, c1, c2 in (('fgfan_a', 200, '#6a2358', '#c96aa8'), ('fgfan_b', 560, '#3a2a78', '#8a6ad0')):
+        s.layer(name)
+        fr = __import__('random').Random(31 if name.endswith('a') else 47)
+        s.add(boulder(s, cx, 620, 300, 110))
+        s.add(coral(fr, cx - 40, 600, c1, c2, 420, 5, 24, -92))
+        s.add(coral(fr, cx + 80, 614, c1, c2, 280, 4, 18, -80))
+
     # The pre-sneeze face: eyes squeezed shut, mouth wide open mid "aaah"
     s.layer('whale_face_uhoh').add(
         '<path d="M231 296 Q246 286 261 296" fill="none" stroke="#1b1030" stroke-width="6" stroke-linecap="round"/>'
@@ -520,7 +579,8 @@ def scene_props_layers():
         + pearls([(470 + i * 22.5, 130 + 74 * (1 - abs(i - 4) / 4) ** 1.2) for i in range(9)], 7))
     return {name: s.svg_layer(name) for name in (
         'lock', 'afish', 'afish_face', 'whale', 'whale_face',
-        'whale_face_uhoh', 'hoard_left', 'hoard_right', 'hoard_floor', 'hoard_strings')}
+        'whale_face_uhoh', 'hoard_left', 'hoard_right', 'hoard_floor', 'hoard_strings',
+        'fgfan_a', 'fgfan_b')}
 
 from frame import scene_home_layers
 
@@ -537,7 +597,11 @@ SCENES2 = {
     'iwallc': (scene_iwallc_layers, dict(bg='bg')),
     'ipillars': (scene_ipillars_layers, dict(pillar_a='fg', pillar_b='fg')),
     'ihome': (scene_ihome_layers, dict(bg='bg', wall='fg', items='piece')),
+    'journeya': (scene_journeya_layers, dict(bg='bg')),
+    'journeyb': (scene_journeyb_layers, dict(bg='bg')),
+    'journeyc': (scene_journeyc_layers, dict(bg='bg')),
     'props': (scene_props_layers, dict(lock='prop', afish='prop', afish_face='vector', whale='piece', whale_face='vector',
                                        whale_face_uhoh='vector', hoard_left='prop', hoard_right='prop',
-                                       hoard_floor='prop', hoard_strings='vector')),
+                                       hoard_floor='prop', hoard_strings='vector',
+                                       fgfan_a='fg', fgfan_b='fg')),
 }
