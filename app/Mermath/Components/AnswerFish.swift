@@ -32,12 +32,16 @@ enum FishLanes {
     }
 }
 
-/// A painted goldfish wearing its numeral on its belly. The body (and face)
-/// flip with the swim direction; the numeral never mirrors.
+/// A painted goldfish wearing its numeral on its belly and carrying its pearl
+/// at its nose: the fish never turns into anything, it delivers what it holds.
+/// The body (and face, and pearl) flip with the swim direction; the numeral
+/// never mirrors.
 struct FishBody: View {
     let number: Int
     let facingRight: Bool
     let scale: CGFloat
+    /// Hidden once this fish has handed its pearl to the counter.
+    var carriesPearl = true
 
     var body: some View {
         let w = FishLanes.fishW * scale
@@ -52,6 +56,12 @@ struct FishBody: View {
                         x: (FishLanes.faceFrame.midX - 0.5) * w,
                         y: (FishLanes.faceFrame.midY - 0.5) * h
                     )
+                if carriesPearl {
+                    ArtImage("ui/pearl.png")
+                        .frame(width: 24 * scale, height: 24 * scale)
+                        .shadow(color: Tokens.Palette.pearl.opacity(0.8), radius: 4 * scale)
+                        .offset(x: -0.5 * w - 2 * scale, y: 0.1 * h)
+                }
             }
             .scaleEffect(x: facingRight ? -1 : 1)
             Text("\(number)")
@@ -127,9 +137,13 @@ struct CatchFlight: View {
             .keyframeAnimator(initialValue: 1.0, trigger: reduceMotion ? 0 : trigger) { _, v in
                 ZStack {
                     if v < 1 {
+                        // Fish reaches the counter at `arrive`, drops its pearl
+                        // there, and keeps swimming off the top of the stage.
+                        let arrive = 0.72
+                        let u = min(v / arrive, 1)
                         // Splash ring at the catch point
-                        if v < 0.3 {
-                            let r = v / 0.3
+                        if v < 0.28 {
+                            let r = v / 0.28
                             Circle()
                                 .stroke(Tokens.Palette.pearl, lineWidth: 5 * scale * (1 - r))
                                 .frame(width: (70 + 120 * r) * scale, height: (70 + 120 * r) * scale)
@@ -138,7 +152,7 @@ struct CatchFlight: View {
                         }
                         // Bubble trail behind the fish
                         ForEach(0..<5, id: \.self) { i in
-                            let tv = v - 0.07 * Double(i + 1)
+                            let tv = u - 0.09 * Double(i + 1)
                             if tv > 0 {
                                 let p = Self.path(from: from, to: to, tv)
                                 ArtImage("props/bubble.png")
@@ -147,22 +161,38 @@ struct CatchFlight: View {
                                     .position(x: p.x * scale, y: p.y * scale)
                             }
                         }
-                        // The fish, carrying its numeral home
-                        let p = Self.path(from: from, to: to, v)
-                        let fishScale = 1 - 0.68 * v
+                        // The fish, carrying its pearl up to the counter
+                        let right = to.x > from.x
+                        let exit = CGPoint(x: to.x + (right ? 180 : -180), y: to.y - 150)
+                        let p = v <= arrive
+                            ? Self.path(from: from, to: to, u)
+                            : CGPoint(
+                                x: to.x + (exit.x - to.x) * (v - arrive) / (1 - arrive),
+                                y: to.y + (exit.y - to.y) * (v - arrive) / (1 - arrive)
+                            )
+                        let fishScale = 1 - 0.66 * min(1, v / arrive)
                         // Squash on the catch, stretch into the launch
-                        let squash = Wave.keyframes(v, [(0, 1), (0.06, 0.82), (0.16, 1.14), (0.26, 1)])
-                        FishBody(number: number, facingRight: to.x > from.x, scale: scale)
+                        let squash = Wave.keyframes(v, [(0, 1), (0.05, 0.82), (0.13, 1.14), (0.22, 1)])
+                        FishBody(number: number, facingRight: right, scale: scale, carriesPearl: v <= arrive)
                             .scaleEffect(x: fishScale * (2 - squash), y: fishScale * squash)
-                            .rotationEffect(.degrees(Wave.keyframes(v, [(0, 0), (0.2, to.x > from.x ? -32 : 32), (0.85, to.x > from.x ? -12 : 12), (1, 0)])))
-                            .opacity(v > 0.93 ? (1 - v) / 0.07 : 1)
+                            .rotationEffect(.degrees(Wave.keyframes(u, [(0, 0), (0.25, right ? -32 : 32), (0.9, right ? -14 : 14), (1, 0)])))
+                            .opacity(v > 0.88 ? max(0, (1 - v) / 0.12) : 1)
                             .position(x: p.x * scale, y: p.y * scale)
+                        // The delivered pearl settles into its slot
+                        if v > arrive {
+                            let settle = (v - arrive) / (1 - arrive)
+                            ArtImage("ui/pearl.png")
+                                .frame(width: 22 * scale, height: 22 * scale)
+                                .scaleEffect(Wave.keyframes(settle, [(0, 1.5), (0.5, 0.95), (1, 1)]))
+                                .opacity(1 - settle * settle)
+                                .position(x: to.x * scale, y: to.y * scale)
+                        }
                     }
                 }
             } keyframes: { _ in
                 KeyframeTrack {
                     LinearKeyframe(0.0, duration: 0.0001)
-                    LinearKeyframe(1.0, duration: 0.9, timingCurve: .easeInOut)
+                    LinearKeyframe(1.0, duration: 1.0, timingCurve: .easeInOut)
                 }
             }
             .allowsHitTesting(false)
@@ -176,5 +206,58 @@ struct CatchFlight: View {
             x: from.x + (to.x - from.x) * ease,
             y: from.y + (to.y - from.y) * ease - sin(.pi * v) * 110
         )
+    }
+}
+
+/// The Coral Reef's reward: the popped bubble's pearl arcs up to the counter
+/// behind a splash ring and a short bubble trail. One shot per pearl.
+/// Draws in a full-stage (800x600 design) container.
+struct PearlDelivery: View {
+    let trigger: Int
+    let from: CGPoint
+    let to: CGPoint
+    let scale: CGFloat
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        Color.clear
+            .keyframeAnimator(initialValue: 1.0, trigger: reduceMotion ? 0 : trigger) { _, v in
+                ZStack {
+                    if v < 1 {
+                        if v < 0.3 {
+                            let r = v / 0.3
+                            Circle()
+                                .stroke(Tokens.Palette.pearl, lineWidth: 5 * scale * (1 - r))
+                                .frame(width: (120 + 120 * r) * scale, height: (120 + 120 * r) * scale)
+                                .opacity(1 - r)
+                                .position(x: from.x * scale, y: from.y * scale)
+                        }
+                        ForEach(0..<4, id: \.self) { i in
+                            let tv = v - 0.09 * Double(i + 1)
+                            if tv > 0 {
+                                let p = CatchFlight.path(from: from, to: to, tv)
+                                ArtImage("props/bubble.png")
+                                    .frame(width: (15 - CGFloat(i) * 2) * scale, height: (15 - CGFloat(i) * 2) * scale)
+                                    .opacity(max(0, 0.9 - tv))
+                                    .position(x: p.x * scale, y: p.y * scale)
+                            }
+                        }
+                        let p = CatchFlight.path(from: from, to: to, v)
+                        ArtImage("ui/pearl.png")
+                            .frame(width: 26 * scale, height: 26 * scale)
+                            .shadow(color: Tokens.Palette.pearl.opacity(0.9), radius: 6 * scale)
+                            .scaleEffect(Wave.keyframes(v, [(0, 1.4), (0.3, 1), (1, 0.85)]))
+                            .opacity(v > 0.92 ? (1 - v) / 0.08 : 1)
+                            .position(x: p.x * scale, y: p.y * scale)
+                    }
+                }
+            } keyframes: { _ in
+                KeyframeTrack {
+                    LinearKeyframe(0.0, duration: 0.0001)
+                    LinearKeyframe(1.0, duration: 0.8, timingCurve: .easeInOut)
+                }
+            }
+            .allowsHitTesting(false)
     }
 }

@@ -10,6 +10,35 @@ struct CoralReefScreen: View {
     var onMap: () -> Void = {}
 
     @Environment(\.stage) private var m
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    /// Where the mermaid floats between answers, and where she is now.
+    private static let rest = CGPoint(x: 614, y: 448)
+    @State private var mermaidPos = Self.rest
+    @State private var mermaidLean: Double = 0
+    @State private var pendingAnswer: DispatchWorkItem?
+
+    /// Answer bubble centers (140px bubbles, 26px apart, from x 288, y 240).
+    private func bubbleCenter(_ i: Int) -> CGPoint {
+        CGPoint(x: 358 + CGFloat(i) * 166, y: 310)
+    }
+
+    /// Tapping an answer sends the mermaid swimming to it; the answer counts
+    /// when she arrives. Tapping another mid-swim just redirects her.
+    private func swim(to lane: Int, answer n: Int) {
+        pendingAnswer?.cancel()
+        let target = CGPoint(x: bubbleCenter(lane).x, y: 428)
+        withMotion(.easeInOut(duration: 0.65)) {
+            mermaidLean = target.x > mermaidPos.x + 4 ? 10 : (target.x < mermaidPos.x - 4 ? -10 : 0)
+            mermaidPos = target
+        }
+        let work = DispatchWorkItem { [weak dive] in
+            withMotion(.easeOut(duration: 0.25)) { mermaidLean = 0 }
+            dive?.answer(n)
+        }
+        pendingAnswer = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + (reduceMotion ? 0.05 : 0.66), execute: work)
+    }
 
     var body: some View {
         let s = m.scale
@@ -87,16 +116,42 @@ struct CoralReefScreen: View {
                 }
 
                 HStack(spacing: Tokens.Space.answerGap * s) {
-                    ForEach(dive.question.choices, id: \.self) { n in
+                    ForEach(Array(dive.question.choices.enumerated()), id: \.offset) { i, n in
                         AnswerBubble(
                             number: n,
                             state: bubbleState(for: n),
                             scale: s,
-                            tap: { dive.answer(n) }
+                            tap: { swim(to: i, answer: n) }
                         )
                     }
                 }
                 .stageTopLeft(x: 288, y: 240)
+
+                // The diver herself: she swims to whichever bubble was tapped,
+                // leaning into the turn, and spins when she wins the pearl.
+                SisterView(spec: dive.child.puppet, t: t, scale: s)
+                    .frame(width: 130 * s, height: 149 * s)
+                    .rotationEffect(.degrees(mermaidLean))
+                    .keyframeAnimator(initialValue: 0.0, trigger: reduceMotion ? 0 : dive.pearls) { content, spin in
+                        content.rotationEffect(.degrees(dive.pearls > 0 ? spin : 0))
+                    } keyframes: { _ in
+                        KeyframeTrack {
+                            LinearKeyframe(0.0, duration: 0.05)
+                            LinearKeyframe(360.0, duration: 0.65, timingCurve: .easeInOut)
+                        }
+                    }
+                    .allowsHitTesting(false)
+                    .stage(x: mermaidPos.x - 65, y: mermaidPos.y - 74, w: 130, h: 149)
+
+                // The won pearl arcs from the popped bubble into the counter
+                let goldLane = dive.question.choices.firstIndex(of: dive.question.target) ?? 1
+                PearlDelivery(
+                    trigger: dive.pearls,
+                    from: bubbleCenter(goldLane),
+                    to: CGPoint(x: 486 + CGFloat(max(1, min(dive.pearls, 10)) - 1) * 28, y: 48),
+                    scale: s
+                )
+                .stage(x: 0, y: 0, w: 800, h: 600)
 
                 if dive.diveComplete {
                     SolvedPanel(
@@ -135,7 +190,7 @@ struct ReefSpeechBubble: View {
     let replay: () -> Void
 
     var body: some View {
-        HStack(alignment: .bottom, spacing: 14 * scale) {
+        HStack(alignment: .bottom, spacing: 10 * scale) {
             Button(action: replay) {
                 ArtImage("ui/icon-shell.png")
                     .frame(width: 82 * scale, height: 70 * scale)
@@ -168,15 +223,21 @@ struct ReefSpeechBubble: View {
     }
 
     private func addend(_ n: Int, shell: String) -> some View {
-        // Shells shrink a little when an addend is wide, so the bubble
-        // never pushes past the stage; the reference's 46x37 is the norm.
-        let w = min(46 * scale, 240 * scale / CGFloat(n))
-        return VStack(spacing: 0) {
+        // Shells wrap five per row (like the counting bubbles), so the bubble
+        // never pushes past the stage even for 7 + 3. The reference's 46px
+        // size holds while a single row fits.
+        let w = n <= 5 ? min(46, 190 / CGFloat(n)) * scale : 28 * scale
+        let rows = stride(from: 0, to: n, by: 5).map { min(5, n - $0) }
+        return VStack(spacing: 2 * scale) {
             if showShells {
-                HStack(spacing: 3 * scale) {
-                    ForEach(0..<n, id: \.self) { _ in
-                        ArtImage(shell)
-                            .frame(width: w, height: w * 0.8)
+                VStack(spacing: 3 * scale) {
+                    ForEach(Array(rows.enumerated()), id: \.offset) { _, count in
+                        HStack(spacing: 3 * scale) {
+                            ForEach(0..<count, id: \.self) { _ in
+                                ArtImage(shell)
+                                    .frame(width: w, height: w * 0.8)
+                            }
+                        }
                     }
                 }
                 .transition(.opacity)
