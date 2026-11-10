@@ -1,4 +1,15 @@
 import SwiftUI
+import UIKit
+
+/// withAnimation that respects Reduce Motion: state changes become instant.
+@MainActor
+func withMotion(_ animation: Animation, _ body: () -> Void) {
+    if UIAccessibility.isReduceMotionEnabled {
+        body()
+    } else {
+        withAnimation(animation, body)
+    }
+}
 
 /// One clock per screen: feeds elapsed seconds into pure wave functions.
 /// With Reduce Motion on, emits a constant t = 0 so every loop freezes at its

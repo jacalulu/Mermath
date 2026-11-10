@@ -1,47 +1,73 @@
 import SwiftUI
 
-/// Temporary root while the screens come up: pick-your-mermaid into the Tide
-/// Pool style-frame state (2 / 4 / 7, target 4, nine pearls) and back.
-/// Replaced by the route switch and DiveSession.
+/// Enum-driven root switch: no navigation chrome, nothing a three year old
+/// can swipe to escape. Cross-dissolves between screens.
 struct RootView: View {
-    private enum DemoRoute {
-        case pick
-        case tidePool
-    }
-
-    @State private var route = DemoRoute.pick
-    @State private var state = TidePoolViewState(
-        prompt: "Find the number four!",
-        choices: [2, 4, 7],
-        target: 4,
-        pearls: 9
-    )
+    @State private var model = AppModel()
 
     var body: some View {
         StageView {
-            switch route {
+            switch model.route {
             case .pick:
-                PickMermaidScreen(onPick: { _ in route = .tidePool })
-            case .tidePool:
-                TidePoolScreen(
-                    state: state,
-                    onAnswer: { n in
-                        withAnimation(.easeOut(duration: 0.35)) {
-                            if n == state.target {
-                                state.solved = true
-                                state.showHint = false
-                                state.pearls = 10
-                                state.solvedText = "You found four! That makes 10 pearls."
-                            } else {
-                                state.faded.insert(n)
-                                state.showHint = true
-                            }
-                        }
-                    },
-                    onReplay: { state.popTrigger += 1 },
-                    onMap: { route = .pick }
+                PickMermaidScreen(
+                    onPick: { model.pick($0) },
+                    onParentGate: { model.openParent() }
                 )
+                .transition(.opacity)
+
+            case .map:
+                if let child = model.activeChild {
+                    ReefMapScreen(
+                        child: child,
+                        onDive: { model.startDive($0) },
+                        onSwitchMermaid: { model.switchMermaid() }
+                    )
+                    .transition(.opacity)
+                }
+
+            case .dive:
+                if let dive = model.session {
+                    if dive.zone == .coralReef {
+                        CoralReefScreen(
+                            dive: dive,
+                            onOpenChest: { model.openChest() },
+                            onMap: { model.leaveDive() }
+                        )
+                        .transition(.opacity)
+                    } else {
+                        TidePoolScreen(
+                            state: model.tideState(dive),
+                            onAnswer: { dive.answer($0) },
+                            onReplay: { dive.replay() },
+                            onMap: { model.leaveDive() },
+                            onOpenChest: { model.openChest() }
+                        )
+                        .transition(.opacity)
+                    }
+                }
+
+            case let .chest(earned):
+                ChestScreen(
+                    earned: earned,
+                    onPlace: { model.placeInGrotto(earned) }
+                )
+                .transition(.opacity)
+
+            case .grotto:
+                if let child = model.activeChild {
+                    GrottoScreen(
+                        child: child,
+                        progress: model.store.progress(for: child),
+                        onDiveAgain: { model.diveAgain() }
+                    )
+                    .transition(.opacity)
+                }
+
+            case .parent:
+                ParentScreen(store: model.store, onClose: { model.closeParent() })
+                    .transition(.opacity)
             }
         }
+        .onAppear { model.appeared() }
     }
 }

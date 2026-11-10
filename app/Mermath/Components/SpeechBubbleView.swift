@@ -6,6 +6,8 @@ struct SpeechBubbleView: View {
     let text: String
     let scale: CGFloat
     let popTrigger: Int
+    var numeral: Int?
+    var countIcons: Int?
     let replay: () -> Void
 
     var body: some View {
@@ -19,6 +21,29 @@ struct SpeechBubbleView: View {
                 .font(baloo(Tokens.Type.prompt, weight: 700, scale: scale))
                 .foregroundStyle(Tokens.Palette.midnight)
                 .padding(.top, 4 * scale)
+            if let numeral {
+                // Match level: the numeral she is matching
+                Text("\(numeral)")
+                    .font(baloo(48, weight: 700, scale: scale))
+                    .foregroundStyle(Tokens.Palette.midnight)
+                    .padding(.leading, 2 * scale)
+            }
+            if let countIcons {
+                // Count level: little bubbles to count, five per row
+                let rows = stride(from: 0, to: countIcons, by: 5).map { start in
+                    min(5, countIcons - start)
+                }
+                VStack(alignment: .leading, spacing: 4 * scale) {
+                    ForEach(Array(rows.enumerated()), id: \.offset) { _, n in
+                        HStack(spacing: 4 * scale) {
+                            ForEach(0..<n, id: \.self) { _ in
+                                ArtImage("props/bubble.png")
+                                    .frame(width: 26 * scale, height: 26 * scale)
+                            }
+                        }
+                    }
+                }
+            }
         }
         .padding(.top, 9 * scale)
         .padding(.bottom, 9 * scale)

@@ -7,10 +7,15 @@ struct TidePoolViewState {
     var target: Int
     var pearls: Int
     var faded: Set<Int> = []
-    var solved = false
+    var solved = false        // gold glow on the right answer
+    var diveComplete = false  // tenth pearl: solved panel appears
     var showHint = false
     var solvedText = ""
     var popTrigger = 0
+    /// Match level: the numeral she matches, shown in the speech bubble.
+    var promptNumeral: Int?
+    /// Count level: how many little bubbles to count in the speech bubble.
+    var countIcons: Int?
 }
 
 /// The locked Tide Pool screen, ported from reference/html/tide-pool-*.html.
@@ -95,6 +100,8 @@ struct TidePoolScreen: View {
                     text: state.prompt,
                     scale: s,
                     popTrigger: state.popTrigger,
+                    numeral: state.promptNumeral,
+                    countIcons: state.countIcons,
                     replay: onReplay
                 )
                 .stageTopLeft(x: 196, y: 96)
@@ -111,7 +118,7 @@ struct TidePoolScreen: View {
                 }
                 .stageTopLeft(x: 288, y: 230)
 
-                if state.solved {
+                if state.diveComplete {
                     SolvedPanel(
                         text: state.solvedText,
                         buttonTitle: "Open the chest",
