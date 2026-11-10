@@ -235,6 +235,142 @@ def scene_deep_layers():
     return {n: s.svg_layer(n) for n in ('bg', 'kelp_far', 'fg', 'grass')}
 
 
+# ---- The intro's treasure gallery: three wall segments the camera pans
+# across. Every segment ends in the same dark rock pillar, so they tile
+# seamlessly in any order.
+
+_EDGE_L = '<path d="M-20 -20 L74 -20 C44 120 64 300 38 470 C52 556 32 620 -20 620 Z" fill="#061c33"/>'
+_EDGE_R = '<path d="M820 -20 L726 -20 C756 120 736 300 762 470 C748 556 768 620 820 620 Z" fill="#061c33"/>'
+
+
+def _ledge(x, y, w):
+    return (f'<path d="M{x} {y} Q{x+w/2} {y-10} {x+w} {y} L{x+w-8} {y+18} Q{x+w/2} {y+26} {x+8} {y+18} Z" fill="#0d3a5c"/>'
+            f'<path d="M{x} {y} Q{x+w/2} {y-10} {x+w} {y}" fill="none" stroke="#7fe9e0" stroke-width="2.5" opacity=".35"/>')
+
+
+def _goblet(g, x, y, h=44):
+    w = h * .52
+    return (f'<g transform="translate({x} {y})">'
+            f'<path d="M{-w/2} {-h} Q0 {-h+8} {w/2} {-h} L{w*.3} {-h*.45} Q0 {-h*.3} {-w*.3} {-h*.45} Z" fill="{g}"/>'
+            f'<path d="M-3 {-h*.45} L3 {-h*.45} L2 -6 L-2 -6 Z" fill="{g}"/>'
+            f'<path d="M{-w*.36} 0 Q0 -8 {w*.36} 0 L{w*.3} 4 L{-w*.3} 4 Z" fill="{g}"/></g>')
+
+
+def _crown(g, x, y, w=46):
+    return (f'<g transform="translate({x} {y})">'
+            f'<path d="M{-w/2} 0 L{-w/2} {-w*.34} L{-w*.25} {-w*.14} L0 {-w*.42} L{w*.25} {-w*.14} L{w/2} {-w*.34} L{w/2} 0 Z" fill="{g}" stroke="#a86a14" stroke-width="2"/>'
+            f'<circle cx="0" cy="{-w*.1}" r="4.5" fill="#e04a6a"/></g>')
+
+
+def _bottle(x, y, h, col):
+    w = h * .42
+    return (f'<g transform="translate({x} {y})">'
+            f'<path d="M{-w/2} 0 L{-w/2} {-h*.62} Q{-w/2} {-h*.72} {-w*.18} {-h*.78} L{-w*.18} {-h} L{w*.18} {-h} L{w*.18} {-h*.78} Q{w/2} {-h*.72} {w/2} {-h*.62} L{w/2} 0 Z" fill="{col}" opacity=".9"/>'
+            f'<ellipse cx="{-w*.16}" cy="{-h*.4}" rx="{w*.13}" ry="{h*.18}" fill="#ffffff" opacity=".35"/></g>')
+
+
+def _mirror(g, x, y, h=54):
+    r = h * .3
+    return (f'<g transform="translate({x} {y})">'
+            f'<ellipse cx="0" cy="{-h+r*1.2}" rx="{r}" ry="{r*1.25}" fill="#bfe9f2" stroke="{g}" stroke-width="5"/>'
+            f'<path d="M-4 {-h+r*2.5} L4 {-h+r*2.5} L3 0 L-3 0 Z" fill="{g}"/></g>')
+
+
+def _vase(x, y, h, col, col2):
+    w = h * .54
+    return (f'<g transform="translate({x} {y})">'
+            f'<path d="M{-w*.2} {-h} L{w*.2} {-h} L{w*.16} {-h*.8} Q{w*.55} {-h*.6} {w*.4} {-h*.25} Q{w*.3} 0 0 0 Q{-w*.3} 0 {-w*.4} {-h*.25} Q{-w*.55} {-h*.6} {-w*.16} {-h*.8} Z" fill="{col}"/>'
+            f'<path d="M{-w*.3} {-h*.5} Q0 {-h*.4} {w*.3} {-h*.5}" fill="none" stroke="{col2}" stroke-width="3" opacity=".7"/></g>')
+
+
+def _teacup(x, y, h=26):
+    w = h * 1.3
+    return (f'<g transform="translate({x} {y})">'
+            f'<path d="M{-w/2} {-h} L{w/2} {-h} Q{w*.44} 0 0 0 Q{-w*.44} 0 {-w/2} {-h} Z" fill="#fdf3f8"/>'
+            f'<path d="M{w/2} {-h*.85} Q{w*.85} {-h*.7} {w*.42} {-h*.3}" fill="none" stroke="#fdf3f8" stroke-width="4"/>'
+            f'<path d="M{-w*.42} {-h*.75} Q0 {-h*.6} {w*.42} {-h*.75}" fill="none" stroke="#ff9ecb" stroke-width="3"/></g>')
+
+
+def _chestlet(g, x, y, w=58):
+    h = w * .62
+    return (f'<g transform="translate({x} {y})">'
+            f'<path d="M{-w/2} {-h*.55} L{w/2} {-h*.55} L{w*.46} 0 L{-w*.46} 0 Z" fill="#6a4426"/>'
+            f'<path d="M{-w/2} {-h*.55} Q0 {-h*1.15} {w/2} {-h*.55} Z" fill="#8a5c34"/>'
+            f'<path d="M{-w/2} {-h*.55} L{w/2} {-h*.55}" stroke="{g}" stroke-width="5"/>'
+            f'<rect x="-5" y="{-h*.62}" width="10" height="13" rx="3" fill="{g}"/></g>')
+
+
+def _garland(s, x0, y0, x1, sag, n=9, r=7):
+    pf = s.rad([(0, '#ffffff', 1), (.6, '#fff1e2', 1), (1, '#e3c4a8', 1)], cx=.35, cy=.3, rr=.8)
+    out = f'<path d="M{x0} {y0} Q{(x0+x1)/2} {y0+sag*2} {x1} {y0}" fill="none" stroke="#e8d8c0" stroke-width="2"/>'
+    for i in range(n):
+        t = i / (n - 1)
+        x = x0 + (x1 - x0) * t
+        y = y0 + sag * 2 * t * (1 - t) * 2
+        out += f'<circle cx="{x:.0f}" cy="{y:.0f}" r="{r}" fill="{pf}"/>'
+    return out
+
+
+def _gallery(seed):
+    """One 800x600 segment of the treasure gallery, stuffed shelf to shelf."""
+    s = LS(seed, 400, -260, 900); r = s.r
+    s.layer('bg')
+    s.add(f'<rect width="800" height="600" fill="{s.lin([(0, "#16466a", 1), (.5, "#0f3756", 1), (1, "#0a2440", 1)])}"/>')
+    s.bloom(400, -60, 460, '#9fe8df', .55)
+    s.rays([(-10, 6), (2, 5), (14, 7)], 900, .3)
+    gold = s.lin([(0, '#fff0b0', 1), (.5, '#ffcf5a', 1), (1, '#c9882a', 1)])
+    pf = s.rad([(0, '#ffffff', 1), (.6, '#fff1e2', 1), (1, '#e3c4a8', 1)], cx=.35, cy=.3, rr=.8)
+    jewels = ['#e04a6a', '#8FE9DF', '#C9A8FF', '#ff9ecb']
+
+    def glowjar(x, y, h=40):
+        w = h * .72
+        glow = s.rad([(0, '#ffe9a8', .85), (1, '#ffe9a8', 0)])
+        return (f'<circle cx="{x}" cy="{y-h*.45:.0f}" r="{h*1.3:.0f}" fill="{glow}"/>'
+                f'<g transform="translate({x} {y})"><rect x="{-w/2}" y="{-h*.8}" width="{w}" height="{h*.8}" rx="7" fill="#d8f2f2" opacity=".6"/>'
+                f'<rect x="{-w*.56}" y="{-h}" width="{w*1.12}" height="{h*.22}" rx="4" fill="#a86a14"/>'
+                f'<circle cx="0" cy="{-h*.38}" r="{h*.2}" fill="#fff6e0"/></g>')
+
+    def shelf_items(y, xs):
+        out = ''
+        for x in xs:
+            kind = r.choice(['goblet', 'crown', 'bottle', 'mirror', 'vase', 'jar', 'cup', 'pearl', 'star'])
+            if kind == 'goblet': out += _goblet(gold, x, y, r.uniform(38, 52))
+            elif kind == 'crown': out += _crown(gold, x, y, r.uniform(38, 50))
+            elif kind == 'bottle': out += _bottle(x, y, r.uniform(44, 60), r.choice(['#7fc9b8', '#b79cff', '#8fd0e8']))
+            elif kind == 'mirror': out += _mirror(gold, x, y, r.uniform(48, 60))
+            elif kind == 'vase': out += _vase(x, y, r.uniform(44, 58), r.choice(jewels), '#fff0b0')
+            elif kind == 'jar': out += glowjar(x, y, r.uniform(36, 44))
+            elif kind == 'cup': out += _teacup(x, y, r.uniform(22, 28))
+            elif kind == 'pearl': out += f'<circle cx="{x}" cy="{y-10}" r="10" fill="{pf}"/><circle cx="{x+16}" cy="{y-8}" r="8" fill="{pf}"/>'
+            else: out += f'<polygon points="{star(x, y - 12, 13, 6, -90)}" fill="{r.choice(jewels)}"/>'
+        return out
+
+    # Three shelf rows, each a pair of carved ledges crowded with treasure
+    for y, lanes in ((218, ((90, 280), (430, 280)),), (352, ((140, 240), (470, 250)),), (486, ((80, 300), (450, 270)),)):
+        for lx, lw in lanes:
+            n = max(2, int(lw / r.uniform(62, 80)))
+            xs = [lx + lw * (i + 0.5) / n + r.uniform(-8, 8) for i in range(n)]
+            s.add(shelf_items(y, xs))
+            s.add(_ledge(lx - 14, y + 2, lw + 28))
+    # Pearl garlands draped between the shelves
+    s.add(_garland(s, r.uniform(80, 140), 110, r.uniform(300, 380), r.uniform(28, 40)))
+    s.add(_garland(s, r.uniform(430, 500), 96, r.uniform(680, 730), r.uniform(26, 38)))
+    # The floor: sand, coin drifts, a little chest
+    s.add(f'<path d="M-20 556 Q200 540 420 554 Q620 566 820 552 L820 620 L-20 620 Z" fill="{s.lin([(0, "#e8d4a4", 1), (1, "#9a7850", 1)])}"/>')
+    coins = ''.join(f'<ellipse cx="{r.uniform(80, 720):.0f}" cy="{r.uniform(560, 590):.0f}" rx="10" ry="7" fill="#ffd866" stroke="#e09a1f" stroke-width="1.5"/>' for _ in range(10))
+    s.add(coins + _chestlet(gold, r.uniform(180, 620), 574, 64))
+    s.add(''.join(f'<circle cx="{r.uniform(60, 740):.0f}" cy="{r.uniform(556, 586):.0f}" r="{r.uniform(6, 9):.0f}" fill="{pf}"/>' for _ in range(6)))
+    # The seam pillars, identical on every segment
+    s.add(_EDGE_L + _EDGE_R)
+    s.finish(mott=.3, streak=0, vig=.3)
+    return {'bg': s.svg_layer('bg')}
+
+
+def scene_iwalla_layers(): return _gallery(1201)
+def scene_iwallb_layers(): return _gallery(1202)
+def scene_iwallc_layers(): return _gallery(1203)
+
+
 def scene_props_layers():
     """Small painted objects used by the screens: the padlock for a locked zone,
     the two countable shells, and the Tide Pool's big answer fish (it carries a
@@ -321,6 +457,9 @@ SCENES2 = {
     'map': (scene_map_layers, dict(bg='bg', kelp_far='far', kelp_mid='mid', floor='fg', grass='grass')),
     'hunt': (scene_hunt_layers, dict(bg='bg', kelp_far='far', fg='fg', grass='grass')),
     'deep': (scene_deep_layers, dict(bg='bg', kelp_far='far', fg='fg', grass='grass')),
+    'iwalla': (scene_iwalla_layers, dict(bg='bg')),
+    'iwallb': (scene_iwallb_layers, dict(bg='bg')),
+    'iwallc': (scene_iwallc_layers, dict(bg='bg')),
     'props': (scene_props_layers, dict(lock='prop', afish='prop', afish_face='vector', whale='piece', whale_face='vector',
                                        whale_face_uhoh='vector', hoard_left='prop', hoard_right='prop',
                                        hoard_floor='prop', hoard_strings='vector')),
