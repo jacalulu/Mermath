@@ -33,8 +33,8 @@ struct IntroScreen: View {
         MotionClock { t in
             let tl = t - (start ?? t)
             ZStack {
-                // ---- The continuous shot: swim, arrive, sneeze, quiet
-                if tl < 26.8 {
+                // ---- The continuous shot: swim, arrive, sneeze
+                if tl < 22.0 {
                     let cam = smooth(beat(tl, 0.3, 12.0)) * 2400
                     let dx = 2400 - cam                        // entrance offset
                     let bob = Wave.alternate(t, from: -7, to: 7, duration: 3.4)
@@ -42,7 +42,6 @@ struct IntroScreen: View {
                     let rattle = tl > 17.8 && tl < 20.0
                         ? sin(tl * 34) * 3 * beat(tl, 17.8, 20.0) : 0
                     let sc = easeOut(beat(tl, 20.1, 21.9))     // the scatter
-                    let quiet = beat(tl, 21.0, 23.0)           // dim afterwards
                     Group {
                         // The gallery segments slide past
                         ForEach(0..<3, id: \.self) { i in
@@ -66,9 +65,11 @@ struct IntroScreen: View {
                         let inflate = beat(tl, 17.8, 20.0)
                         let lunge = beat(tl, 20.05, 20.3)
                         let recoil = easeOut(beat(tl, 20.3, 21.5))
-                        let scaleW = 0.62 + through * 0.2 + inflate * 0.1 + lunge * 0.05 - recoil * 0.28
-                        let wx = dx + 900 - approach * 340 - through * 250 - lunge * 60 + recoil * 980
-                        let wy = 170 + through * 60 + Wave.alternate(t, from: -7, to: 7, duration: 3.1)
+                        // Through the hole it shrinks a touch so its body fits
+                        // the opening - squeezing, cartoon style, not clipping.
+                        let scaleW = 0.62 + through * 0.12 + inflate * 0.08 + lunge * 0.05 - recoil * 0.28
+                        let wx = dx + 900 - approach * 340 - through * 270 - lunge * 60 + recoil * 980
+                        let wy = 172 + through * 8 + Wave.alternate(t, from: -6, to: 6, duration: 3.1)
                         let whaleBody = WhaleIntroView(
                             scale: s,
                             uhoh: tl > 16.6 && tl < 20.6,
@@ -94,7 +95,7 @@ struct IntroScreen: View {
                                     .stage(x: wx, y: wy, w: 568, h: 240)
                             }
                             .stage(x: 0, y: 0, w: 800, h: 600)
-                            .clipShape(LeftOf(cut: (dx + 505) * s))
+                            .clipShape(InsideRoom(dx: dx, scale: s))
                         }
                         // The tickling frond, by the shelves it sniffs
                         if tl > 16.2 && tl < 20.1 {
@@ -182,28 +183,11 @@ struct IntroScreen: View {
                                            y: 300 + sin(a) * 320 * sc - 12, w: 24, h: 24)
                             }
                         }
-                        if tl > 20.1 && tl < 23.5 {
+                        if tl > 20.1 {
                             TwinkleStar(t: t, duration: 1.4).stage(x: 200, y: 180, w: 24, h: 24)
                             TwinkleStar(t: t, duration: 1.7, delay: 0.4).stage(x: 540, y: 140, w: 20, h: 20)
                             TwinkleStar(t: t, duration: 1.5, delay: 0.8).stage(x: 380, y: 340, w: 22, h: 22)
-                            TwinkleStar(t: t, duration: 1.6, delay: 1.1).stage(x: 640, y: 420, w: 20, h: 20)
-                            TwinkleStar(t: t, duration: 1.3, delay: 0.2).stage(x: 120, y: 420, w: 22, h: 22)
                         }
-
-                        // The lone pearl that rolls to a stop in the quiet
-                        if tl > 23.3 {
-                            let roll = easeOut(beat(tl, 23.5, 25.7))
-                            ArtImage("ui/pearl.png")
-                                .rotationEffect(.degrees(roll * 720))
-                                .stage(x: 140 + roll * 420, y: 568, w: 22, h: 22)
-                        }
-
-                        // Dimming after the loss
-                        Rectangle()
-                            .fill(Tokens.Palette.midnight)
-                            .opacity(quiet * 0.32)
-                            .stage(x: 0, y: 0, w: 800, h: 600)
-                            .bleed()
 
                         // Foreground pillars sweep past during the swim only
                         ForEach(0..<6, id: \.self) { i in
@@ -237,38 +221,110 @@ struct IntroScreen: View {
                     .scaleEffect(1 + 0.07 * sin(.pi * beat(tl, 20.05, 20.5)))
                     .offset(x: tl > 20.05 && tl < 20.8 ? sin(t * 56) * 9 * s * (1 - beat(tl, 20.05, 20.8)) : 0,
                             y: bob * s)
+                    .opacity(1 - beat(tl, 21.3, 21.9))
                     .transition(.opacity)
                 }
 
-                // ---- The treasures sink toward the zones
-                if tl >= 26.8 && tl < 31.3 {
-                    let fall = beat(tl, 27.0, 30.8)
+                // ---- The journey: the camera chases the treasures across
+                // the ocean, zone by zone, watching each one splash down
+                if tl >= 21.4 && tl < 30.4 {
+                    let camJ = smooth(beat(tl, 21.7, 29.8)) * 1600
                     Group {
-                        ArtImage("scenes/reef-map/bg.jpg")
+                        // The three zones as one panning strip
+                        Group {
+                            ArtImage("scenes/tide-pool/bg.jpg")
+                                .stage(x: 0 - camJ - 1, y: 0, w: 802, h: 600)
+                            ArtImage("scenes/tide-pool/foreground.png")
+                                .stage(x: 0 - camJ - 1, y: 350, w: 802, h: 250)
+                            ArtImage("scenes/coral-reef/bg.jpg")
+                                .stage(x: 800 - camJ - 1, y: 0, w: 802, h: 600)
+                            ArtImage("scenes/coral-reef/foreground.png")
+                                .stage(x: 800 - camJ - 1, y: 272, w: 802, h: 328)
+                            ArtImage("scenes/deep-sea/bg.jpg")
+                                .stage(x: 1600 - camJ - 1, y: 0, w: 802, h: 600)
+                            ArtImage("scenes/deep-sea/foreground.png")
+                                .stage(x: 1600 - camJ - 1, y: 292, w: 802, h: 308)
+                        }
+
+                        // Each hero treasure splashes down in its own water
+                        let lampFall = smooth(beat(tl, 21.9, 24.2))
+                        ArtImage("scenes/grotto/starfish-lamp.png")
+                            .rotationEffect(.degrees(lampFall * 340))
+                            .opacity(lampFall < 1 ? 1 : 0.75)
+                            .stage(x: 430 - camJ - lampFall * 60, y: -90 + lampFall * 520, w: 78, h: 75)
+                        if lampFall > 0.9 {
+                            TwinkleStar(t: t, duration: 1.2).stage(x: 350 - camJ, y: 420, w: 26, h: 26)
+                        }
+                        let curtFall = smooth(beat(tl, 24.2, 26.6))
+                        ArtImage("scenes/grotto/kelp-curtain.png")
+                            .rotationEffect(.degrees(sin(curtFall * 3 * .pi) * 30))
+                            .opacity(curtFall < 1 ? 1 : 0.75)
+                            .stage(x: 1210 - camJ + curtFall * 40, y: -170 + curtFall * 560, w: 70, h: 164)
+                        if curtFall > 0.9 {
+                            TwinkleStar(t: t, duration: 1.2, delay: 0.3).stage(x: 1260 - camJ, y: 400, w: 24, h: 24)
+                        }
+                        let bedFall = smooth(beat(tl, 26.6, 29.2))
+                        ArtImage("scenes/grotto/shell-bed.png")
+                            .rotationEffect(.degrees(-bedFall * 200))
+                            .opacity(bedFall < 1 ? 1 : 0.7)
+                            .stage(x: 2010 - camJ - bedFall * 50, y: -120 + bedFall * 560, w: 120, h: 81)
+                        if bedFall > 0.9 {
+                            TwinkleStar(t: t, duration: 1.2, delay: 0.1).stage(x: 1990 - camJ, y: 430, w: 26, h: 26)
+                        }
+                        // And a drizzle of pearls raining down everywhere
+                        ForEach(0..<9, id: \.self) { i in
+                            let px = CGFloat(140 + i * 250)
+                            let pf = smooth(beat(tl, 21.8 + Double(i) * 0.55, 24.2 + Double(i) * 0.55))
+                            if pf > 0 && pf < 1 {
+                                ArtImage("ui/pearl.png")
+                                    .stage(x: px - camJ, y: -40 + pf * 560, w: 16, h: 16)
+                            }
+                        }
+
+                        // Passing pillars hide the zone seams
+                        ArtImage("props/pillar-b.png")
+                            .stage(x: 716 - camJ, y: 0, w: 168, h: 600)
+                        ArtImage("props/pillar-a.png")
+                            .stage(x: 1484 - camJ, y: 0, w: 234, h: 600)
+                        // And nearer ones sweep by for depth
+                        ForEach(0..<4, id: \.self) { i in
+                            ArtImage(i % 2 == 0 ? "props/pillar-a.png" : "props/pillar-b.png")
+                                .stage(x: CGFloat(i) * 760 + 300 - camJ * 1.4,
+                                       y: 0, w: i % 2 == 0 ? 234 : 168, h: 600)
+                        }
+                        Vignette()
                             .stage(x: 0, y: 0, w: 800, h: 600)
-                        ArtImage("scenes/reef-map/seabed.png")
-                            .stage(x: 0, y: 206, w: 800, h: 394)
+                            .bleed()
                     }
-                    .bleed()
-                    ArtImage("scenes/grotto/starfish-lamp.png")
-                        .opacity(1 - fall * 0.6)
-                        .stage(x: 120 + fall * 20, y: -80 + fall * 400, w: 70, h: 67)
-                    ArtImage("scenes/grotto/kelp-curtain.png")
-                        .opacity(1 - fall * 0.6)
-                        .stage(x: 420, y: -160 + fall * 420, w: 60, h: 141)
-                    ArtImage("scenes/grotto/shell-bed.png")
-                        .opacity(1 - fall * 0.6)
-                        .stage(x: 640 - fall * 10, y: -60 + fall * 500, w: 90, h: 61)
-                    TwinkleStar(t: t, duration: 1.6).stage(x: 150, y: 300 + fall * 40, w: 26, h: 26)
-                    TwinkleStar(t: t, duration: 2.0, delay: 0.5).stage(x: 440, y: 240 + fall * 60, w: 22, h: 22)
-                    TwinkleStar(t: t, duration: 1.8, delay: 1.0).stage(x: 680, y: 380 + fall * 60, w: 24, h: 24)
-                    Vignette()
-                        .stage(x: 0, y: 0, w: 800, h: 600)
-                        .bleed()
+                    .offset(y: Wave.alternate(t, from: -5, to: 5, duration: 3.6) * s)
+                    .opacity(min(beat(tl, 21.4, 22.0), 1 - beat(tl, 29.8, 30.4)))
+                }
+
+                // ---- The quiet: back home, bare shelves, one lone pearl
+                if tl >= 29.9 && tl < 33.4 {
+                    Group {
+                        ArtImage("scenes/intro/home-bg.jpg")
+                            .stage(x: -1, y: 0, w: 802, h: 600)
+                        ArtImage("scenes/intro/home-wall.png")
+                            .stage(x: -1, y: 0, w: 802, h: 600)
+                        Rectangle()
+                            .fill(Tokens.Palette.midnight)
+                            .opacity(0.32)
+                            .stage(x: 0, y: 0, w: 800, h: 600)
+                            .bleed()
+                        let roll = easeOut(beat(tl, 30.4, 32.6))
+                        ArtImage("ui/pearl.png")
+                            .rotationEffect(.degrees(roll * 720))
+                            .stage(x: 140 + roll * 420, y: 568, w: 22, h: 22)
+                        Vignette()
+                            .stage(x: 0, y: 0, w: 800, h: 600)
+                            .bleed()
+                    }
+                    .opacity(beat(tl, 29.9, 30.5))
                 }
 
                 // ---- The crab rallies; the whale peeks in, sheepish
-                if tl >= 31.3 {
+                if tl >= 33.4 {
                     Group {
                         ArtImage("scenes/home/bg.jpg")
                             .stage(x: 0, y: 0, w: 800, h: 600)
@@ -278,10 +334,10 @@ struct IntroScreen: View {
                             .stage(x: 0, y: 0, w: 800, h: 600)
                     }
                     .bleed()
-                    let pop = easeOut(beat(tl, 31.3, 32.0))
+                    let pop = easeOut(beat(tl, 33.4, 34.1))
                     CrabView(t: t, scale: s)
                         .stage(x: 275, y: 620 - pop * 310, w: 250, h: 211)
-                    let peek = easeOut(beat(tl, 32.8, 33.9))
+                    let peek = easeOut(beat(tl, 34.9, 36.0))
                     if peek > 0 {
                         WhaleIntroView(scale: s, uhoh: false, breathe: 0)
                             .rotationEffect(.degrees(10))
@@ -299,8 +355,8 @@ struct IntroScreen: View {
                 if start == nil { start = t }
                 for (i, at, prompt) in [(1, 0.6, PromptScript.intro1),
                                         (2, 12.5, PromptScript.intro2),
-                                        (3, 23.2, PromptScript.intro3),
-                                        (4, 31.5, PromptScript.intro4)] where tl >= at && !spoken.contains(i) {
+                                        (3, 22.4, PromptScript.intro3),
+                                        (4, 33.6, PromptScript.intro4)] where tl >= at && !spoken.contains(i) {
                     spoken.insert(i)
                     speak(prompt)
                 }
@@ -309,7 +365,7 @@ struct IntroScreen: View {
                     spoken.insert(i)
                     play(effect)
                 }
-                if tl >= 36.5 && !finished {
+                if tl >= 38.8 && !finished {
                     finished = true
                     onDone(true)
                 }
@@ -324,15 +380,23 @@ struct IntroScreen: View {
     }
 }
 
-/// Clips to everything left of `cut` (in container points): the window plane,
-/// so the whale's front half renders inside the room while its back half
-/// stays outside.
-struct LeftOf: Shape {
-    var cut: CGFloat
+/// Clips to the inside of the room: everything left of the window, plus the
+/// window opening itself (an ellipse matching the painted hole), so the
+/// whale's front half renders through the hole with the cut hidden along the
+/// rim instead of a straight line across its body.
+struct InsideRoom: Shape {
+    /// The entrance segment's x offset and the stage scale, in points.
+    var dx: CGFloat
+    var scale: CGFloat
 
     func path(in rect: CGRect) -> Path {
-        Path(CGRect(x: rect.minX - 400, y: rect.minY - 200,
-                    width: cut + 400, height: rect.height + 400))
+        var p = Path()
+        p.addRect(CGRect(x: rect.minX - 400, y: rect.minY - 200,
+                         width: (dx + 452) * scale + 400, height: rect.height + 400))
+        // The painted hole spans roughly (452..796, 102..486) in design space
+        p.addEllipse(in: CGRect(x: (dx + 448) * scale, y: 98 * scale,
+                                width: 352 * scale, height: 392 * scale))
+        return p
     }
 }
 
