@@ -371,6 +371,81 @@ def scene_iwallb_layers(): return _gallery(1202)
 def scene_iwallc_layers(): return _gallery(1203)
 
 
+def _rockpillar(r, cx, w, topw=.7):
+    """A floor-to-ceiling rock column with organic, bumpy edges."""
+    left, right = [], []
+    y = -30
+    while y < 640:
+        k = 1 - (1 - topw) * max(0, (300 - abs(y - 300)) / 300)
+        left.append((cx - w / 2 * k * r.uniform(.82, 1.12), y))
+        right.append((cx + w / 2 * k * r.uniform(.82, 1.12), y))
+        y += r.uniform(46, 84)
+    d = 'M' + ' L'.join(f'{x:.0f} {y:.0f}' for x, y in left) \
+        + ' L' + ' L'.join(f'{x:.0f} {y:.0f}' for x, y in reversed(right)) + ' Z'
+    return d
+
+
+def scene_ipillars_layers():
+    """Foreground silhouette pillars for the intro's multiplane pan: painted
+    rock columns with rough edges, nothing straight anywhere."""
+    s = LS(1301, 300, -230, 900); r = s.r
+    for name, cx, w in (('pillar_a', 180, 220), ('pillar_b', 560, 150)):
+        s.layer(name)
+        fill = s.lin([(0, '#0a2c48', 1), (1, '#051426', 1)], x2=1, y2=0)
+        d = _rockpillar(r, cx, w)
+        s.add(f'<path d="{d}" fill="{fill}"/>')
+        s.add(f'<path d="{d}" fill="none" stroke="#7fe9e0" stroke-width="3" opacity=".22"/>')
+        s.add(''.join(f'<ellipse cx="{cx + r.uniform(-w*.3, w*.3):.0f}" cy="{r.uniform(60, 560):.0f}" rx="{r.uniform(8, 18):.0f}" ry="{r.uniform(5, 9):.0f}" fill="#113a58" opacity=".8"/>' for _ in range(5)))
+    return {n: s.svg_layer(n) for n in ('pillar_a', 'pillar_b')}
+
+
+def scene_ihome_layers():
+    """The gallery's last segment: the grotto entrance. A big cave-mouth
+    window onto open water (the whale passes behind it), ledges that the hero
+    treasures live on, all layered so the app can stage the story:
+      bg    - open water, light, distant kelp (what the window looks out on)
+      wall  - the interior wall WITH the window hole, ledges and floor baked
+      items - the generic shelf treasures (hidden after the sneeze)
+    The hero treasures stay live app overlays, so they can rattle and fly."""
+    s = LS(1310, 560, -120, 900); r = s.r
+    # What lies beyond the window
+    s.layer('bg')
+    open_water(s, cols=('#bdf4e6', '#6fd6cb', '#2d9fb4', '#15648d', '#0b3560'))
+    far = ''.join(kelp(r, x + r.uniform(-14, 14), 6, '#5fc4c4', (30, 56), (6, 10), (22, 38)) for x in (470, 580, 690, 760))
+    s.add(f'<g filter="url(#b3)" opacity=".6">{far}</g>')
+    s.rays([(-6, 6), (6, 5), (18, 7)], 900, .45)
+    s.finish(mott=.25, streak=.1, vig=0, grain=0)
+
+    # The interior wall with the window hole (everything else shows through)
+    s.layer('wall')
+    hole = ('M470 320 C452 206 520 110 612 102 C716 96 790 170 796 282 '
+            'C800 380 744 470 640 486 C540 498 482 420 470 320 Z')
+    wall_fill = s.lin([(0, '#143f60', 1), (.55, '#0e3350', 1), (1, '#0a2440', 1)])
+    s.add(f'<path d="M-20 -20 L820 -20 L820 620 L-20 620 Z {hole}" fill-rule="evenodd" fill="{wall_fill}"/>')
+    s.add(f'<path d="{hole}" fill="none" stroke="#061c33" stroke-width="16"/>')
+    s.add(f'<path d="{hole}" fill="none" stroke="#7fe9e0" stroke-width="3" opacity=".3"/>')
+    s.bloom(400, -60, 380, '#9fe8df', .4)
+    # Ledges, left of the window
+    for lx, lw, y in ((54, 300, 218), (96, 250, 356), (40, 330, 490)):
+        s.add(_ledge(lx, y, lw))
+    # The floor, running under the window
+    s.add(f'<path d="M-20 548 Q220 532 430 548 Q640 562 820 548 L820 620 L-20 620 Z" fill="{s.lin([(0, "#e8d4a4", 1), (1, "#9a7850", 1)])}"/>')
+    s.add(''.join(f'<ellipse cx="{r.uniform(60, 740):.0f}" cy="{r.uniform(560, 592):.0f}" rx="9" ry="6" fill="#ffd866" stroke="#e09a1f" stroke-width="1.4" opacity=".9"/>' for _ in range(8)))
+    s.add(_EDGE_L)
+    s.finish(mott=.3, streak=0, vig=.25)
+
+    # The generic treasures on those ledges (vanish with the sneeze)
+    s.layer('items')
+    gold = s.lin([(0, '#fff0b0', 1), (.5, '#ffcf5a', 1), (1, '#c9882a', 1)])
+    pf = s.rad([(0, '#ffffff', 1), (.6, '#fff1e2', 1), (1, '#e3c4a8', 1)], cx=.35, cy=.3, rr=.8)
+    s.add(_goblet(gold, 110, 216, 46) + _crown(gold, 186, 216, 44) + _bottle(258, 216, 54, '#b79cff') + _mirror(gold, 322, 216, 56))
+    s.add(_vase(150, 354, 52, '#8FE9DF', '#fff0b0') + _teacup(226, 354, 26) + _bottle(292, 354, 48, '#7fc9b8'))
+    s.add(_goblet(gold, 96, 488, 42) + _vase(190, 488, 56, '#ff9ecb', '#fff0b0') + _crown(gold, 276, 488, 40) + _bottle(340, 488, 50, '#8fd0e8'))
+    s.add(_garland(s, 60, 120, 300, 34) + _chestlet(gold, 150, 576, 60))
+    s.add(''.join(f'<circle cx="{r.uniform(60, 400):.0f}" cy="{r.uniform(556, 588):.0f}" r="{r.uniform(6, 9):.0f}" fill="{pf}"/>' for _ in range(5)))
+    return {n: s.svg_layer(n) for n in ('bg', 'wall', 'items')}
+
+
 def scene_props_layers():
     """Small painted objects used by the screens: the padlock for a locked zone,
     the two countable shells, and the Tide Pool's big answer fish (it carries a
@@ -460,6 +535,8 @@ SCENES2 = {
     'iwalla': (scene_iwalla_layers, dict(bg='bg')),
     'iwallb': (scene_iwallb_layers, dict(bg='bg')),
     'iwallc': (scene_iwallc_layers, dict(bg='bg')),
+    'ipillars': (scene_ipillars_layers, dict(pillar_a='fg', pillar_b='fg')),
+    'ihome': (scene_ihome_layers, dict(bg='bg', wall='fg', items='piece')),
     'props': (scene_props_layers, dict(lock='prop', afish='prop', afish_face='vector', whale='piece', whale_face='vector',
                                        whale_face_uhoh='vector', hoard_left='prop', hoard_right='prop',
                                        hoard_floor='prop', hoard_strings='vector')),
