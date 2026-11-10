@@ -164,6 +164,18 @@ final class DiveSession {
         begin()
     }
 
+    #if DEBUG
+    func debugAnswerWrong() {
+        if let wrong = question.choices.first(where: { $0 != question.target }) {
+            answer(wrong)
+        }
+    }
+
+    func debugAnswerRight() {
+        answer(question.target)
+    }
+    #endif
+
     /// Tapping "Open the chest": settle progress and hand back the earned item.
     func completeDive() -> GrottoItem? {
         advanceTask?.cancel()

@@ -68,6 +68,26 @@ struct RootView: View {
                     .transition(.opacity)
             }
         }
-        .onAppear { model.appeared() }
+        .onAppear {
+            #if DEBUG
+            // Headless verification: `simctl launch ... -screen tidePool|coralReef|map|chest|grotto`
+            let args = ProcessInfo.processInfo.arguments
+            if let i = args.firstIndex(of: "-screen"), i + 1 < args.count {
+                switch args[i + 1] {
+                case "autoplay": model.debugAutoplay()
+                case "tidePool": model.pick(.daphne); model.startDive(.tidePool)
+                case "tideHint": model.debugTideHint()
+                case "tideSolved": model.debugTideSolved()
+                case "coralReef": model.pick(.ophelia); model.startDive(.coralReef)
+                case "map": model.pick(.daphne)
+                case "chest": model.pick(.violet); model.debugShowChest()
+                case "grotto": model.pick(.violet); model.debugShowGrotto()
+                default: break
+                }
+                return
+            }
+            #endif
+            model.appeared()
+        }
     }
 }

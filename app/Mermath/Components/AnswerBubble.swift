@@ -32,9 +32,9 @@ struct AnswerBubble: View {
                     )
                 // inset 0 -10 18 rgba(23,135,156,0.25): a teal shade along the lower inside rim
                 Circle()
-                    .stroke(Color(hex: 0x17879C, opacity: 0.25), lineWidth: 14 * scale)
+                    .stroke(Color(hex: 0x17879C, opacity: 0.25), lineWidth: 20 * scale)
                     .blur(radius: 9 * scale)
-                    .offset(y: -6 * scale)
+                    .offset(y: 8 * scale)
                     .clipShape(Circle())
                     .opacity(state == .gold ? 0 : 1)
                 Circle()
@@ -53,6 +53,8 @@ struct AnswerBubble: View {
             .opacity(state == .faded ? Tokens.Opacity.wrongAnswer : 1)
         }
         .buttonStyle(.plain)
-        .disabled(state != .normal)
+        // No .disabled here: plain buttons dim when disabled, which would fight
+        // the 45% fade and the gold state. DiveSession ignores repeat taps.
+        .allowsHitTesting(state == .normal)
     }
 }

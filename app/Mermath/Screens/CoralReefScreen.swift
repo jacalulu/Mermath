@@ -127,12 +127,15 @@ struct EquationPanel: View {
     }
 
     private func addend(_ n: Int, shell: String) -> some View {
-        VStack(spacing: 4 * scale) {
+        // Shells shrink as the addend grows so the row never squeezes the
+        // operators into clipping.
+        let w = min(32 * scale, 180 * scale / CGFloat(n))
+        return VStack(spacing: 4 * scale) {
             if showShells {
                 HStack(spacing: 4 * scale) {
                     ForEach(0..<n, id: \.self) { _ in
                         ArtImage(shell)
-                            .frame(width: 42 * scale, height: 34 * scale)
+                            .frame(width: w, height: w * 0.81)
                     }
                 }
                 .transition(.opacity)
@@ -140,6 +143,7 @@ struct EquationPanel: View {
             Text("\(n)")
                 .font(baloo(64, weight: 700, scale: scale))
                 .foregroundStyle(Tokens.Palette.pearl)
+                .fixedSize()
         }
     }
 
@@ -147,6 +151,7 @@ struct EquationPanel: View {
         Text(symbol)
             .font(baloo(56, weight: 700, scale: scale))
             .foregroundStyle(Color(hex: 0xBFEFEA))
+            .fixedSize()
             .padding(.bottom, 2 * scale)
     }
 }
