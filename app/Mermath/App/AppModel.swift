@@ -47,6 +47,7 @@ final class AppModel {
     /// The intro ended (or was tapped away). The crab's last line already asks
     /// who is diving, so only ask again when it never played.
     func finishIntro(saidWho: Bool) {
+        sounds.stop(.introMusic)
         go(.pick)
         if !saidWho {
             speaker.speak(PromptScript.whoIsDiving)

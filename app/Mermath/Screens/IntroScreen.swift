@@ -243,7 +243,9 @@ struct IntroScreen: View {
                                 .stage(x: 1600 - camJ - 1, y: 0, w: 802, h: 600)
                         }
 
-                        // Each hero treasure splashes down in its own water
+                        // The treasures themselves rain down: the lamp, the
+                        // goblet pile, the mirror stack, the bed, the coin
+                        // spill - each splashing into a different spot.
                         let lampFall = smooth(beat(tl, 21.9, 24.2))
                         ArtImage("scenes/grotto/starfish-lamp.png")
                             .rotationEffect(.degrees(lampFall * 340))
@@ -252,26 +254,42 @@ struct IntroScreen: View {
                         if lampFall > 0.9 {
                             TwinkleStar(t: t, duration: 1.2).stage(x: 350 - camJ, y: 420, w: 26, h: 26)
                         }
-                        let curtFall = smooth(beat(tl, 24.2, 26.6))
-                        ArtImage("scenes/grotto/kelp-curtain.png")
-                            .rotationEffect(.degrees(sin(curtFall * 3 * .pi) * 30))
-                            .opacity(curtFall < 1 ? 1 : 0.75)
-                            .stage(x: 1210 - camJ + curtFall * 40, y: -170 + curtFall * 560, w: 70, h: 164)
-                        if curtFall > 0.9 {
-                            TwinkleStar(t: t, duration: 1.2, delay: 0.3).stage(x: 1260 - camJ, y: 400, w: 24, h: 24)
+                        let gobFall = smooth(beat(tl, 22.8, 25.1))
+                        ArtImage("props/hoard-right.png")
+                            .rotationEffect(.degrees(gobFall * 260))
+                            .opacity(gobFall < 1 ? 1 : 0.75)
+                            .stage(x: 700 - camJ + gobFall * 40, y: -140 + gobFall * 560, w: 99, h: 84)
+                        if gobFall > 0.9 {
+                            TwinkleStar(t: t, duration: 1.2, delay: 0.3).stage(x: 760 - camJ, y: 410, w: 24, h: 24)
                         }
-                        let bedFall = smooth(beat(tl, 26.6, 29.2))
+                        let mirFall = smooth(beat(tl, 24.0, 26.4))
+                        ArtImage("props/hoard-left.png")
+                            .rotationEffect(.degrees(-mirFall * 300))
+                            .opacity(mirFall < 1 ? 1 : 0.75)
+                            .stage(x: 1120 - camJ - mirFall * 50, y: -110 + mirFall * 540, w: 102, h: 52)
+                        if mirFall > 0.9 {
+                            TwinkleStar(t: t, duration: 1.2, delay: 0.2).stage(x: 1080 - camJ, y: 420, w: 24, h: 24)
+                        }
+                        let bedFall = smooth(beat(tl, 25.4, 27.9))
                         ArtImage("scenes/grotto/shell-bed.png")
                             .rotationEffect(.degrees(-bedFall * 200))
                             .opacity(bedFall < 1 ? 1 : 0.7)
-                            .stage(x: 2010 - camJ - bedFall * 50, y: -120 + bedFall * 560, w: 120, h: 81)
+                            .stage(x: 1500 - camJ - bedFall * 50, y: -120 + bedFall * 560, w: 120, h: 81)
                         if bedFall > 0.9 {
-                            TwinkleStar(t: t, duration: 1.2, delay: 0.1).stage(x: 1990 - camJ, y: 430, w: 26, h: 26)
+                            TwinkleStar(t: t, duration: 1.2, delay: 0.1).stage(x: 1470 - camJ, y: 430, w: 26, h: 26)
                         }
-                        // And a drizzle of pearls raining down everywhere
-                        ForEach(0..<9, id: \.self) { i in
-                            let px = CGFloat(140 + i * 250)
-                            let pf = smooth(beat(tl, 21.8 + Double(i) * 0.55, 24.2 + Double(i) * 0.55))
+                        let coinFall = smooth(beat(tl, 26.8, 29.2))
+                        ArtImage("props/hoard-floor.png")
+                            .rotationEffect(.degrees(coinFall * 220))
+                            .opacity(coinFall < 1 ? 1 : 0.7)
+                            .stage(x: 1980 - camJ + coinFall * 30, y: -90 + coinFall * 540, w: 130, h: 39)
+                        if coinFall > 0.9 {
+                            TwinkleStar(t: t, duration: 1.2, delay: 0.4).stage(x: 2030 - camJ, y: 420, w: 24, h: 24)
+                        }
+                        // And just a few pearls drifting down among them
+                        ForEach(0..<5, id: \.self) { i in
+                            let px = CGFloat(260 + i * 420)
+                            let pf = smooth(beat(tl, 22.2 + Double(i) * 0.9, 25.0 + Double(i) * 0.9))
                             if pf > 0 && pf < 1 {
                                 ArtImage("ui/pearl.png")
                                     .stage(x: px - camJ, y: -40 + pf * 560, w: 16, h: 16)
@@ -294,31 +312,10 @@ struct IntroScreen: View {
                     .opacity(min(beat(tl, 21.4, 22.0), 1 - beat(tl, 29.8, 30.4)))
                 }
 
-                // ---- The quiet: back home, bare shelves, one lone pearl
-                if tl >= 29.9 && tl < 33.4 {
-                    Group {
-                        ArtImage("scenes/intro/home-bg.jpg")
-                            .stage(x: -1, y: 0, w: 802, h: 600)
-                        ArtImage("scenes/intro/home-wall.png")
-                            .stage(x: -1, y: 0, w: 802, h: 600)
-                        Rectangle()
-                            .fill(Tokens.Palette.midnight)
-                            .opacity(0.32)
-                            .stage(x: 0, y: 0, w: 800, h: 600)
-                            .bleed()
-                        let roll = easeOut(beat(tl, 30.4, 32.6))
-                        ArtImage("ui/pearl.png")
-                            .rotationEffect(.degrees(roll * 720))
-                            .stage(x: 140 + roll * 420, y: 568, w: 22, h: 22)
-                        Vignette()
-                            .stage(x: 0, y: 0, w: 800, h: 600)
-                            .bleed()
-                    }
-                    .opacity(beat(tl, 29.9, 30.5))
-                }
-
-                // ---- The crab rallies; the whale peeks in, sheepish
-                if tl >= 33.4 {
+                // ---- The mission briefing: the crab explains the game while
+                // ten pearls pop up one by one and a chest appears - dive,
+                // find the numbers, win pearls, open the chest.
+                if tl >= 30.0 {
                     Group {
                         ArtImage("scenes/home/bg.jpg")
                             .stage(x: 0, y: 0, w: 800, h: 600)
@@ -328,14 +325,38 @@ struct IntroScreen: View {
                             .stage(x: 0, y: 0, w: 800, h: 600)
                     }
                     .bleed()
-                    let pop = easeOut(beat(tl, 33.4, 34.1))
+                    let pop = easeOut(beat(tl, 30.1, 30.8))
                     CrabView(t: t, scale: s)
                         .stage(x: 275, y: 620 - pop * 310, w: 250, h: 211)
-                    let peek = easeOut(beat(tl, 34.9, 36.0))
+                    // The culprit, peeking in sheepishly while the crab talks
+                    let peek = easeOut(beat(tl, 31.6, 32.7))
                     if peek > 0 {
                         WhaleIntroView(scale: s, uhoh: false, breathe: 0)
                             .rotationEffect(.degrees(10))
-                            .stage(x: -560 + peek * 220, y: 60, w: 568, h: 240)
+                            .stage(x: -560 + peek * 200, y: 40, w: 568, h: 240)
+                    }
+                    // Ten pearls arc up as he counts them out...
+                    ForEach(0..<10, id: \.self) { i in
+                        let at = 34.6 + Double(i) * 0.36
+                        if tl > at {
+                            let a = easeOut(beat(tl, at, at + 0.3))
+                            ArtImage("ui/pearl.png")
+                                .shadow(color: Tokens.Palette.pearl.opacity(0.8), radius: 5 * s)
+                                .scaleEffect(0.5 + a * 0.5)
+                                .opacity(a)
+                                .stage(x: 190 + CGFloat(i) * 38,
+                                       y: 170 - sin(.pi * Double(i) / 9) * 56, w: 26, h: 26)
+                        }
+                    }
+                    // ...and the chest they open
+                    if tl > 38.6 {
+                        let c = easeOut(beat(tl, 38.6, 39.2))
+                        ArtImage("scenes/treasure-chest/chest-box.png")
+                            .scaleEffect(0.6 + c * 0.4)
+                            .opacity(c)
+                            .stage(x: 600, y: 120, w: 120, h: 77)
+                        TwinkleStar(t: t, duration: 1.6).stage(x: 590, y: 110, w: 24, h: 24)
+                        TwinkleStar(t: t, duration: 1.9, delay: 0.6).stage(x: 722, y: 160, w: 20, h: 20)
                     }
                 }
 
@@ -350,16 +371,18 @@ struct IntroScreen: View {
                 for (i, at, prompt) in [(1, 0.6, PromptScript.intro1),
                                         (2, 12.5, PromptScript.intro2),
                                         (3, 22.4, PromptScript.intro3),
-                                        (4, 33.6, PromptScript.intro4)] where tl >= at && !spoken.contains(i) {
+                                        (4, 30.4, PromptScript.rally1),
+                                        (5, 34.0, PromptScript.rally2),
+                                        (6, 40.6, PromptScript.rally3)] where tl >= at && !spoken.contains(i) {
                     spoken.insert(i)
                     speak(prompt)
                 }
-                for (i, at, effect) in [(10, 0.2, SoundPlayer.Effect.musicbox),
+                for (i, at, effect) in [(10, 0.05, SoundPlayer.Effect.introMusic),
                                         (11, 17.8, SoundPlayer.Effect.rumble)] where tl >= at && !spoken.contains(i) {
                     spoken.insert(i)
                     play(effect)
                 }
-                if tl >= 38.8 && !finished {
+                if tl >= 43.0 && !finished {
                     finished = true
                     onDone(true)
                 }
@@ -369,7 +392,7 @@ struct IntroScreen: View {
         .onTapGesture {
             guard !finished else { return }
             finished = true
-            onDone(spoken.contains(4))
+            onDone(spoken.contains(6))
         }
     }
 }
@@ -386,10 +409,11 @@ struct InsideRoom: Shape {
     func path(in rect: CGRect) -> Path {
         var p = Path()
         p.addRect(CGRect(x: rect.minX - 400, y: rect.minY - 200,
-                         width: (dx + 452) * scale + 400, height: rect.height + 400))
-        // The painted hole spans roughly (452..796, 102..486) in design space
-        p.addEllipse(in: CGRect(x: (dx + 448) * scale, y: 98 * scale,
-                                width: 352 * scale, height: 392 * scale))
+                         width: (dx + 462) * scale + 400, height: rect.height + 400))
+        // Inset INSIDE the painted rim (hole 470..796 x 102..486, stroke 16),
+        // so even the inflated whale never paints over the frame.
+        p.addEllipse(in: CGRect(x: (dx + 476) * scale, y: 114 * scale,
+                                width: 308 * scale, height: 360 * scale))
         return p
     }
 }

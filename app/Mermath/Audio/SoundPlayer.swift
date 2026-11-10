@@ -9,6 +9,7 @@ final class SoundPlayer {
         case pop
         case musicbox
         case rumble
+        case introMusic = "intro-music"
         case note1, note2, note3, note4, note5
 
         /// The bonus-bubble melody, lowest to highest.
@@ -19,12 +20,16 @@ final class SoundPlayer {
 
     init() {
         for effect in Effect.allCases {
-            let url = Bundle.main.url(forResource: effect.rawValue, withExtension: "wav", subdirectory: "Sounds")
-                ?? Bundle.main.url(forResource: effect.rawValue, withExtension: "wav")
+            var url: URL?
+            for ext in ["wav", "mp3"] {
+                url = Bundle.main.url(forResource: effect.rawValue, withExtension: ext, subdirectory: "Sounds")
+                    ?? Bundle.main.url(forResource: effect.rawValue, withExtension: ext)
+                if url != nil { break }
+            }
             if let url,
                let player = try? AVAudioPlayer(contentsOf: url) {
                 player.prepareToPlay()
-                player.volume = 0.6
+                player.volume = effect == .introMusic ? 0.42 : 0.6
                 players[effect] = player
             }
         }
@@ -34,5 +39,10 @@ final class SoundPlayer {
         guard let player = players[effect] else { return }
         player.currentTime = 0
         player.play()
+    }
+
+    /// Fade-free stop, for skipping out of the intro.
+    func stop(_ effect: Effect) {
+        players[effect]?.stop()
     }
 }

@@ -58,6 +58,9 @@ def prompts():
     out.append(('intro-2', 'One day, a great big whale swam by. And then. Aaah. Aaah. AAACHOO!', 'narrator'))
     out.append(('intro-3', 'The sneeze swept the treasures all across the sea!', 'narrator'))
     out.append(('intro-4', 'Oh no! The treasures washed away! Who is diving today?', 'crab'))
+    out.append(('intro-rally-1', 'Oh no! We have to win the treasures back!', 'crab'))
+    out.append(('intro-rally-2', 'Dive down and find the right numbers to earn pearls. Ten pearls open a treasure chest!', 'crab'))
+    out.append(('intro-rally-3', 'Who is diving today?', 'crab'))
     # Treasure hunt
     out.append(('chest-map', 'And look! A treasure map!', 'narrator'))
     out.append(('hunt-intro', 'Follow the map! Can you find all the treasures?', 'crab'))
