@@ -59,7 +59,7 @@ struct CoralReefScreen: View {
                 .transition(.opacity)
             } else if dive.showHint, case let .addition(a, b, _) = dive.question.presentation {
                 Text("Count all the shells: \(countText(a, b))")
-                    .font(baloo(Tokens.Type.panel, weight: 600, scale: s))
+                    .font(baloo(Tokens.TypeScale.panel, weight: 600, scale: s))
                     .foregroundStyle(Tokens.Palette.pearl)
                     .padding(.top, 3 * s)
                     .padding(.vertical, 12 * s)

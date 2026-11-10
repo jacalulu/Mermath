@@ -18,7 +18,7 @@ struct SpeechBubbleView: View {
             }
             .buttonStyle(.plain)
             Text(text)
-                .font(baloo(Tokens.Type.prompt, weight: 700, scale: scale))
+                .font(baloo(Tokens.TypeScale.prompt, weight: 700, scale: scale))
                 .foregroundStyle(Tokens.Palette.midnight)
                 .padding(.top, 4 * scale)
             if let numeral {

@@ -70,7 +70,7 @@ enum Tokens {
 
     // MARK: Type (Baloo 2; PostScript names from the converted TTFs)
 
-    enum Type {
+    enum TypeScale {
         static let answerNumeral: CGFloat = 96   // 700
         static let prompt: CGFloat = 29          // 700
         static let nameTag: CGFloat = 26         // 700

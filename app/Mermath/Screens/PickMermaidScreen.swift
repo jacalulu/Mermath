@@ -89,7 +89,7 @@ struct PickMermaidScreen: View {
                     .onLongPressGesture(minimumDuration: 2, perform: onParentGate)
 
                 Text("Who is diving today?")
-                    .font(baloo(Tokens.Type.pill, weight: 600, scale: s))
+                    .font(baloo(Tokens.TypeScale.pill, weight: 600, scale: s))
                     .foregroundStyle(Tokens.Palette.midnight)
                     .padding(.top, 6 * s)
                     .padding(.bottom, 2 * s)
@@ -115,7 +115,7 @@ struct NamePill: View {
                 .frame(width: 16 * scale, height: 16 * scale)
                 .padding(.bottom, 4 * scale)
             Text(name)
-                .font(baloo(Tokens.Type.nameTag, weight: 700, scale: scale))
+                .font(baloo(Tokens.TypeScale.nameTag, weight: 700, scale: scale))
                 .foregroundStyle(Tokens.Palette.midnight)
         }
         .padding(.top, 6 * scale)

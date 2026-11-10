@@ -40,7 +40,7 @@ struct AnswerBubble: View {
                 Circle()
                     .stroke(Color.white, lineWidth: 3 * scale)
                 Text("\(number)")
-                    .font(baloo(Tokens.Type.answerNumeral, weight: 700, scale: scale))
+                    .font(baloo(Tokens.TypeScale.answerNumeral, weight: 700, scale: scale))
                     .foregroundStyle(Tokens.Palette.midnight)
                     .padding(.top, 10 * scale)
             }

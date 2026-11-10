@@ -9,7 +9,7 @@ struct GoldButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(baloo(Tokens.Type.button, weight: 700, scale: scale))
+                .font(baloo(Tokens.TypeScale.button, weight: 700, scale: scale))
                 .foregroundStyle(Tokens.Palette.midnight)
                 .padding(.top, 13 * scale)
                 .padding(.bottom, 9 * scale)
@@ -28,7 +28,7 @@ struct HintPanel: View {
     var body: some View {
         HStack(spacing: 14 * scale) {
             Text("Count with me")
-                .font(baloo(Tokens.Type.panel, weight: 600, scale: scale))
+                .font(baloo(Tokens.TypeScale.panel, weight: 600, scale: scale))
                 .foregroundStyle(Tokens.Palette.pearl)
                 .padding(.top, 3 * scale)
             HStack(spacing: 8 * scale) {
@@ -56,7 +56,7 @@ struct SolvedPanel: View {
     var body: some View {
         HStack(spacing: 18 * scale) {
             Text(text)
-                .font(baloo(Tokens.Type.solvedPanel, weight: 600, scale: scale))
+                .font(baloo(Tokens.TypeScale.solvedPanel, weight: 600, scale: scale))
                 .foregroundStyle(Tokens.Palette.pearl)
                 .padding(.top, 3 * scale)
             GoldButton(title: buttonTitle, scale: scale, action: action)

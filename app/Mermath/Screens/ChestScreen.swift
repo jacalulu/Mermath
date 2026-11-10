@@ -21,7 +21,7 @@ struct ChestScreen: View {
 
             VStack(spacing: 12 * s) {
                 Text("10 pearls! The chest is open.")
-                    .font(baloo(Tokens.Type.nameTag, weight: 700, scale: s))
+                    .font(baloo(Tokens.TypeScale.nameTag, weight: 700, scale: s))
                     .foregroundStyle(Tokens.Palette.midnight)
                     .padding(.top, 6 * s)
                     .padding(.bottom, 2 * s)
