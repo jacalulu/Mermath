@@ -16,3 +16,5 @@ xcuserdata/
 art-pipeline/.venv/
 art-pipeline/out/
 art-pipeline/art-out/
+# Local secrets written by `elevenlabs onboard`
+/.env.local

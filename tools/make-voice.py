@@ -9,10 +9,11 @@ Casting (two characters):
   narrator  - the gentle mermaid voice that frames the game: who-is-diving,
               hellos, chest, grotto.
 
-Usage:
-  ELEVENLABS_API_KEY=...  python3 tools/make-voice.py            # ElevenLabs
-  GEMINI_API_KEY=...      python3 tools/make-voice.py --provider gemini
+Usage (the ElevenLabs key lives in .env.local via `elevenlabs onboard init`):
+  set -a; source .env.local; set +a; python3 tools/make-voice.py
+  GEMINI_API_KEY=... python3 tools/make-voice.py --provider gemini
 Options: --only <id-prefix>  --force  --dry-run
+Needs: pip install elevenlabs (see requirements.txt)
 """
 import argparse, base64, json, os, struct, subprocess, sys, tempfile, urllib.request
 
@@ -56,29 +57,36 @@ def prompts():
     return out
 
 
-# ---------------- ElevenLabs ----------------
+# ---------------- ElevenLabs (SDK; reads ELEVENLABS_API_KEY from the env) ----------------
 
-ELEVEN_CAST = {'crab': 'Jessica', 'narrator': 'Matilda'}  # premade voices, by name
-ELEVEN_MODEL = 'eleven_multilingual_v2'
-
-
-def eleven_voices(key):
-    req = urllib.request.Request('https://api.elevenlabs.io/v1/voices', headers={'xi-api-key': key})
-    data = json.load(urllib.request.urlopen(req))
-    return {v['name']: v['voice_id'] for v in data['voices']}
+ELEVEN_CAST = {'crab': 'Jessica', 'narrator': 'Sarah'}  # premade voices, by first name
+ELEVEN_MODEL = 'eleven_v4'  # v4 supports only stability/similarity settings
 
 
-def eleven_tts(key, voice_id, text, path_mp3):
-    body = json.dumps({
-        'text': text,
-        'model_id': ELEVEN_MODEL,
-        'voice_settings': {'stability': 0.5, 'similarity_boost': 0.75, 'style': 0.35, 'speed': 0.9},
-    }).encode()
-    req = urllib.request.Request(
-        f'https://api.elevenlabs.io/v1/text-to-speech/{voice_id}?output_format=mp3_44100_128',
-        data=body, headers={'xi-api-key': key, 'content-type': 'application/json'})
-    with urllib.request.urlopen(req) as r, open(path_mp3, 'wb') as f:
-        f.write(r.read())
+def eleven_client():
+    from elevenlabs import ElevenLabs
+    return ElevenLabs()
+
+
+def eleven_voices(client):
+    """Premade voices only (Voice Library voices 402 on free plans), keyed by
+    first name: the dashboard lists them as 'Jessica - Playful, Bright, Warm'."""
+    return {v.name.split(' - ')[0].strip(): v.voice_id
+            for v in client.voices.get_all().voices if v.category == 'premade'}
+
+
+def eleven_tts(client, voice_id, text, path_mp3):
+    from elevenlabs import VoiceSettings
+    audio = client.text_to_speech.convert(
+        text=text,
+        voice_id=voice_id,
+        model_id=ELEVEN_MODEL,
+        output_format='mp3_44100_128',
+        voice_settings=VoiceSettings(stability=0.5, similarity_boost=0.75),
+    )
+    with open(path_mp3, 'wb') as f:
+        for chunk in audio:
+            f.write(chunk)
 
 
 # ---------------- Gemini ----------------
@@ -130,8 +138,10 @@ def main():
         return
 
     if args.provider == 'elevenlabs':
-        key = os.environ.get('ELEVENLABS_API_KEY') or sys.exit('set ELEVENLABS_API_KEY')
-        ids = eleven_voices(key)
+        if not os.environ.get('ELEVENLABS_API_KEY'):
+            sys.exit('set ELEVENLABS_API_KEY (the CLI onboarding put it in .env.local)')
+        client = eleven_client()
+        ids = eleven_voices(client)
         cast = {}
         for who, name in ELEVEN_CAST.items():
             if name not in ids:
@@ -151,7 +161,7 @@ def main():
             raw = tmp.name
         try:
             if args.provider == 'elevenlabs':
-                eleven_tts(key, cast[character], text, raw)
+                eleven_tts(client, cast[character], text, raw)
             else:
                 gemini_tts(key, GEMINI_CAST[character], character, text, raw)
             to_m4a(raw, dst)
