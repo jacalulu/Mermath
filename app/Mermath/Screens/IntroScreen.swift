@@ -132,21 +132,21 @@ struct IntroScreen: View {
                         // bed until the rattling wakes them with a start
                         Group {
                             SisterView(spec: .ophelia, t: t, scale: s, asleep: tl < 18.1)
-                                .frame(width: 162 * s, height: 186 * s)
-                                .stage(x: dx + 203 + rattle, y: 254, w: 162, h: 186)
+                                .frame(width: 259 * s, height: 297 * s)
+                                .stage(x: dx + 155 + rattle, y: 183, w: 259, h: 297)
                             SisterView(spec: .daphne, t: t, scale: s, asleep: tl < 18.3)
-                                .frame(width: 140 * s, height: 160 * s)
-                                .stage(x: dx + 98 + rattle, y: 345, w: 140, h: 160)
+                                .frame(width: 224 * s, height: 256 * s)
+                                .stage(x: dx + 56 + rattle, y: 264, w: 224, h: 256)
                             SisterView(spec: .violet, t: t, scale: s, asleep: tl < 18.2)
-                                .frame(width: 140 * s, height: 160 * s)
+                                .frame(width: 224 * s, height: 256 * s)
                                 .scaleEffect(x: -1)
-                                .stage(x: dx + 336 + rattle, y: 335, w: 140, h: 160)
+                                .stage(x: dx + 294 + rattle, y: 259, w: 224, h: 256)
                         }
                         // Little sleep bubbles rising off each snoozing sister
                         if tl < 18.1 {
                             ForEach(0..<3, id: \.self) { i in
-                                let bx: CGFloat = [296, 176, 408][i]
-                                let by: CGFloat = [300, 388, 378][i]
+                                let bx: CGFloat = [284, 170, 400][i]
+                                let by: CGFloat = [235, 308, 300][i]
                                 let rise = (t * 26 + Double(i) * 53).truncatingRemainder(dividingBy: 120)
                                 ArtImage("props/bubble.png")
                                     .opacity(max(0, 0.8 - rise / 120))
@@ -405,8 +405,11 @@ struct IntroScreen: View {
                                                           Color(red: 1, green: 0.85, blue: 0.5).opacity(0)],
                                                  center: .center, startRadius: 0, endRadius: 60 * s))
                             .stage(x: 615, y: 400, w: 120, h: 90)
+                        // ...and pops with a bounce as the last pearl rolls in
+                        let unlock = sin(.pi * beat(tl, BriefingPearl.allIn, BriefingPearl.allIn + 0.5))
                         ArtImage("scenes/treasure-chest/chest-box.png")
-                            .scaleEffect(0.6 + c * 0.4, anchor: .bottom)
+                            .scaleEffect(0.6 + c * 0.4 + 0.14 * unlock, anchor: .bottom)
+                            .rotationEffect(.degrees(unlock * 3), anchor: .bottom)
                             .opacity(c)
                             .stage(x: 600, y: 440, w: 150, h: 97)
                         TwinkleStar(t: t, duration: 1.6).stage(x: 592, y: 430, w: 24, h: 24)
@@ -418,8 +421,8 @@ struct IntroScreen: View {
                         .opacity(0.95)
                     // The treasure map - the real, open parchment - bursts out
                     // of the chest when he names it and hangs big in the sky
-                    if tl > 40.5 {
-                        let mp = easeOut(beat(tl, 40.5, 41.3))
+                    if tl > 40.9 {
+                        let mp = easeOut(beat(tl, 40.9, 41.7))
                         ArtImage("props/big-map.png")
                             .scaleEffect(0.18 + mp * 0.82)
                             .opacity(min(1, mp * 2))
@@ -447,8 +450,11 @@ struct IntroScreen: View {
                     spoken.insert(i)
                     speak(prompt)
                 }
-                for (i, at, effect) in [(10, 0.05, SoundPlayer.Effect.introMusic),
-                                        (11, 17.8, SoundPlayer.Effect.rumble)] where tl >= at && !spoken.contains(i) {
+                var sounds: [(Int, Double, SoundPlayer.Effect)] = [(10, 0.05, .introMusic),
+                                                                   (11, 17.8, .rumble),
+                                                                   (12, BriefingPearl.allIn, .chime)]
+                for i in 0..<10 { sounds.append((20 + i, BriefingPearl.landTime(i), .thud)) }
+                for (i, at, effect) in sounds where tl >= at && !spoken.contains(i) {
                     spoken.insert(i)
                     play(effect)
                 }
@@ -467,10 +473,12 @@ struct IntroScreen: View {
     }
 }
 
-/// One pearl of the briefing's chain. It pops out of the crab's claw and arcs
-/// to its slot on a necklace line along the sand that leads the eye to the
-/// chest; when the crab names the chest, it arcs on into the lock and is
-/// swallowed (the chest is drawn over it).
+/// One pearl of the briefing's chain. It pops out of the crab's claw, arcs
+/// over and DROPS into the sand with a thud - squashing for a beat, kicking
+/// up a puff, and leaving a little sand pile it sits in. When the crab names
+/// the chest, the pearls roll along the sand line one after another into the
+/// chest's lock (nearest first) and are swallowed - the chest is drawn over
+/// them - which pops it open.
 private struct BriefingPearl: View {
     static let slots: [(x: CGFloat, y: CGFloat)] = [
         (212, 448), (258, 476), (308, 496), (362, 508), (418, 513),
@@ -478,27 +486,67 @@ private struct BriefingPearl: View {
     ]
     static let claw = (x: CGFloat(206), y: CGFloat(426))
     static let lock = (x: CGFloat(672), y: CGFloat(486))
+    /// When pearl `i` hits the sand (the thud sounds are scheduled off this).
+    static func landTime(_ i: Int) -> Double { 34.6 + Double(i) * 0.36 + 0.6 }
+    /// All ten are inside the chest by here; the lid pops right after.
+    static let allIn = 40.7
+
     let i: Int
     let t: Double
     let tl: Double
     let s: CGFloat
 
-    private func ease(_ v: Double) -> Double { 1 - pow(1 - min(max(v, 0), 1), 3) }
+    private func clamp01(_ v: Double) -> Double { min(max(v, 0), 1) }
+
+    /// Where the pearl is after rolling fraction `f` of the way from its own
+    /// slot along the remaining sand line into the lock.
+    private func rolled(_ f: Double) -> (x: CGFloat, y: CGFloat) {
+        var pts = Self.slots[i...].map { $0 }
+        pts.append(Self.lock)
+        let seg = f * Double(pts.count - 1)
+        let k = min(pts.count - 2, Int(seg))
+        let u = CGFloat(seg - Double(k))
+        return (pts[k].x + (pts[k + 1].x - pts[k].x) * u,
+                pts[k].y + (pts[k + 1].y - pts[k].y) * u)
+    }
 
     var body: some View {
         let slot = Self.slots[i]
-        let f1 = ease((tl - (34.6 + Double(i) * 0.36)) / 0.55)
-        let f2 = ease((tl - (39.0 + Double(i) * 0.13)) / 0.45)
-        if f1 > 0 && f2 < 1 {
-            let fly = f2 > 0 ? f2 : f1
-            let fx = f2 > 0 ? slot.x + (Self.lock.x - slot.x) * fly : Self.claw.x + (slot.x - Self.claw.x) * fly
-            let fy = (f2 > 0 ? slot.y + (Self.lock.y - slot.y) * fly : Self.claw.y + (slot.y - Self.claw.y) * fly)
-                     - sin(.pi * fly) * 46
-            ArtImage("ui/pearl.png")
-                .shadow(color: Tokens.Palette.pearl.opacity(0.8), radius: 5 * s)
-                .scaleEffect(0.4 + 0.6 * f1 - 0.2 * f2)
-                .offset(y: Wave.alternate(t, from: -3, to: 3, duration: 2.8, delay: Double(i) * -0.35) * s * f1 * (1 - f2))
-                .stage(x: fx, y: fy, w: 26, h: 26)
+        let land = Self.landTime(i)
+        let f1 = clamp01((tl - (34.6 + Double(i) * 0.36)) / 0.6)
+        // nearest pearl rolls first; farther ones roll longer
+        let f2raw = clamp01((tl - (39.0 + Double(9 - i) * 0.1)) / (0.4 + Double(9 - i) * 0.045))
+        let f2 = f2raw * f2raw * (3 - 2 * f2raw)
+        if f1 > 0 {
+            // the little sand pile the thud makes - it stays behind
+            if tl > land {
+                Ellipse().fill(Color(red: 0.84, green: 0.73, blue: 0.52))
+                    .stage(x: slot.x - 8, y: slot.y + 15, w: 42, h: 12)
+                Ellipse().fill(Color(red: 0.95, green: 0.88, blue: 0.70))
+                    .stage(x: slot.x - 5, y: slot.y + 14, w: 36, h: 9)
+            }
+            // the puff of sand kicked up at the thud
+            let pt = clamp01((tl - land) / 0.45)
+            if pt > 0 && pt < 1 {
+                Ellipse()
+                    .fill(Color(red: 0.93, green: 0.85, blue: 0.65).opacity(0.75 * (1 - pt)))
+                    .stage(x: slot.x - 10 - 26 * pt, y: slot.y + 8 - 10 * pt,
+                           w: 46 + 52 * pt, h: 14 + 12 * pt)
+            }
+            if f2raw < 1 {
+                // the flight: eased across, gravity down, squash on impact
+                let pos = f2raw > 0
+                    ? rolled(f2)
+                    : (x: Self.claw.x + (slot.x - Self.claw.x) * (1 - pow(1 - f1, 2)),
+                       y: Self.claw.y + (slot.y - Self.claw.y) * f1 * f1 - sin(.pi * f1) * 64)
+                let sq = tl > land && f2raw == 0 ? max(0, 1 - (tl - land) / 0.18) : 0
+                ArtImage("ui/pearl.png")
+                    .shadow(color: Tokens.Palette.pearl.opacity(0.8), radius: 5 * s)
+                    .scaleEffect(x: (0.45 + 0.55 * f1) * (1 + 0.22 * sq),
+                                 y: (0.45 + 0.55 * f1) * (1 - 0.3 * sq))
+                    .opacity(1 - max(0, (f2 - 0.82) / 0.18))
+                    .stage(x: pos.x, y: pos.y, w: 26, h: 26)
+            }
         }
     }
 }

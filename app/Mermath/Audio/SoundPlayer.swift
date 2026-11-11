@@ -7,6 +7,7 @@ final class SoundPlayer {
         case chime
         case fanfare
         case pop
+        case thud
         case musicbox
         case rumble
         case introMusic = "intro-music"
