@@ -154,6 +154,7 @@ struct RootView: View {
                 case "compA": model.debugShowComp(false)
                 case "compB": model.debugShowComp(true)
                 case "grotto": model.pick(.violet); model.debugShowGrotto()
+                case "hunt": model.pick(.daphne); model.debugShowHunt()
                 default: break
                 }
                 return

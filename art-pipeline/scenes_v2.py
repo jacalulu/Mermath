@@ -30,12 +30,20 @@ def scene_coral_layers():
     s.layer('kelp_far').add(f'<g filter="url(#b3)" opacity=".6">{far}</g>')
     d, top = hill(r, 462, 14); s.layer('bg').add(f'<path d="{d}" fill="#52bcc0" opacity=".7" filter="url(#b3)"/>')
     s.rays(RAYS, 1000, .5)
+    # the luminous heart sits behind the answer bubbles' open water
+    s.add('<ellipse cx="420" cy="270" rx="290" ry="150" fill="#aef5ea" opacity=".26" filter="url(#b6)"/>')
     s.layer('fan_left').add(f'<g filter="url(#paintS)">{coral(r, 44, 484, "#6a43b8", "#d9c2ff", 230, 5, 10, -86)}</g>')
     s.layer('fan_right').add(f'<g filter="url(#paintS)">{coral(r, 782, 520, "#b03070", "#ffb3d6", 118, 4, 9, -93)}</g>')
     s.layer('fg'); sand(s, r, 470, 8, SAND)
     s.add(boulder(s, 712, 548, 240, 96) + boulder(s, 590, 566, 110, 46, moss=False))
+    # cool cast shadows anchor the big corals (light upper-left)
+    s.add('<ellipse cx="752" cy="476" rx="54" ry="10" fill="#123a52" opacity=".35" filter="url(#b3)"/>'
+          '<ellipse cx="680" cy="506" rx="44" ry="8" fill="#123a52" opacity=".32" filter="url(#b3)"/>')
     s.add(coral(r, 738, 470, '#5a3aa8', '#d2b4ff', 150, 4, 17, -94) + coral(r, 668, 500, '#b23a2a', '#ffb347', 110, 4, 14, -80))
     s.add(boulder(s, 140, 486, 310, 100) + boulder(s, 300, 544, 120, 52, moss=False))
+    # shadow pools sink the bottom corners so the center reads brightest
+    s.add('<ellipse cx="60" cy="612" rx="200" ry="56" fill="#0d3350" opacity=".4" filter="url(#b6)"/>'
+          '<ellipse cx="760" cy="614" rx="190" ry="54" fill="#0d3350" opacity=".4" filter="url(#b6)"/>')
     s.add('<ellipse cx="140" cy="402" rx="96" ry="12" fill="#0d3a50" opacity=".5" filter="url(#b6)"/>')
     sand(s, r, 566, 6, SAND2, caustic=False)
     s.add(coral(r, 40, 600, '#b23a2a', '#ffb347', 160, 4, 18, -84) + coral(r, 118, 606, '#b03070', '#ff9ecb', 112, 4, 14, -98) + coral(r, 178, 604, '#5a3aa8', '#c9a8ff', 80, 3, 12, -78))
@@ -307,7 +315,12 @@ def scene_hunt_layers():
     s.layer('kelp_far').add(f'<g filter="url(#b3)" opacity=".6">{far}</g>')
     d, top = hill(r, 450, 16); s.layer('bg').add(f'<path d="{d}" fill="#4fb8bd" opacity=".65" filter="url(#b3)"/>')
     s.rays(RAYS, 1000, .5)
+    # a warm heart over the dig ground - buried treasure light
+    s.add('<ellipse cx="420" cy="330" rx="280" ry="150" fill="#fff3c4" opacity=".2" filter="url(#b6)"/>')
     s.layer('fg'); sand(s, r, 452, 9, SAND)
+    # shadow pools sink the corners around the bright clearing
+    s.add('<ellipse cx="60" cy="600" rx="190" ry="54" fill="#0d3350" opacity=".36" filter="url(#b6)"/>'
+          '<ellipse cx="750" cy="602" rx="190" ry="54" fill="#0d3350" opacity=".36" filter="url(#b6)"/>')
     # The wreck: an old rowboat, resting at a tilt in the sand
     hull = s.lin([(0, '#8a5c34', 1), (1, '#573418', 1)])
     planks = ''.join(f'<path d="M{308+i*4} {466-i*15} C370 {450-i*15} 530 {450-i*15} {588-i*3} {464-i*15}" fill="none" stroke="#3f2410" stroke-width="3" opacity=".5"/>' for i in (1, 2, 3))
@@ -337,6 +350,8 @@ def scene_deep_layers():
     s.layer('kelp_far').add(f'<g filter="url(#b3)" opacity=".55">{far}</g>')
     d, top = hill(r, 470, 14); s.layer('bg').add(f'<path d="{d}" fill="#1f6d88" opacity=".6" filter="url(#b3)"/>')
     s.rays(RAYS, 1000, .4)
+    # a faint cool heart keeps the counting space readable in the dark
+    s.add('<ellipse cx="440" cy="290" rx="270" ry="140" fill="#7fd0d8" opacity=".16" filter="url(#b6)"/>')
     s.layer('fg'); sand(s, r, 476, 8, [(0, '#c9b58b', 1), (1, '#8a7452', 1)])
     s.add(boulder(s, 140, 486, 310, 104) + boulder(s, 302, 548, 120, 50, moss=False))
     s.add(boulder(s, 742, 544, 180, 70) + boulder(s, 652, 572, 90, 36, moss=False))
@@ -344,6 +359,10 @@ def scene_deep_layers():
     sand(s, r, 574, 5, [(0, '#d6c29a', 1), (1, '#7a6648', 1)], caustic=False)
     s.add(mound(s, 420, 598, 40, 32, '#2f9c9c', '#0e5f78') + mound(s, 560, 600, 34, 28, '#4a5fb0', '#20306e'))
     s.add(shell_on_sand(360, 592) + seastar(500, 590, 9, '#9fd0ff', -75))
+    # bioluminescent specks, the deep's own stars
+    s.add(''.join(f'<circle cx="{x}" cy="{y}" r="{rr}" fill="#8ff0ff" opacity=".85" filter="url(#b1)"/>'
+                  for x, y, rr in ((372, 556, 2.6), (452, 572, 2), (588, 560, 2.6),
+                                   (296, 578, 2), (646, 584, 2.2), (520, 548, 1.8))))
     s.layer('grass').add(grass(r, 240, 596, 6, 22, 50, '#157c74', '#2fae9c') + grass(r, 620, 598, 6, 20, 46, '#157c74', '#2fae9c'))
     s.layer('bg'); s.finish(mott=.3, streak=.12, vig=.25, grain=0)
     return {n: s.svg_layer(n) for n in ('bg', 'kelp_far', 'fg', 'grass')}

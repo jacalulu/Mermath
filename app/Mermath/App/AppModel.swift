@@ -204,6 +204,10 @@ final class AppModel {
         go(.debugLab)
     }
 
+    func debugShowHunt() {
+        go(.hunt(.starfishLamp))
+    }
+
     func debugShowComp(_ b: Bool) {
         go(b ? .debugCompB : .debugCompA)
     }
