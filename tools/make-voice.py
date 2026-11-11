@@ -70,6 +70,11 @@ def prompts():
     out.append(('chest-map-2', 'And look! A treasure map! Tap it!', 'narrator'))
     out.append(('hunt-intro', 'Follow the map! Can you find all the treasures?', 'crab'))
     out.append(('hunt-found', 'You found them all! Hooray!', 'crab'))
+    out.append(('follow-map-2', 'Follow the map! The lost treasure is close!', 'crab'))
+    out.append(('dig-intro', 'X marks the spot! Dig, dig, dig!', 'crab'))
+    out.append(('dig-not-here', 'Not there! Dig where the X is!', 'crab'))
+    out.append(('dig-found', 'There it is! You rescued the treasure!', 'crab'))
+    out.append(('swim-home', "Hooray! Let's take it home!", 'crab'))
     # Deep Sea: counting by 2s and 5s
     out.append(('deep-intro', 'Welcome to the Deep Sea! Swim through the right ring!', 'crab'))
     for step, currents in ((2, (2, 4, 6, 8)), (5, (5, 10, 15))):

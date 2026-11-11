@@ -1,58 +1,38 @@
 import SwiftUI
 
-/// The hidden-object hunt: the chest's map leads here. A legend along the
-/// bottom shows what to find and how many; tap each treasure where it hides
-/// and it lights its legend slot. Find them all and the lost grotto treasure
-/// sparkles into view. Pure reward play - no math, no misses, no penalties.
+/// X MARKS THE SPOT. The map led here: three sandy mounds on the seabed, and
+/// one of them wears the X. Dig it open - four taps, each with a burst of
+/// sand - and the ONE treasure the whale sneezed away rises sparkling, ready
+/// to be carried home. Tapping a plain mound just puffs and the crab
+/// redirects; never a penalty. Pure reward play.
 struct HuntScreen: View {
     let earned: GrottoItem?
     var onDone: () -> Void = {}
-    var onFind: (Int) -> Void = { _ in }
-    var speakFound: () -> Void = {}
+    var speak: (Prompt) -> Void = { _ in }
+    var play: (SoundPlayer.Effect) -> Void = { _ in }
 
     @Environment(\.stage) private var m
 
-    enum Kind: Int, CaseIterable {
-        case star, shell, pearl
-
-        var sprite: String {
-            switch self {
-            case .star: return "props/sea-star-pink.png"
-            case .shell: return "props/shell-orange.png"
-            case .pearl: return "ui/pearl.png"
-            }
-        }
-
-        /// Sprite aspect (h/w), so nothing squashes.
-        var aspect: CGFloat {
-            switch self {
-            case .star: return 1
-            case .shell: return 0.8
-            case .pearl: return 1
-            }
-        }
-    }
-
-    struct Findable: Identifiable {
+    private struct Puff: Identifiable {
         let id: Int
-        let kind: Kind
         let x: CGFloat
         let y: CGFloat
-        let w: CGFloat
+        let at: Double
     }
 
-    /// Where the treasures hide (design space), tucked against the scenery.
-    private static let findables: [Findable] = [
-        Findable(id: 0, kind: .star, x: 146, y: 452, w: 46),
-        Findable(id: 1, kind: .star, x: 438, y: 468, w: 42),
-        Findable(id: 2, kind: .star, x: 712, y: 496, w: 44),
-        Findable(id: 3, kind: .shell, x: 330, y: 504, w: 46),
-        Findable(id: 4, kind: .shell, x: 596, y: 466, w: 44),
-        Findable(id: 5, kind: .pearl, x: 390, y: 450, w: 28),
+    /// Mound centers (x, base y, width) on the open sand.
+    private static let mounds: [(x: CGFloat, y: CGFloat, w: CGFloat)] = [
+        (152, 474, 198), (408, 500, 230), (654, 466, 194),
     ]
+    private static let digsNeeded = 4
 
-    @State private var found: Set<Int> = []
+    @State private var xMound = Int.random(in: 0..<3)
+    @State private var digs = 0
     @State private var revealed = false
+    @State private var puffs: [Puff] = []
+    @State private var puffId = 0
+    @State private var saidIntro = false
+    @State private var lastNope = -10.0
 
     var body: some View {
         let s = m.scale
@@ -72,34 +52,55 @@ struct HuntScreen: View {
                 }
                 .bleed()
 
-                // The treasures, hiding in plain sight
-                ForEach(Self.findables) { f in
-                    if !found.contains(f.id) {
+                // The three mounds; the treasure hides behind the X one and
+                // peeks out a little more with every dig
+                ForEach(0..<3, id: \.self) { i in
+                    let mound = Self.mounds[i]
+                    let mh = mound.w * 114 / 224
+                    let isX = i == xMound
+                    let dug = isX ? CGFloat(min(digs, Self.digsNeeded)) / CGFloat(Self.digsNeeded) : 0
+
+                    if isX, let earned, digs > 0, !revealed {
+                        let a = earned.spriteAspect
+                        let rw: CGFloat = a > 1.4 ? 64 : 92
+                        ArtImage(earned.sprite)
+                            .stage(x: mound.x - rw / 2,
+                                   y: mound.y - mh * 0.4 - rw * a * dug * 0.55,
+                                   w: rw, h: rw * a)
+                    }
+                    if !(isX && revealed) {
                         Button {
-                            onFind(found.count)
-                            withMotion(.easeOut(duration: 0.3)) {
-                                _ = found.insert(f.id)
-                                if found.count == Self.findables.count {
-                                    revealed = true
-                                }
-                            }
-                            if found.count == Self.findables.count {
-                                speakFound()
-                                // No button: the treasure sparkles in, the
-                                // cheer plays, and off to the grotto it goes
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 3.6) {
-                                    onDone()
-                                }
-                            }
+                            dig(i, at: t)
                         } label: {
-                            ArtImage(f.kind.sprite)
-                                .rotationEffect(.degrees(Double((f.id * 23) % 30) - 15))
+                            ZStack {
+                                ArtImage("props/dig-mound.png")
+                                if isX {
+                                    ArtImage("props/dig-x.png")
+                                        .frame(width: mound.w * 0.4 * s, height: mound.w * 0.4 * 78 / 94 * s)
+                                        .opacity(1 - Double(dug) * 0.85)
+                                        .offset(y: -mh * 0.12 * s)
+                                }
+                            }
+                            .frame(width: mound.w * s, height: mh * s)
                         }
                         .buttonStyle(.plain)
-                        .contentShape(Rectangle().inset(by: -14 * s))
-                        .transition(.scale(scale: 1.6).combined(with: .opacity))
-                        .stage(x: f.x - f.w / 2, y: f.y - f.w * f.kind.aspect / 2,
-                               w: f.w, h: f.w * f.kind.aspect)
+                        .contentShape(Rectangle().inset(by: -10 * s))
+                        .scaleEffect(y: 1 - dug * 0.5, anchor: .bottom)
+                        .scaleEffect(x: 1 + dug * 0.12, anchor: .bottom)
+                        .stage(x: mound.x - mound.w / 2, y: mound.y - mh, w: mound.w, h: mh)
+                    }
+                }
+
+                // Sand puffs where small hands dig
+                ForEach(puffs) { puff in
+                    let age = t - puff.at
+                    if age >= 0 && age < 0.55 {
+                        let p = age / 0.55
+                        Ellipse()
+                            .fill(Color(red: 0.93, green: 0.85, blue: 0.65).opacity(0.8 * (1 - p)))
+                            .stage(x: puff.x - 28 - 34 * p, y: puff.y - 10 - 26 * p,
+                                   w: 56 + 68 * p, h: 22 + 20 * p)
+                            .allowsHitTesting(false)
                     }
                 }
 
@@ -107,28 +108,7 @@ struct HuntScreen: View {
                     .stage(x: 0, y: 0, w: 800, h: 600)
                     .bleed()
 
-                // The legend: what to find, and how many are still hiding
-                HStack(spacing: 20 * s) {
-                    legendGroup(.star, total: 3, scale: s)
-                    legendGroup(.shell, total: 2, scale: s)
-                    legendGroup(.pearl, total: 1, scale: s)
-                    if let earned {
-                        // The lost treasure, waiting to be revealed
-                        let a = earned.spriteAspect
-                        ArtImage(earned.sprite)
-                            .saturation(revealed ? 1 : 0)
-                            .opacity(revealed ? 1 : 0.35)
-                            .frame(width: min(44, 44 / a) * s, height: min(44, 44 / a) * a * s)
-                    }
-                }
-                .padding(.vertical, 10 * s)
-                .padding(.horizontal, 24 * s)
-                .background(Capsule().fill(Tokens.Palette.panel))
-                .shadow(color: Tokens.Palette.midnight.opacity(0.28), radius: 7 * s, y: 6 * s)
-                .opacity(revealed ? 0 : 1)
-                .stageBottomCenter(bottom: 24)
-
-                Text("Find the treasures!")
+                Text("X marks the spot!")
                     .font(baloo(Tokens.TypeScale.nameTag, weight: 700, scale: s))
                     .foregroundStyle(Tokens.Palette.midnight)
                     .padding(.top, 6 * s)
@@ -138,47 +118,50 @@ struct HuntScreen: View {
                     .shadow(color: Tokens.Palette.midnight.opacity(0.28), radius: 7 * s, y: 6 * s)
                     .stageTopCenter(y: 24)
 
-                // Found them all: the lost treasure sparkles into view
+                // Dug free: the lost treasure rises sparkling over its hole
                 if revealed, let earned {
-                    GlowPulse(t: t, color: Color(hex: 0xFFE9A8), fromOpacity: 0.45, toOpacity: 1, duration: 1.8)
-                        .stage(x: 300, y: 130, w: 200, h: 200)
+                    let mound = Self.mounds[xMound]
                     let a = earned.spriteAspect
-                    let rw: CGFloat = a > 1.4 ? 90 : 130
+                    let rw: CGFloat = a > 1.4 ? 96 : 136
+                    GlowPulse(t: t, color: Color(hex: 0xFFE9A8), fromOpacity: 0.45, toOpacity: 1, duration: 1.8)
+                        .stage(x: mound.x - 110, y: mound.y - 320, w: 220, h: 220)
                     ArtImage(earned.sprite)
                         .shadow(color: Color(hex: 0xFFD27A, opacity: 0.8), radius: 20 * s)
                         .offset(y: Wave.bob(t, from: 0, to: -8, duration: 3) * s)
-                        .stage(x: 400 - rw / 2, y: 230 - rw * a / 2, w: rw, h: rw * a)
+                        .stage(x: mound.x - rw / 2, y: mound.y - 210 - rw * a / 2, w: rw, h: rw * a)
                         .transition(.scale(scale: 0.3).combined(with: .opacity))
-                    TwinkleStar(t: t, duration: 2.2).stage(x: 300, y: 150, w: 22, h: 22)
-                    TwinkleStar(t: t, duration: 2.6, delay: 0.7).stage(x: 480, y: 180, w: 18, h: 18)
-                    TwinkleStar(t: t, duration: 2, delay: 1.2).stage(x: 420, y: 120, w: 20, h: 20)
-
-                    Text("Off to your grotto it goes!")
-                        .font(baloo(24, weight: 700, scale: s))
-                        .foregroundStyle(Tokens.Palette.midnight)
-                        .padding(.top, 7 * s)
-                        .padding(.bottom, 3 * s)
-                        .padding(.horizontal, 26 * s)
-                        .background(Capsule().fill(Tokens.Palette.pearl))
-                        .shadow(color: Tokens.Palette.midnight.opacity(0.28), radius: 7 * s, y: 6 * s)
-                        .stageBottomCenter(bottom: 28)
-                        .transition(.opacity)
+                    TwinkleStar(t: t, duration: 2.2).stage(x: mound.x - 100, y: mound.y - 290, w: 22, h: 22)
+                    TwinkleStar(t: t, duration: 2.6, delay: 0.7).stage(x: mound.x + 80, y: mound.y - 250, w: 18, h: 18)
+                    TwinkleStar(t: t, duration: 2, delay: 1.2).stage(x: mound.x + 20, y: mound.y - 330, w: 20, h: 20)
+                }
+            }
+            .onChange(of: Int(t * 10)) {
+                if !saidIntro && t > 0.5 {
+                    saidIntro = true
+                    speak(PromptScript.digIntro)
                 }
             }
         }
     }
 
-    private func legendGroup(_ kind: Kind, total: Int, scale: CGFloat) -> some View {
-        let foundCount = found.intersection(
-            Set(Self.findables.filter { $0.kind == kind }.map(\.id))
-        ).count
-        return HStack(spacing: 6 * scale) {
-            ForEach(0..<total, id: \.self) { i in
-                ArtImage(kind.sprite)
-                    .saturation(i < foundCount ? 1 : 0)
-                    .opacity(i < foundCount ? 1 : 0.4)
-                    .frame(width: 34 * scale, height: 34 * scale * kind.aspect)
+    private func dig(_ i: Int, at t: Double) {
+        let mound = Self.mounds[i]
+        puffId += 1
+        puffs.append(Puff(id: puffId, x: mound.x, y: mound.y - mound.w * 114 / 224 / 2, at: t))
+        if i == xMound {
+            play(.pop)
+            withMotion(.easeOut(duration: 0.25)) { digs += 1 }
+            if digs >= Self.digsNeeded && !revealed {
+                withMotion(.easeOut(duration: 0.4)) { revealed = true }
+                play(.fanfare)
+                speak(PromptScript.digFound)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3.2) {
+                    onDone()
+                }
             }
+        } else if t - lastNope > 2.5 {
+            lastNope = t
+            speak(PromptScript.digNotHere)
         }
     }
 }

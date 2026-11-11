@@ -669,6 +669,20 @@ def scene_props_layers():
           '<path d="M606 220 q10 -12 6 -26" fill="none" stroke="#49a07a" stroke-width="3.5" stroke-linecap="round"/>'
           '<path d="M248 486 q8 -14 -2 -26 M248 486 q-8 -10 -4 -22" fill="none" stroke="#2f7c5c" stroke-width="3.5" stroke-linecap="round"/>')
 
+    # The dig mini-game: a sandy mound to dig open, and the red X that marks
+    # the right one (a separate prop so it can sit on any mound and fade).
+    s.layer('digmound')
+    s.add(f'<path d="M296 420 C316 368 364 348 404 350 C446 352 486 372 502 420 C506 434 496 442 478 444 '
+          f'C430 450 360 450 318 444 C300 442 292 432 296 420 Z" fill="{s.lin(SAND2)}" stroke="#c9a05e" stroke-width="3"/>'
+          f'<path d="M318 400 C340 380 368 370 398 368 M330 422 C360 408 420 404 470 416" '
+          f'fill="none" stroke="#e8cf9c" stroke-width="5" opacity=".8"/>'
+          f'<ellipse cx="330" cy="438" rx="12" ry="5" fill="#b98f5c" opacity=".6"/>'
+          f'<ellipse cx="470" cy="434" rx="10" ry="4" fill="#b98f5c" opacity=".6"/>'
+          + shell_on_sand(448, 372))
+    s.layer('digx')
+    s.add('<path d="M368 380 L432 428 M432 380 L368 428" stroke="#b03030" stroke-width="17" stroke-linecap="round" opacity=".92"/>'
+          '<path d="M368 380 L432 428 M432 380 L368 428" stroke="#e85d4a" stroke-width="9" stroke-linecap="round"/>')
+
     # The pre-sneeze face: eyes squeezed shut, mouth wide open mid "aaah"
     s.layer('whale_face_uhoh').add(
         '<path d="M231 296 Q246 286 261 296" fill="none" stroke="#1b1030" stroke-width="6" stroke-linecap="round"/>'
@@ -709,7 +723,7 @@ def scene_props_layers():
     return {name: s.svg_layer(name) for name in (
         'lock', 'afish', 'afish_face', 'whale', 'whale_face',
         'whale_face_uhoh', 'hoard_left', 'hoard_right', 'hoard_floor', 'hoard_strings',
-        'fgfan_a', 'fgfan_b', 'bigmap')}
+        'fgfan_a', 'fgfan_b', 'bigmap', 'digmound', 'digx')}
 
 from frame import scene_home_layers
 
@@ -732,5 +746,6 @@ SCENES2 = {
     'props': (scene_props_layers, dict(lock='prop', afish='prop', afish_face='vector', whale='piece', whale_face='vector',
                                        whale_face_uhoh='vector', hoard_left='prop', hoard_right='prop',
                                        hoard_floor='prop', hoard_strings='vector',
-                                       fgfan_a='fg', fgfan_b='fg', bigmap='prop')),
+                                       fgfan_a='fg', fgfan_b='fg', bigmap='prop',
+                                       digmound='prop', digx='vector')),
 }

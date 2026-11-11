@@ -12,6 +12,7 @@ final class AppModel {
         case map
         case dive
         case chest(GrottoItem?)
+        case journey(GrottoItem?, home: Bool)
         case hunt(GrottoItem?)
         case grotto
         case parent
@@ -94,15 +95,28 @@ final class AppModel {
         }
     }
 
-    /// The chest held a map: follow it to the treasure garden. With nothing
-    /// left to earn, head home instead.
+    /// The chest held a map: swim out after it (the travelling shot), dig the
+    /// treasure free, then swim it home. With nothing left to earn, go home.
     func followMap(_ earned: GrottoItem?) {
         guard earned != nil else {
             go(.grotto)
             return
         }
-        speaker.speak(PromptScript.huntIntro)
-        go(.hunt(earned))
+        go(.journey(earned, home: false))
+    }
+
+    /// The travelling shot ended: out lands at the dig, home at the grotto.
+    func journeyDone(_ earned: GrottoItem?, home: Bool) {
+        if home {
+            placeInGrotto(earned)
+        } else {
+            go(.hunt(earned))
+        }
+    }
+
+    /// The treasure is dug free: swim it home.
+    func carryHome(_ earned: GrottoItem?) {
+        go(.journey(earned, home: true))
     }
 
     func placeInGrotto(_ item: GrottoItem?) {
@@ -150,7 +164,7 @@ final class AppModel {
                 } else if case let .chest(item) = self.route {
                     self.followMap(item)
                 } else if case let .hunt(item) = self.route {
-                    self.placeInGrotto(item)
+                    self.carryHome(item)
                 } else {
                     timer.invalidate()
                 }

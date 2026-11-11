@@ -73,12 +73,22 @@ struct RootView: View {
                 )
                 .transition(.opacity)
 
+            case let .journey(earned, home):
+                JourneyScreen(
+                    child: model.activeChild,
+                    earned: earned,
+                    home: home,
+                    speak: { model.speaker.speak($0) },
+                    onDone: { model.journeyDone(earned, home: home) }
+                )
+                .transition(.opacity)
+
             case let .hunt(earned):
                 HuntScreen(
                     earned: earned,
-                    onDone: { model.placeInGrotto(earned) },
-                    onFind: { model.sounds.play(SoundPlayer.Effect.notes[$0 % SoundPlayer.Effect.notes.count]) },
-                    speakFound: { model.speaker.speak(PromptScript.huntFound) }
+                    onDone: { model.carryHome(earned) },
+                    speak: { model.speaker.speak($0) },
+                    play: { model.sounds.play($0) }
                 )
                 .transition(.opacity)
 

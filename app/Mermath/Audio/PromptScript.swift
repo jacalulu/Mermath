@@ -104,8 +104,11 @@ enum PromptScript {
     // MARK: Treasure hunt
 
     static let chestMap = Prompt(id: "chest-map-2", text: "And look! A treasure map! Tap it!")
-    static let huntIntro = Prompt(id: "hunt-intro", text: "Follow the map! Can you find all the treasures?")
-    static let huntFound = Prompt(id: "hunt-found", text: "You found them all! Hooray!")
+    static let followMap = Prompt(id: "follow-map-2", text: "Follow the map! The lost treasure is close!")
+    static let digIntro = Prompt(id: "dig-intro", text: "X marks the spot! Dig, dig, dig!")
+    static let digNotHere = Prompt(id: "dig-not-here", text: "Not there! Dig where the X is!")
+    static let digFound = Prompt(id: "dig-found", text: "There it is! You rescued the treasure!")
+    static let swimHome = Prompt(id: "swim-home", text: "Hooray! Let's take it home!")
 
     // MARK: Deep Sea (counting by 2s and 5s)
 
