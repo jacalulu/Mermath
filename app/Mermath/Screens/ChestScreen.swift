@@ -52,13 +52,25 @@ struct ChestScreen: View {
                 }
                 .bleed()
 
-                // The chest in its pulsing warm light
+                // The chest in its pulsing warm light. The lid stays shut
+                // while the pearls pour in, then swings open on the flash.
+                let openP = reduceMotion ? 1.0 : 1 - pow(1 - min(1, max(0, (ov - 0.86) / 0.14)), 3)
                 GlowPulse(t: t, color: Color(hex: 0xFFE9A8), fromOpacity: 0.45, toOpacity: 1, duration: 1.8)
+                    .opacity(0.4 + 0.6 * openP)
                     .stage(x: 240, y: 190, w: 320, h: 300)
                 ArtImage("scenes/treasure-chest/chest-lid.png")
+                    .rotationEffect(.degrees(openP * -26), anchor: .bottomTrailing)
+                    .offset(x: -openP * 10 * s, y: -openP * 26 * s)
                     .stage(x: 284, y: 244, w: 232, h: 144)
                 ArtImage("scenes/treasure-chest/chest-box.png")
                     .stage(x: 282, y: 330, w: 236, h: 152)
+
+                // The counter you filled, still at the top - it empties as
+                // each pearl leaves it and dives down into the chest's lock.
+                let launched = ov >= 1 ? 10 : min(10, max(0, Int(ov * 2.0 / 0.09) + 1))
+                PearlCounter(filled: 10 - launched, scale: s)
+                    .opacity(ov < 1 ? 1 : 0)
+                    .stageTopRight(right: 24, y: 26)
 
                 // The overture: the ten pearls you earned drain one by one
                 // into the chest's lock, sparkles build, then the reveal.
@@ -94,13 +106,21 @@ struct ChestScreen: View {
                     }
                 }
 
-                // What the chest holds: not the treasure itself, but the map
-                // to it, floating and tilting in the column of light.
-                if earned != nil && ov >= 1 {
-                    MapReveal(t: t, scale: s)
-                        .frame(width: 140 * s, height: 140 * s)
-                        .stage(x: 330, y: 95, w: 140, h: 140)
-                        .transition(.opacity)
+                // What the chest holds: not the treasure itself, but the MAP
+                // to it. It rises out of the open chest, unrolled and real,
+                // and hangs there wobbling - inviting the tap that follows it.
+                if earned != nil {
+                    let em = reduceMotion ? 1.0 : 1 - pow(1 - min(1, max(0, (t - (t0 ?? t) - 2.1) / 0.9)), 3)
+                    if em > 0 {
+                        Button(action: onPlace) {
+                            MapReveal(t: t, scale: s)
+                                .frame(width: 290 * s, height: 203 * s)
+                        }
+                        .buttonStyle(.plain)
+                        .scaleEffect(0.2 + 0.8 * em)
+                        .opacity(min(1, em * 2.5))
+                        .stage(x: 255, y: 330 - em * 250, w: 290, h: 203)
+                    }
                 }
 
                 // Twinkles around the chest and lamp
@@ -121,27 +141,26 @@ struct ChestScreen: View {
                     .stage(x: 0, y: 0, w: 800, h: 600)
                     .bleed()
 
-                MapButton(scale: s, action: onMap)
-                    .stage(x: 22, y: 20, w: 66, h: 66)
+                // Only true - and only shown - once the lid has swung open
+                if ov >= 0.95 {
+                    Text("10 pearls! The chest is open.")
+                        .font(baloo(26, weight: 700, scale: s))
+                        .foregroundStyle(Tokens.Palette.midnight)
+                        .padding(.top, 7 * s)
+                        .padding(.bottom, 3 * s)
+                        .padding(.horizontal, 26 * s)
+                        .background(Capsule().fill(Tokens.Palette.pearl))
+                        .shadow(color: Tokens.Palette.midnight.opacity(0.28), radius: 7 * s, y: 6 * s)
+                        .stageTopCenter(y: 26)
+                        .transition(.opacity)
+                }
 
-                Text("10 pearls! The chest is open.")
-                    .font(baloo(26, weight: 700, scale: s))
-                    .foregroundStyle(Tokens.Palette.midnight)
-                    .padding(.top, 7 * s)
-                    .padding(.bottom, 3 * s)
-                    .padding(.horizontal, 26 * s)
-                    .background(Capsule().fill(Tokens.Palette.pearl))
-                    .shadow(color: Tokens.Palette.midnight.opacity(0.28), radius: 7 * s, y: 6 * s)
-                    .stageTopCenter(y: 26)
-
-                SolvedPanel(
-                    text: earned == nil ? "Your grotto is full of treasures!" : "You found a treasure map!",
-                    buttonTitle: earned == nil ? "See my grotto" : "Follow the map",
-                    scale: s,
-                    action: onPlace
-                )
-                .opacity(ov >= 1 ? 1 : 0)
-                .stageBottomCenter(bottom: 24)
+                // With every treasure already home there is no map to follow
+                if earned == nil && ov >= 1 {
+                    OpenChestButton(title: "See my grotto", t: t, scale: s, action: onPlace)
+                        .stageBottomCenter(bottom: 36)
+                        .transition(.opacity)
+                }
             }
             .onChange(of: Int(t * 20)) {
                 if t0 == nil { t0 = t }
@@ -150,8 +169,8 @@ struct ChestScreen: View {
     }
 }
 
-/// The floating map: glow behind, gentle rise and tilt, per the lamp's old
-/// reveal motion (up 10px, -5 to 5deg, 3.4s).
+/// The real, open treasure map, risen from the chest: glow behind, a gentle
+/// bob and tilt, and a slow swell that says "tap me".
 private struct MapReveal: View {
     let t: Double
     let scale: CGFloat
@@ -160,11 +179,12 @@ private struct MapReveal: View {
         let frac = Wave.cycleFraction(t, duration: 3.4) ?? 0
         ZStack {
             GlowPulse(t: t, color: Color(hex: 0xFFE9A8), fromOpacity: 0.45, toOpacity: 1, duration: 1.8)
-                .scaleEffect(1.8)
-            ArtImage("ui/icon-map.png")
-                .frame(width: 110 * scale, height: 110 * scale)
+                .scaleEffect(1.5)
+            ArtImage("props/big-map.png")
+                .frame(width: 280 * scale, height: 219 * scale)
         }
         .offset(y: Wave.keyframes(frac, [(0, 0), (0.5, -10), (1, 0)]) * scale)
-        .rotationEffect(.degrees(Wave.keyframes(frac, [(0, -5), (0.5, 5), (1, -5)])))
+        .rotationEffect(.degrees(Wave.keyframes(frac, [(0, -3), (0.5, 3), (1, -3)])))
+        .scaleEffect(Wave.alternate(t, from: 0.98, to: 1.04, duration: 1.2))
     }
 }

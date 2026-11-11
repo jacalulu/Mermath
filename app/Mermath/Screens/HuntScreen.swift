@@ -64,10 +64,6 @@ struct HuntScreen: View {
                         .stage(x: 0, y: 0, w: 800, h: 600)
                     LightShimmer(t: t)
                         .stage(x: 0, y: 0, w: 800, h: 340)
-                    KelpLayer(t: t, path: "scenes/hunt/kelp-far.png",
-                              from: -0.8, to: 0.9, duration: 7, pivot: UnitPoint(x: 0.5, y: 1))
-                        .opacity(0.75)
-                        .stage(x: 100, y: 0, w: 700, h: 600)
                     ArtImage("scenes/hunt/foreground.png")
                         .stage(x: 0, y: 266, w: 800, h: 334)
                     KelpLayer(t: t, path: "scenes/hunt/seagrass.png",
@@ -89,6 +85,11 @@ struct HuntScreen: View {
                             }
                             if found.count == Self.findables.count {
                                 speakFound()
+                                // No button: the treasure sparkles in, the
+                                // cheer plays, and off to the grotto it goes
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 3.6) {
+                                    onDone()
+                                }
                             }
                         } label: {
                             ArtImage(f.kind.sprite)
@@ -152,14 +153,16 @@ struct HuntScreen: View {
                     TwinkleStar(t: t, duration: 2.6, delay: 0.7).stage(x: 480, y: 180, w: 18, h: 18)
                     TwinkleStar(t: t, duration: 2, delay: 1.2).stage(x: 420, y: 120, w: 20, h: 20)
 
-                    SolvedPanel(
-                        text: "You found the \(earned.displayName.lowercased())!",
-                        buttonTitle: "Put it in my grotto",
-                        scale: s,
-                        action: onDone
-                    )
-                    .stageBottomCenter(bottom: 24)
-                    .transition(.opacity)
+                    Text("Off to your grotto it goes!")
+                        .font(baloo(24, weight: 700, scale: s))
+                        .foregroundStyle(Tokens.Palette.midnight)
+                        .padding(.top, 7 * s)
+                        .padding(.bottom, 3 * s)
+                        .padding(.horizontal, 26 * s)
+                        .background(Capsule().fill(Tokens.Palette.pearl))
+                        .shadow(color: Tokens.Palette.midnight.opacity(0.28), radius: 7 * s, y: 6 * s)
+                        .stageBottomCenter(bottom: 28)
+                        .transition(.opacity)
                 }
             }
         }

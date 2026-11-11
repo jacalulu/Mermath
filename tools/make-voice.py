@@ -49,8 +49,10 @@ def prompts():
             out.append((f'reef-hint-{a}-{b}', f'Count all the shells: {first}, and then {rest}!', 'crab'))
             out.append((f'reef-praise-{a}-{b}', f'{wa} and {wb} make {ws}!', 'crab'))
             out.append((f'reef-tenth-{a}-{b}', f'{wa} and {wb} make {ws}! That makes ten pearls! Open the chest!', 'crab'))
-    # Tollbooth play and counting shells
+    # The bubble party and counting shells
     out.append(('pop-bubbles', 'Pop the bubbles!', 'crab'))
+    out.append(('pop-all', 'Ooh, bubbles! Can you pop them all?', 'crab'))
+    out.append(('pop-all-done', 'Wow! You popped them all!', 'crab'))
     for n in range(1, 11):
         out.append((f'count-{n}', f'{WORD[n].capitalize()}!', 'crab'))
     # Intro cinematic
@@ -65,6 +67,7 @@ def prompts():
     out.append(('intro-rally-3', 'So, who is diving today?', 'crab'))
     # Treasure hunt
     out.append(('chest-map', 'And look! A treasure map!', 'narrator'))
+    out.append(('chest-map-2', 'And look! A treasure map! Tap it!', 'narrator'))
     out.append(('hunt-intro', 'Follow the map! Can you find all the treasures?', 'crab'))
     out.append(('hunt-found', 'You found them all! Hooray!', 'crab'))
     # Deep Sea: counting by 2s and 5s

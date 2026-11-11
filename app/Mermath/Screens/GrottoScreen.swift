@@ -24,8 +24,17 @@ extension GrottoItem {
     var labelSpot: CGPoint {
         switch self {
         case .starfishLamp: return CGPoint(x: 400, y: 240)
-        case .kelpCurtain: return CGPoint(x: 700, y: 404)
-        case .shellBed: return CGPoint(x: 520, y: 550)
+        case .kelpCurtain: return CGPoint(x: 483, y: 294)
+        case .shellBed: return CGPoint(x: 330, y: 556)
+        }
+    }
+
+    /// The dashed "coming soon" circle for this item (stage top-left, 92px).
+    var slotSpot: CGPoint {
+        switch self {
+        case .starfishLamp: return CGPoint(x: 330, y: 128)
+        case .kelpCurtain: return CGPoint(x: 440, y: 140)
+        case .shellBed: return CGPoint(x: 290, y: 448)
         }
     }
 }
@@ -39,36 +48,34 @@ struct GrottoScreen: View {
 
     @Environment(\.stage) private var m
 
-    private static let slotSpots: [CGPoint] = [
-        CGPoint(x: 168, y: 158),
-        CGPoint(x: 498, y: 176),
-        CGPoint(x: 268, y: 474),
-    ]
-
     private static let slotLabels = ["Next dive", "2 more dives", "3 more dives"]
 
     var body: some View {
         let s = m.scale
         MotionClock { t in
             ZStack {
-                // The cave (bleeds to the physical edges)
+                // THE grotto from the story: the sisters' cozy home from the
+                // intro, with the round window onto open water and the shelves
+                // waiting to be filled again (bleeds to the physical edges)
                 Group {
-                    ArtImage("scenes/grotto/bg.jpg")
+                    ArtImage("scenes/intro/home-bg.jpg")
                         .stage(x: 0, y: 0, w: 800, h: 600)
-                    LightShimmer(t: t, center: UnitPoint(x: 0.5, y: 0), maxOpacity: 0.4)
-                        .stage(x: 150, y: 0, w: 500, h: 380)
-                    ArtImage("scenes/grotto/floor.png")
-                        .stage(x: 0, y: 466, w: 800, h: 134)
-                    ArtImage("scenes/grotto/walls.png")
+                    FishSwim(t: t, travel: 920, bobDown: 6, bobUp: 7, duration: 26, delay: -6, scale: s)
+                        .stage(x: 830, y: 240, w: 40, h: 25)
+                    FishSwim(t: t, travel: 920, bobDown: 6, bobUp: 7, duration: 31, delay: -19, scale: s)
+                        .stage(x: 850, y: 330, w: 30, h: 19)
+                    ArtImage("scenes/intro/home-wall.png")
                         .stage(x: 0, y: 0, w: 800, h: 600)
+                    LightShimmer(t: t, center: UnitPoint(x: 0.5, y: 0), maxOpacity: 0.3)
+                        .stage(x: 440, y: 60, w: 350, h: 430)
                 }
                 .bleed()
 
-                // Earned decorations, exactly where the scene composed them
+                // Earned decorations, back exactly where the story keeps them
                 if progress.grottoItems.contains(.kelpCurtain) {
                     KelpLayer(t: t, path: "scenes/grotto/kelp-curtain.png",
                               from: -2.4, to: 2.2, duration: 4.2, pivot: UnitPoint(x: 0.5, y: 0))
-                        .stage(x: 570, y: 54, w: 166, h: 390)
+                        .stage(x: 424, y: 0, w: 118, h: 277)
                         .transition(.opacity)
                 }
                 ArtImage("scenes/grotto/string-lights.png")
@@ -87,7 +94,7 @@ struct GrottoScreen: View {
                 }
                 if progress.grottoItems.contains(.shellBed) {
                     ArtImage("scenes/grotto/shell-bed.png")
-                        .stage(x: 394, y: 378, w: 252, h: 170)
+                        .stage(x: 210, y: 430, w: 240, h: 162)
                         .transition(.opacity)
                 }
 
@@ -96,11 +103,11 @@ struct GrottoScreen: View {
                     .frame(width: 280 * s, height: 321 * s)
                     .stage(x: 80, y: 210, w: 280, h: 321)
 
-                // Dashed circles for what is still to come
+                // Dashed circles where each missing treasure belongs
                 let remaining = GrottoItem.allCases.filter { !progress.grottoItems.contains($0) }
-                ForEach(Array(remaining.enumerated()), id: \.element) { index, _ in
-                    if index < Self.slotSpots.count {
-                        let spot = Self.slotSpots[index]
+                ForEach(Array(remaining.enumerated()), id: \.element) { index, item in
+                    if index < Self.slotLabels.count {
+                        let spot = item.slotSpot
                         ZStack {
                             Circle().fill(Tokens.Palette.midnight.opacity(0.46))
                             Circle().strokeBorder(

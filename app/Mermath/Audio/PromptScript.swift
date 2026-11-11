@@ -92,8 +92,9 @@ enum PromptScript {
     static let rallyAsk = Prompt(id: "intro-rally-ask", text: "Can you help rescue all the treasures?")
     static let rally3 = Prompt(id: "intro-rally-3", text: "So, who is diving today?")
 
-    /// The crab inviting the tollbooth play, once per dive.
-    static let popBubbles = Prompt(id: "pop-bubbles", text: "Pop the bubbles!")
+    /// The bubble party: the invitation with the goal, and the full clear.
+    static let popAll = Prompt(id: "pop-all", text: "Ooh, bubbles! Can you pop them all?")
+    static let popAllDone = Prompt(id: "pop-all-done", text: "Wow! You popped them all!")
 
     /// Single counting words, for tapping the reef's shells one by one.
     static func countWord(_ n: Int) -> Prompt {
@@ -102,7 +103,7 @@ enum PromptScript {
 
     // MARK: Treasure hunt
 
-    static let chestMap = Prompt(id: "chest-map", text: "And look! A treasure map!")
+    static let chestMap = Prompt(id: "chest-map-2", text: "And look! A treasure map! Tap it!")
     static let huntIntro = Prompt(id: "hunt-intro", text: "Follow the map! Can you find all the treasures?")
     static let huntFound = Prompt(id: "hunt-found", text: "You found them all! Hooray!")
 

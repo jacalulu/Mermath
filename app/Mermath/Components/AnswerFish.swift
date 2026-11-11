@@ -88,12 +88,15 @@ struct AnswerFish: View {
     let scale: CGFloat
     /// Changes when this fish was wrong-tapped: it wiggles "nope" once.
     let shakeTrigger: Int
+    /// While the school slides on or off stage, it faces its travel direction
+    /// (a fish never swims backwards); nil returns it to its patrol facing.
+    var facingOverride: Bool?
     let tap: () -> Void
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        let right = FishLanes.movingRight(lane, t)
+        let right = facingOverride ?? FishLanes.movingRight(lane, t)
         let bob = Wave.alternate(t, from: -4, to: 4, duration: 1.6, delay: FishLanes.phase[lane])
         Button(action: tap) {
             FishBody(number: number, facingRight: right, scale: scale)

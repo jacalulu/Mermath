@@ -13,6 +13,7 @@ struct TidePoolViewState {
     var solvedText = ""
     var popTrigger = 0
     var partyTrigger = 0
+    var partyActive = false
     /// Count level: how many little bubbles to count in the speech bubble.
     var countIcons: Int?
 }
@@ -32,8 +33,12 @@ struct TidePoolScreen: View {
     /// The clock time when the right fish was caught, so it freezes to pop.
     @State private var caughtAt: Double?
     /// Off-stage shift for the fish: after a catch the others swim away,
-    /// and a fresh school slides in with the next question.
+    /// and a fresh school swims in with the next question. The middle lane
+    /// uses the left edge, the others the right, so the school arrives from
+    /// both sides - always nose first.
     @State private var fishSlide: CGFloat = 0
+    /// 0 none, 1 swimming on, 2 swimming off: forces travel-direction facing.
+    @State private var slidePhase = 0
 
     var body: some View {
         MotionClock { t in
@@ -129,16 +134,19 @@ struct TidePoolScreen: View {
                         }
                     }
                     .stageTopRight(right: 24, y: 26)
-                SpeechBubbleTail()
-                    .stage(x: 180, y: 176, w: 70, h: 54)
-                SpeechBubbleView(
-                    text: state.prompt,
-                    scale: s,
-                    popTrigger: state.popTrigger,
-                    countIcons: state.countIcons,
-                    replay: onReplay
-                )
-                .stageTopLeft(x: 196, y: 96)
+                // The crab's bubble steps aside for the party and the finale
+                if !state.partyActive && !state.diveComplete {
+                    SpeechBubbleTail()
+                        .stage(x: 180, y: 176, w: 70, h: 54)
+                    SpeechBubbleView(
+                        text: state.prompt,
+                        scale: s,
+                        popTrigger: state.popTrigger,
+                        countIcons: state.countIcons,
+                        replay: onReplay
+                    )
+                    .stageTopLeft(x: 196, y: 96)
+                }
 
                 // The answers swim on the fish themselves; catching the right
                 // one is the game. The caught fish hands off to CatchFlight,
@@ -152,11 +160,12 @@ struct TidePoolScreen: View {
                         state: bubbleState(for: n),
                         scale: s,
                         shakeTrigger: state.faded.contains(n) ? 1 : 0,
+                        facingOverride: slidePhase == 1 ? (i == 1) : slidePhase == 2 ? (i != 1) : nil,
                         tap: { onAnswer(n) }
                     )
                     .stage(x: xc - FishLanes.fishW / 2, y: FishLanes.centerY[i] - FishLanes.fishH / 2,
                            w: FishLanes.fishW, h: FishLanes.fishH)
-                    .offset(x: fishSlide * s)
+                    .offset(x: fishSlide * (i == 1 ? -1 : 1) * s)
                 }
 
                 // The catch: splash, arc to the counter, bubble trail
@@ -174,18 +183,14 @@ struct TidePoolScreen: View {
                 .stage(x: 0, y: 0, w: 800, h: 600)
 
                 // Three in a row: the surprise bubble party rises from below
-                BonusBubbleField(t: t, trigger: state.partyTrigger, scale: s, onPop: onBonusPop)
+                BonusBubbleField(t: t, trigger: state.partyTrigger, active: state.partyActive,
+                                 scale: s, onPop: onBonusPop)
                 .stage(x: 0, y: 0, w: 800, h: 600)
 
                 if state.diveComplete {
-                    SolvedPanel(
-                        text: state.solvedText,
-                        buttonTitle: "Open the chest",
-                        scale: s,
-                        action: onOpenChest
-                    )
-                    .stageBottomCenter(bottom: 24)
-                    .transition(.opacity)
+                    OpenChestButton(title: "Open the chest", t: t, scale: s, action: onOpenChest)
+                        .stageBottomCenter(bottom: 36)
+                        .transition(.scale(scale: 0.6).combined(with: .opacity))
                 } else if state.showHint {
                     HintPanel(count: state.target, scale: s)
                         .stageBottomCenter(bottom: 24)
@@ -195,20 +200,26 @@ struct TidePoolScreen: View {
             .onChange(of: state.solved) { _, isSolved in
                 caughtAt = isSolved ? t : nil
                 if isSolved && !reduceMotion {
-                    // The other fish clear the pool for bubble popping
+                    // The other fish swim off, nose first
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                        slidePhase = 2
                         withMotion(.easeIn(duration: 0.8)) { fishSlide = 720 }
                     }
                 }
             }
             .onChange(of: state.target) {
-                // A fresh school swims in with the new question
+                // A fresh school swims in with the new question, from both
+                // sides of the screen, each fish facing its way in
                 guard !reduceMotion else { return }
                 var snap = Transaction()
                 snap.disablesAnimations = true
                 withTransaction(snap) { fishSlide = 720 }
+                slidePhase = 1
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                     withMotion(.easeOut(duration: 1.0)) { fishSlide = 0 }
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.15) {
+                    slidePhase = 0
                 }
             }
         }

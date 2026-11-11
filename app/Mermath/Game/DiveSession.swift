@@ -17,6 +17,8 @@ final class DiveSession {
     private(set) var popTrigger = 0
     /// Rises when three right answers in a row break into the bubble party.
     private(set) var partyTrigger = 0
+    /// True while the party is on: the prompt bubble steps aside for it.
+    private(set) var partyActive = false
 
     private var progress: ChildProgress
     private let store: ProgressStore
@@ -131,20 +133,24 @@ final class DiveSession {
         }
         speaker.speak(praisePrompt())
 
-        // Three right answers IN A ROW break into the bubble party - never
-        // announced: the music starting and the shower of bubbles say it.
+        // Three right answers IN A ROW break into the bubble party: the music
+        // starts, the crab sets the goal, and the prompt bubble steps aside.
         // Otherwise just a short praise beat before the next question.
         streak += 1
         var pause: UInt64 = 3_500_000_000
         if streak >= 3 {
             streak = 0
             partyTrigger += 1
+            withMotion(.easeOut(duration: 0.3)) { partyActive = true }
             pause = 11_000_000_000
             sounds.play(.bubbleMusic)
-            let sounds = self.sounds
-            Task {
-                try? await Task.sleep(nanoseconds: 10_600_000_000)
-                sounds.stop(.bubbleMusic)
+            Task { [weak self] in
+                try? await Task.sleep(nanoseconds: 2_000_000_000)
+                self?.speaker.speak(PromptScript.popAll)
+                try? await Task.sleep(nanoseconds: 8_600_000_000)
+                guard let self else { return }
+                self.sounds.stop(.bubbleMusic)
+                withMotion(.easeOut(duration: 0.4)) { self.partyActive = false }
             }
         }
         advanceTask?.cancel()
@@ -199,6 +205,7 @@ final class DiveSession {
             faded = []
             solved = false
             showHint = false
+            partyActive = false
             hintThisQuestion = false
             question = Self.generate(zone: zone, progress: progress, avoiding: question.target)
         }
@@ -206,10 +213,14 @@ final class DiveSession {
     }
 
     /// A party bubble popped: the next rising note plays and the running
-    /// count is said out loud - popping IS counting practice.
+    /// count is said out loud - popping IS counting practice. Clearing all
+    /// twelve earns a fanfare and a cheer.
     func bubblePopped(_ n: Int) {
         sounds.play(SoundPlayer.Effect.notes[n % SoundPlayer.Effect.notes.count])
-        if n < 10 {
+        if n + 1 == 12 {
+            sounds.play(.fanfare)
+            speaker.speak(PromptScript.popAllDone)
+        } else if n < 10 {
             speaker.speak(PromptScript.countWord(n + 1))
         }
     }

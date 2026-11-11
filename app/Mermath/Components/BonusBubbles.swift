@@ -30,6 +30,8 @@ struct BonusBubbleField: View {
     let t: Double
     /// Fires a new party when it increases.
     let trigger: Int
+    /// True while the party is on; shows the goal counter.
+    var active = false
     let scale: CGFloat
     /// Called with the running pop count (0-based).
     let onPop: (Int) -> Void
@@ -59,6 +61,28 @@ struct BonusBubbleField: View {
                         }
                     }
                 }
+            }
+            // The goal: twelve little bubbles to collect, filling as you pop
+            if active {
+                HStack(spacing: 7 * scale) {
+                    ForEach(0..<12, id: \.self) { i in
+                        if i < pops {
+                            ArtImage("props/bubble.png")
+                                .frame(width: 22 * scale, height: 22 * scale)
+                        } else {
+                            Circle()
+                                .strokeBorder(Tokens.Palette.pearl.opacity(0.55), lineWidth: 2.5 * scale)
+                                .frame(width: 22 * scale, height: 22 * scale)
+                        }
+                    }
+                }
+                .padding(.vertical, 10 * scale)
+                .padding(.horizontal, 18 * scale)
+                .background(Capsule().fill(Tokens.Palette.panel))
+                .shadow(color: Tokens.Palette.midnight.opacity(0.28), radius: 7 * scale, y: 6 * scale)
+                .position(x: 400 * scale, y: 126 * scale)
+                .transition(.opacity)
+                .allowsHitTesting(false)
             }
             // Pop bursts: pearls fling outward while the count pops up
             ForEach(fx) { f in

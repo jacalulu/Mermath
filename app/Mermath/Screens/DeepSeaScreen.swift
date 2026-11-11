@@ -131,18 +131,14 @@ struct DeepSeaScreen: View {
                 .stage(x: 0, y: 0, w: 800, h: 600)
 
                 // The tollbooth payout in the deep
-                BonusBubbleField(t: t, trigger: dive.partyTrigger, scale: s, onPop: { dive.bubblePopped($0) })
+                BonusBubbleField(t: t, trigger: dive.partyTrigger, active: dive.partyActive,
+                                 scale: s, onPop: { dive.bubblePopped($0) })
                 .stage(x: 0, y: 0, w: 800, h: 600)
 
                 if dive.diveComplete {
-                    SolvedPanel(
-                        text: dive.solvedText,
-                        buttonTitle: "Open the chest",
-                        scale: s,
-                        action: onOpenChest
-                    )
-                    .stageBottomCenter(bottom: 24)
-                    .transition(.opacity)
+                    OpenChestButton(title: "Open the chest", t: t, scale: s, action: onOpenChest)
+                        .stageBottomCenter(bottom: 36)
+                        .transition(.scale(scale: 0.6).combined(with: .opacity))
                 } else if dive.showHint, case let .skip(step, _) = dive.question.presentation {
                     HStack(spacing: 10 * s) {
                         Text("Count with me:")

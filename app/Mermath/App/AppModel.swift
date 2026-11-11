@@ -208,6 +208,7 @@ final class AppModel {
         v.solvedText = dive.solvedText
         v.popTrigger = dive.popTrigger
         v.partyTrigger = dive.partyTrigger
+        v.partyActive = dive.partyActive
         if case .count = dive.question.presentation { v.countIcons = dive.question.target }
         return v
     }
