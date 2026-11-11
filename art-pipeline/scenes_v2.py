@@ -321,16 +321,26 @@ def scene_hunt_layers():
     # shadow pools sink the corners around the bright clearing
     s.add('<ellipse cx="60" cy="600" rx="190" ry="54" fill="#0d3350" opacity=".36" filter="url(#b6)"/>'
           '<ellipse cx="750" cy="602" rx="190" ry="54" fill="#0d3350" opacity=".36" filter="url(#b6)"/>')
-    # The wreck: an old rowboat, resting at a tilt in the sand
-    hull = s.lin([(0, '#8a5c34', 1), (1, '#573418', 1)])
-    planks = ''.join(f'<path d="M{308+i*4} {466-i*15} C370 {450-i*15} 530 {450-i*15} {588-i*3} {464-i*15}" fill="none" stroke="#3f2410" stroke-width="3" opacity=".5"/>' for i in (1, 2, 3))
-    s.add(f'<g transform="rotate(-7 420 470)">'
-          f'<path d="M300 470 C310 430 330 414 352 410 L520 410 C560 416 588 438 596 470 C560 500 340 504 300 470 Z" fill="{hull}"/>'
-          f'{planks}'
-          f'<path d="M300 470 C340 504 560 500 596 470 L592 482 C540 510 350 514 306 482 Z" fill="#3f2410" opacity=".8"/>'
-          f'<circle cx="394" cy="446" r="13" fill="#2b4a5e" stroke="#a87648" stroke-width="5"/>'
-          f'<path d="M520 410 L548 338 L566 342 L540 412 Z" fill="#6a4426"/>'
+    # The wreck: a sunken rowboat up on the back slope, drawn silhouette-first
+    # so it reads over the mounds - dark hull, sunlit gunwale, a tilted mast
+    # with a tattered sail catching the light
+    s.add('<ellipse cx="452" cy="430" rx="150" ry="15" fill="#123a52" opacity=".4" filter="url(#b6)"/>')
+    hull = s.lin([(0, '#9a6a3c', 1), (.4, '#6a4426', 1), (1, '#38200e', 1)])
+    s.add(f'<g transform="rotate(-6 450 396)">'
+          f'<path d="M330 400 C332 376 346 358 370 352 L540 352 C564 356 580 372 584 398 '
+          f'C544 424 372 426 330 400 Z" fill="{hull}"/>'
+          f'<path d="M352 366 C400 356 500 356 560 366 C544 380 380 382 352 366 Z" fill="#1e0f06"/>'
+          f'<path d="M340 392 C400 384 500 384 576 390 M342 404 C404 398 498 398 572 402" '
+          f'fill="none" stroke="#2e1a0c" stroke-width="3" opacity=".55"/>'
+          f'<path d="M334 394 C340 370 352 356 372 352 L540 352" fill="none" '
+          f'stroke="#e8c28e" stroke-width="5" opacity=".9" stroke-linecap="round"/>'
+          f'<path d="M496 352 L514 288 L524 290 L508 354 Z" fill="#54341a"/>'
+          f'<path d="M514 290 C540 296 556 310 560 330 C542 326 524 318 512 306 Z" fill="#f3e3c2"/>'
+          f'<path d="M514 290 C540 296 556 310 560 330" fill="none" stroke="#c9a878" stroke-width="2.5"/>'
           f'</g>')
+    s.add(seastar(362, 408, 8, '#ff7eb6', -75))
+    # sand drifted over the stern: the sea is slowly keeping it
+    s.add('<path d="M520 400 C560 386 596 390 616 406 C584 416 540 416 520 400 Z" fill="#edd8a8" opacity=".9"/>')
     s.add(boulder(s, 96, 500, 220, 86) + boulder(s, 724, 520, 200, 80) + boulder(s, 640, 556, 100, 42, moss=False))
     s.add(coral(r, 60, 486, '#b03070', '#ff9ecb', 150, 4, 14, -86) + coral(r, 756, 470, '#5a3aa8', '#d2b4ff', 160, 4, 15, -94) + coral(r, 688, 520, '#b23a2a', '#ffb347', 100, 3, 12, -80))
     sand(s, r, 560, 6, SAND2, caustic=False)
