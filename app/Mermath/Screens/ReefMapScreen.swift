@@ -73,13 +73,14 @@ struct ReefMapScreen: View {
                 .stage(x: 14, y: 40, w: 330, h: 230)
                 GlowPulse(t: t)
                     .stage(x: 86, y: 116, w: 150, h: 56)
-                // Sign first, crab after: his claw rests against the post
-                SignPost(name: "Tide Pool", w: 126, t: t, scale: s, tilt: 2)
-                    .stage(x: 196, y: 64, w: 126, h: 102)
                 CrabView(t: t, scale: s, blinkCycle: 5.1, bobTo: -3)
                     .frame(width: 76 * s, height: 64 * s)
                     .allowsHitTesting(false)
                     .stage(x: 182, y: 84, w: 76, h: 64)
+                RisingBubble(t: t, duration: 6, delay: 1.5, scale: s)
+                    .stage(x: 148, y: 252, w: 12, h: 12)
+                GlassPill(name: "Tide Pool", t: t, scale: s)
+                    .stage(x: 174, y: 216, w: 0, h: 0)
 
                 // Coral Reef on the mid-water ledge: the picked sister floats
                 // over the coral, her sign planted in the seagrass where the
@@ -88,18 +89,17 @@ struct ReefMapScreen: View {
                     Color.clear.contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .stage(x: 250, y: 210, w: 350, h: 280)
+                .stage(x: 340, y: 210, w: 260, h: 290)
                 GlowPulse(t: t, delay: -0.8)
                     .stage(x: 398, y: 346, w: 195, h: 82)
                 SisterView(spec: child.puppet, t: t, scale: s)
                     .frame(width: 158 * s, height: 181 * s)
                     .allowsHitTesting(false)
                     .stage(x: 388, y: 220, w: 158, h: 181)
-                SignPost(name: "Coral Reef", w: 140, t: t, scale: s, tilt: -2, delay: -0.9)
-                    .stage(x: 252, y: 352, w: 140, h: 113)
-                ArtImage("props/sea-star-pink.png")
-                    .allowsHitTesting(false)
-                    .stage(x: 328, y: 446, w: 26, h: 24)
+                RisingBubble(t: t, duration: 7, delay: 3.5, scale: s)
+                    .stage(x: 398, y: 492, w: 13, h: 13)
+                GlassPill(name: "Coral Reef", t: t, scale: s, delay: -1.1)
+                    .stage(x: 424, y: 458, w: 0, h: 0)
 
                 // Deep Sea, down the cliff in the dark corner: the padlock
                 // hangs on its sign until two clean dives open it
@@ -111,16 +111,19 @@ struct ReefMapScreen: View {
                     .stage(x: 602, y: 390, w: 174, h: 186)
                     GlowPulse(t: t, delay: -0.4)
                         .stage(x: 630, y: 468, w: 166, h: 80)
-                    SignPost(name: "Deep Sea", w: 140, t: t, scale: s, tilt: -2, delay: -1.7, cool: true)
-                        .stage(x: 628, y: 406, w: 140, h: 113)
+                    GlassPill(name: "Deep Sea", t: t, scale: s, delay: -2.3)
+                        .stage(x: 672, y: 478, w: 0, h: 0)
                 } else {
-                    SignPost(name: "Deep Sea", w: 140, t: t, scale: s, tilt: -2, delay: -1.7, locked: true, cool: true)
-                        .stage(x: 628, y: 406, w: 140, h: 113)
-                    // The painted padlock hangs from its rope over the plank
+                    GlassPill(name: "Deep Sea", t: t, scale: s, delay: -2.3, locked: true)
+                        .stage(x: 672, y: 478, w: 0, h: 0)
+                    // The painted padlock sits locked around the pill's right
+                    // end, bobbing with it
                     ArtImage("props/padlock-rope.png")
-                        .shadow(color: Tokens.Palette.midnight.opacity(0.45), radius: 4 * s, y: 4 * s)
+                        .rotationEffect(.degrees(10))
+                        .shadow(color: Tokens.Palette.midnight.opacity(0.5), radius: 5 * s, y: 4 * s)
+                        .offset(y: Wave.alternate(t, from: -2.4, to: 2.4, duration: 3.4, delay: -2.3) * s)
                         .allowsHitTesting(false)
-                        .stage(x: 679, y: 434, w: 38, h: 68)
+                        .stage(x: 729, y: 462, w: 42, h: 75)
                 }
 
                 Vignette()
@@ -128,7 +131,7 @@ struct ReefMapScreen: View {
                     .bleed()
 
                 HomeButton(scale: s, action: onHome)
-                    .stageTopLeft(x: 24, y: 24)
+                    .stageTopLeft(x: 30, y: 30)
             }
             .onChange(of: Int(t * 10)) {
                 if start == nil { start = t }
@@ -155,53 +158,36 @@ private struct TrailDot: View {
     }
 }
 
-/// A driftwood signpost planted in the scenery, the place name painted on its
-/// plank in walnut ink. It breathes a gentle tap-me swell from its base. A
-/// locked place keeps its sign but the ink fades (the padlock hangs on top).
-private struct SignPost: View {
+/// The game's floating UI material: sea-glass. A frosted lens of water with a
+/// bright rim where it catches the light from above, drifting buoyantly like
+/// the game's own bubbles. Labels float in it over their places rather than
+/// pretending to be scenery. Locked places get dark glass and pearl ink.
+private struct GlassPill: View {
     let name: String
-    /// Design-space width; height follows the painted plank's 320:258 aspect.
-    let w: CGFloat
     let t: Double
     let scale: CGFloat
-    var tilt: Double = 0
     var delay: Double = 0
     var locked = false
-    /// Deep-water color grade: cools and darkens the wood to sit at depth.
-    var cool = false
 
     var body: some View {
-        let h = w * 258 / 320
-        let ink = Color(hex: cool ? 0x2E2418 : 0x4A2C12)
-        ZStack {
-            // Contact shadow cast to the bottom-right (light from upper left)
-            Ellipse()
-                .fill(Tokens.Palette.midnight.opacity(cool ? 0.4 : 0.26))
-                .blur(radius: 3.5 * scale)
-                .frame(width: w * 0.5 * scale, height: h * 0.08 * scale)
-                .position(x: w * 0.6 * scale, y: h * 0.955 * scale)
-            ArtImage("props/sign.png")
-                .frame(width: w * scale, height: h * scale)
-                .colorMultiply(cool ? Color(hex: 0xAEBACF) : .white)
-            // Carved lettering: a light chisel catch under the walnut ink
-            ZStack {
-                carvedText.foregroundStyle(Color(hex: 0xF7E7C0).opacity(cool ? 0.4 : 0.75))
-                    .offset(y: 1.6 * scale)
-                carvedText.foregroundStyle(ink.opacity(locked ? 0.65 : 0.95))
-            }
-            .frame(width: w * 0.76 * scale)
-            .position(x: w * 0.5 * scale, y: h * 0.19 * scale)
-        }
-        .frame(width: w * scale, height: h * scale)
-        .rotationEffect(.degrees(tilt), anchor: .bottom)
-        .scaleEffect(Wave.alternate(t, from: 1.0, to: 1.03, duration: 2.6, delay: delay), anchor: .bottom)
-        .allowsHitTesting(false)
-    }
-
-    private var carvedText: some View {
         Text(name)
-            .font(baloo(21, weight: 700, scale: scale))
-            .lineLimit(1)
-            .minimumScaleFactor(0.65)
+            .font(baloo(25, weight: 700, scale: scale))
+            .foregroundStyle(locked ? Tokens.Palette.pearl.opacity(0.92) : Color(hex: 0x1A3B5C))
+            .padding(.top, 9 * scale)
+            .padding(.bottom, 5 * scale)
+            .padding(.horizontal, 24 * scale)
+            .background(SeaGlass(scale: scale, locked: locked))
+            // satellite bubbles break the perfect capsule into something alive
+            .overlay(alignment: .topTrailing) {
+                SeaGlassDot(d: 13, scale: scale).offset(x: 3 * scale, y: -7 * scale)
+            }
+            .overlay(alignment: .bottomLeading) {
+                SeaGlassDot(d: 9, scale: scale).offset(x: -5 * scale, y: 5 * scale)
+            }
+            .shadow(color: Tokens.Palette.midnight.opacity(0.22), radius: 8 * scale, y: 5 * scale)
+            .offset(y: Wave.alternate(t, from: -2.4, to: 2.4, duration: 3.4, delay: delay) * scale)
+            .fixedSize()
+            .frame(width: 0, height: 0, alignment: .top)
+            .allowsHitTesting(false)
     }
 }

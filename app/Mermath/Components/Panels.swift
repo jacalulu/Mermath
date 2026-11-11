@@ -70,30 +70,70 @@ struct SolvedPanel: View {
     }
 }
 
-/// The corner home button every kids' game uses: a chunky geometric circle in
-/// the tap-me orange with a plain white house glyph and a hard offset shadow,
-/// deliberately crisp UI against the painted world behind it.
+/// The sea-glass material, the game's one language for floating UI: frosted
+/// water with a wet cyan cast, a crescent of light hugging the top-left
+/// curve, and a refraction rim. Locked UI gets dark glass.
+struct SeaGlass: View {
+    let scale: CGFloat
+    var locked = false
+
+    var body: some View {
+        ZStack {
+            Capsule().fill(.ultraThinMaterial)
+            Capsule().fill(Color(hex: 0x99E5FF, opacity: locked ? 0.08 : 0.18))
+            if locked {
+                Capsule().fill(Color(hex: 0x0A2238, opacity: 0.45))
+            }
+            Capsule().strokeBorder(Color.white.opacity(0.9), lineWidth: 3 * scale)
+                .mask(LinearGradient(colors: [.white, .clear],
+                                     startPoint: .topLeading, endPoint: .center))
+        }
+        .clipShape(Capsule())
+        .overlay(
+            Capsule().strokeBorder(
+                LinearGradient(
+                    colors: [.white.opacity(0.85), .white.opacity(locked ? 0.12 : 0.25)],
+                    startPoint: .topLeading, endPoint: .bottomTrailing),
+                lineWidth: 2 * scale)
+        )
+    }
+}
+
+/// A tiny bubble of the same glass, attached to a pill's silhouette.
+struct SeaGlassDot: View {
+    let d: CGFloat
+    let scale: CGFloat
+
+    var body: some View {
+        ZStack {
+            Circle().fill(.ultraThinMaterial)
+            Circle().fill(Color(hex: 0x99E5FF, opacity: 0.18))
+        }
+        .clipShape(Circle())
+        .overlay(Circle().strokeBorder(Color.white.opacity(0.7), lineWidth: 1.5 * scale))
+        .frame(width: d * scale, height: d * scale)
+    }
+}
+
+/// The corner home button in the sea-glass material, the house glyph in the
+/// same deep-sea ink as the labels.
 struct HomeButton: View {
     let scale: CGFloat
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
-            ZStack {
-                Circle()
-                    .fill(Color(hex: 0xC9641A))
-                    .offset(y: 5 * scale)
-                Circle()
-                    .fill(Color(hex: 0xFF9A3D))
-                Circle()
-                    .strokeBorder(.white.opacity(0.85), lineWidth: 3 * scale)
-                    .padding(3.5 * scale)
-                Image(systemName: "house.fill")
-                    .font(.system(size: 30 * scale, weight: .bold))
-                    .foregroundStyle(.white)
-                    .offset(y: -1.5 * scale)
-            }
-            .frame(width: 72 * scale, height: 72 * scale)
+            Image(systemName: "house.fill")
+                .font(.system(size: 29 * scale, weight: .bold))
+                .foregroundStyle(Color(hex: 0x1A3B5C))
+                .offset(y: -1 * scale)
+                .frame(width: 70 * scale, height: 70 * scale)
+                .background(SeaGlass(scale: scale))
+                .overlay(alignment: .topTrailing) {
+                    SeaGlassDot(d: 12, scale: scale)
+                        .offset(x: -1 * scale, y: 1 * scale)
+                }
+                .shadow(color: Tokens.Palette.midnight.opacity(0.22), radius: 8 * scale, y: 5 * scale)
         }
         .buttonStyle(.plain)
     }
