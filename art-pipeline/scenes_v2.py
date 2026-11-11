@@ -151,35 +151,59 @@ def scene_grotto_layers():
     return {n: s.svg_layer(n) for n in ('bg', 'floor', 'walls', 'curtain', 'bed', 'lights', 'lamp', 'lamp_face')}
 
 def scene_map_layers():
-    """Reef map: one seabed stepping down from the bright shallows on the left to the dark deep on the right, with a place on each step."""
+    """Reef map as a real dive, top to bottom: the sunlit surface with a rocky
+    shore shelf cupping the TIDE POOL right under the waterline; a sandy slope
+    down to the CORAL REEF ledge in open mid-water; then a cliff falling away
+    into the dark navy DEEP SEA in the bottom-right corner."""
     s = LS(747, 300, -230, 1000); r = s.r
-    open_water(s, ('#dcfcef', '#8fe3d6', '#35aab8', '#167c9b', '#0e5576'))
-    s.add(f'<rect width="{W}" height="{H}" fill="{s.lin([(.3, "#0b2e57", 0), (1, "#0b2e57", .6)], x1=0, y1=.2, x2=1, y2=.8)}"/>')
-    far = ''.join(kelp(r, x + r.uniform(-12, 12), 6, '#6fd0cd', (30, 56), (6, 10), (22, 38)) for x in (250, 330, 540, 612))
-    s.layer('kelp_far').add(f'<g filter="url(#b3)" opacity=".55">{far}</g>')
-    s.layer('bg').add('<path d="M-20 300 C120 280 260 300 400 350 C540 400 680 420 820 436 L820 620 L-20 620 Z" fill="#4ab4bd" opacity=".55" filter="url(#b3)"/>')
+    # Water that actually gets deep: pale at the surface, navy at the bottom,
+    # darkest toward the bottom-right where the deep sits
+    s.layer('bg'); s.water(['#eafff7', '#9fe9da', '#3db5be', '#15718f', '#0a3c60'], [0, .14, .44, .76, 1])
+    s.bloom(190, -30, 480, '#ffffff', .9, 300)
+    s.add(SURFACE)
+    s.add(f'<rect width="{W}" height="{H}" fill="{s.lin([(0, "#07284a", 0), (.5, "#07284a", 0), (1, "#07284a", .6)], x1=0, y1=0, x2=1, y2=1)}"/>')
     s.rays(RAYS, 1000, .5)
-    mid = kelp(r, 20, 12, '#1f8f95', (46, 86), (10, 16), (28, 46), lean=18) + kelp(r, 786, 11, '#14707c', (40, 72), (9, 15), (26, 44), lean=-12)
+    far = ''.join(kelp(r, x + r.uniform(-10, 10), 6, '#6fd0cd', (30, 52), (6, 10), (22, 36)) for x in (330, 384, 566, 616))
+    s.layer('kelp_far').add(f'<g filter="url(#b3)" opacity=".5">{far}</g>')
+    mid = kelp(r, 742, 12, '#1f8f95', (46, 82), (10, 16), (28, 46), lean=-14) + kelp(r, 788, 11, '#14707c', (40, 70), (9, 15), (26, 44), lean=-10)
     s.layer('kelp_mid').add(f'<g filter="url(#paintS)">{mid}</g>')
+    # The seabed: shelf at the surface, slope, ledge, cliff, deep floor
     s.layer('floor')
-    fl = 'M-20 326 C60 314 200 318 270 334 C300 342 304 372 322 388 C360 402 500 396 548 410 C580 420 580 448 600 462 C640 476 760 468 820 474 L820 620 L-20 620 Z'
+    fl = ('M-20 170 C60 162 150 164 212 172 C258 178 282 206 298 242 '
+          'C314 278 320 312 344 346 C364 372 386 392 426 402 C476 414 540 408 584 418 '
+          'C614 426 622 458 642 486 C660 510 702 522 760 526 C790 528 810 530 820 532 L820 620 L-20 620 Z')
     s.add(f'<path d="{fl}" fill="{s.lin(SAND)}"/>')
-    s.add(f'<g clip-path="{s.clip(fl)}"><rect width="{W}" height="{H}" filter="url(#caustic)" opacity=".5" style="mix-blend-mode:screen"/>'
-          f'<path d="M270 334 C300 342 304 372 322 388 L322 620 L262 620 Z" fill="#b98f5c" opacity=".55" filter="url(#b6)"/><path d="M548 410 C580 420 580 448 600 462 L600 620 L540 620 Z" fill="#8a744f" opacity=".6" filter="url(#b6)"/>'
-          f'<rect width="{W}" height="{H}" fill="{s.lin([(.34, "#0b2e57", 0), (.7, "#0b2e57", .42), (1, "#0b2e57", .62)], x1=0, y1=0, x2=1, y2=0)}"/></g>')
-    # 1. Tide Pool: sunlit sand, mossy rocks around a pale pool
-    s.add(boulder(s, 58, 356, 124, 66) + boulder(s, 232, 360, 100, 48, moss=False))
-    s.add('<ellipse cx="146" cy="356" rx="72" ry="17" fill="#e9fffa"/><ellipse cx="146" cy="358" rx="63" ry="12.5" fill="#9ee9de"/><ellipse cx="128" cy="354" rx="26" ry="4.5" fill="#ffffff" opacity=".7"/>')
-    s.add(seastar(214, 374, 10, '#ff7eb6', -80) + grass(r, 100, 378, 4, 14, 30, '#1f9c7c', '#3fc79a') + shell_on_sand(176, 384))
-    # 2. Coral Reef: bright coral on the middle step
-    s.add(coral(r, 372, 430, '#b23a2a', '#ffb347', 165, 4, 16, -93) + coral(r, 500, 432, '#5a3aa8', '#d2b4ff', 175, 4, 16, -86) + coral(r, 436, 440, '#b03070', '#ff9ecb', 124, 4, 14, -90))
-    s.add(mound(s, 340, 444, 32, 26, '#35c6a8', '#12788c') + mound(s, 530, 446, 28, 22, '#ffb347', '#c9562b') + shell_on_sand(410, 456))
-    # 3. Deep Sea: dark rock, a glowing cave mouth, cold crystals
-    s.add(boulder(s, 646, 492, 132, 90, lit='#7fb7c4', base='#245f78', dark='#0b2c48', moss=False) + boulder(s, 770, 494, 120, 72, lit='#7fb7c4', base='#245f78', dark='#0b2c48', moss=False))
-    s.add('<path d="M676 494 C684 434 730 434 740 494 Z" fill="#061c3a"/><ellipse cx="708" cy="480" rx="22" ry="15" fill="#5fe0ff" opacity=".55" filter="url(#b6)"/>')
-    s.add(''.join(f'<g transform="translate({x} {y}) rotate({rot})"><path d="M0 0 L{-h*.2:.0f} {-h*.7:.0f} L0 {-h} L{h*.2:.0f} {-h*.7:.0f} Z" fill="{c}"/><path d="M0 0 L0 {-h} L{h*.2:.0f} {-h*.7:.0f} Z" fill="#ffffff" opacity=".45"/></g>' for x, y, h, c, rot in ((684, 500, 36, '#8ff0ff', -16), (734, 502, 30, '#b79cff', 14), (708, 504, 22, '#8ff0ff', 2))))
-    s.add(boulder(s, 30, 600, 130, 40, moss=False) + shell_on_sand(300, 588) + seastar(520, 590, 8, '#ffd27a', -70))
-    s.layer('grass').add(grass(r, 120, 598, 6, 22, 46, '#1f9c7c', '#3fc79a') + grass(r, 590, 598, 6, 20, 42, '#1f9c7c', '#3fc79a'))
+    s.add(f'<g clip-path="{s.clip(fl)}">'
+          f'<rect width="{W}" height="480" filter="url(#caustic)" opacity=".5" style="mix-blend-mode:screen"/>'
+          # the two cliff faces in shadow
+          f'<path d="M298 242 C314 278 320 312 344 346 L344 620 L242 620 Z" fill="#b98f5c" opacity=".5" filter="url(#b6)"/>'
+          f'<path d="M584 418 C614 426 622 458 642 486 L642 620 L560 620 Z" fill="#6e5a3e" opacity=".6" filter="url(#b6)"/>'
+          # strata and a couple of half-buried rocks keep the slope face alive
+          f'<path d="M-20 300 C90 290 190 296 260 310 M-20 420 C100 408 220 416 300 432 M20 530 C140 518 280 526 380 544" '
+          f'fill="none" stroke="#c9a06c" stroke-width="7" opacity=".5" filter="url(#b6)"/>'
+          + boulder(s, 120, 372, 88, 40, moss=False) + boulder(s, 258, 492, 104, 48)
+          # depth shading: everything right of the second cliff sinks into navy
+          + f'<rect width="{W}" height="{H}" fill="{s.lin([(.4, "#0b2e57", 0), (.72, "#0b2e57", .4), (1, "#0b2e57", .68)], x1=0, y1=0, x2=1, y2=0)}"/>'
+          f'<rect width="{W}" height="{H}" fill="{s.lin([(.42, "#07284a", 0), (1, "#07284a", .55)], x1=0, y1=0, x2=0, y2=1)}"/></g>')
+    # 1. TIDE POOL, cupped in the shore shelf right under the waterline:
+    # rim rocks, a pale bright pool, starfish and a shell at its lip
+    s.add(boulder(s, 36, 176, 96, 46) + boulder(s, 224, 180, 86, 42, moss=False))
+    s.add('<ellipse cx="132" cy="178" rx="74" ry="17" fill="#e9fffa"/><ellipse cx="132" cy="180" rx="64" ry="12.5" fill="#9ee9de"/>'
+          '<ellipse cx="114" cy="176" rx="26" ry="4.5" fill="#ffffff" opacity=".75"/>')
+    s.add(seastar(198, 196, 10, '#ff7eb6', -80) + grass(r, 70, 200, 4, 12, 26, '#1f9c7c', '#3fc79a') + shell_on_sand(158, 206))
+    s.add(seastar(258, 206, 8, '#ffd27a', 24))
+    # 2. CORAL REEF on the mid-water ledge
+    s.add(coral(r, 420, 408, '#b23a2a', '#ffb347', 150, 4, 16, -93) + coral(r, 520, 410, '#5a3aa8', '#d2b4ff', 160, 4, 16, -86) + coral(r, 468, 418, '#b03070', '#ff9ecb', 116, 4, 14, -90))
+    s.add(mound(s, 386, 420, 30, 24, '#35c6a8', '#12788c') + mound(s, 556, 422, 26, 20, '#ffb347', '#c9562b') + shell_on_sand(452, 432))
+    # 3. DEEP SEA at the bottom of the second cliff: cold dark rock, a glowing
+    # cave mouth, crystals - everything already sunk in navy shade
+    s.add(boulder(s, 672, 556, 150, 84, lit='#5f93a8', base='#1c4a62', dark='#081f38', moss=False) + boulder(s, 786, 552, 120, 66, lit='#5f93a8', base='#1c4a62', dark='#081f38', moss=False))
+    s.add('<path d="M702 556 C710 492 760 492 770 556 Z" fill="#051a36"/>'
+          '<ellipse cx="736" cy="538" rx="30" ry="20" fill="#5fe0ff" opacity=".7" filter="url(#b6)"/>'
+          '<ellipse cx="736" cy="540" rx="12" ry="9" fill="#bdf4ff" opacity=".8" filter="url(#b3)"/>')
+    s.add(''.join(f'<g transform="translate({x} {y}) rotate({rot})"><path d="M0 0 L{-h*.2:.0f} {-h*.7:.0f} L0 {-h} L{h*.2:.0f} {-h*.7:.0f} Z" fill="{c}"/><path d="M0 0 L0 {-h} L{h*.2:.0f} {-h*.7:.0f} Z" fill="#ffffff" opacity=".45"/></g>' for x, y, h, c, rot in ((708, 562, 34, '#8ff0ff', -16), (756, 564, 28, '#b79cff', 14), (732, 566, 20, '#8ff0ff', 2))))
+    s.add(shell_on_sand(390, 442) + seastar(348, 388, 8, '#ffd27a', -70))
+    s.layer('grass').add(grass(r, 90, 204, 5, 14, 30, '#1f9c7c', '#3fc79a') + grass(r, 400, 410, 6, 18, 38, '#1f9c7c', '#3fc79a') + grass(r, 584, 424, 5, 16, 32, '#1f9c7c', '#3fc79a'))
     s.layer('bg'); s.finish(mott=.26, streak=.14, vig=0, grain=0)
     return {n: s.svg_layer(n) for n in ('bg', 'kelp_far', 'kelp_mid', 'floor', 'grass')}
 

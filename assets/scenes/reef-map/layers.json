@@ -1,45 +1,45 @@
 {
-  "designSpace": [
-    800,
-    600
-  ],
-  "order": "back to front",
-  "note": "x, y, w, h are in the 800x600 design space. Place every layer exactly here; do not eyeball positions.",
-  "layers": [
-    {
-      "file": "bg.jpg",
-      "x": 0,
-      "y": 0,
-      "w": 800,
-      "h": 600
-    },
-    {
-      "file": "kelp-far.webp",
-      "x": 192,
-      "y": 0,
-      "w": 504,
-      "h": 600
-    },
-    {
-      "file": "kelp-mid.webp",
-      "x": 0,
-      "y": 0,
-      "w": 800,
-      "h": 600
-    },
-    {
-      "file": "seabed.webp",
-      "x": 0,
-      "y": 206,
-      "w": 800,
-      "h": 394
-    },
-    {
-      "file": "seagrass.png",
-      "x": 92,
-      "y": 548,
-      "w": 520,
-      "h": 52
-    }
-  ]
+ "designSpace": [
+  800,
+  600
+ ],
+ "order": "back to front",
+ "note": "x, y, w, h are in the 800x600 design space. Place every layer exactly here; do not eyeball positions.",
+ "layers": [
+  {
+   "file": "bg.jpg",
+   "x": 0,
+   "y": 0,
+   "w": 800,
+   "h": 600
+  },
+  {
+   "file": "kelp-far.webp",
+   "x": 276,
+   "y": 0,
+   "w": 414,
+   "h": 600
+  },
+  {
+   "file": "kelp-mid.webp",
+   "x": 664,
+   "y": 0,
+   "w": 136,
+   "h": 600
+  },
+  {
+   "file": "seabed.webp",
+   "x": 0,
+   "y": 122,
+   "w": 800,
+   "h": 478
+  },
+  {
+   "file": "seagrass.png",
+   "x": 68,
+   "y": 170,
+   "w": 538,
+   "h": 260
+  }
+ ]
 }
