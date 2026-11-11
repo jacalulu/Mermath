@@ -773,6 +773,66 @@ def scene_props_layers():
         'whale_face_uhoh', 'hoard_left', 'hoard_right', 'hoard_floor', 'hoard_strings',
         'fgfan_a', 'fgfan_b', 'bigmap', 'digmound', 'digx', 'sign', 'icon_home', 'padlock2')}
 
+def scene_ui2_layers():
+    """The brand-guidelines UI set: every floating control as paint. A creamy
+    speech panel with a separate swooping tail, the orange pebble button, a
+    pebble home button with a navy painted house, the pearl-counter strand
+    with ten shell dimples, and the grotto's soft bubble ring."""
+    s = LS(97, 300, -230, 1000)
+    cream = s.lin([(0, '#FFFBEF', 1), (.7, '#F8ECCE', 1), (1, '#EEDCB2', 1)])
+    s.layer('bubblepanel')
+    s.add(f'<path d="M190 196 C320 178 560 182 672 200 C702 206 708 232 704 258 '
+          f'C700 288 676 302 638 308 C520 320 330 318 240 308 C204 304 190 288 186 262 '
+          f'C182 234 178 208 190 196 Z" fill="{cream}"/>'
+          f'<path d="M240 304 C340 314 540 314 636 304" fill="none" stroke="#E0C896" '
+          f'stroke-width="5" opacity=".55"/>'
+          f'<path d="M212 206 C330 190 560 192 660 208" fill="none" stroke="#FFFFFF" '
+          f'stroke-width="5" opacity=".8"/>')
+    s.layer('bubbletail')
+    s.add(f'<path d="M272 296 C266 340 244 374 204 400 C252 386 290 352 310 300 '
+          f'C298 304 284 302 272 296 Z" fill="{cream}"/>'
+          f'<path d="M270 310 C262 344 244 372 216 392" fill="none" stroke="#E0C896" '
+          f'stroke-width="3.5" opacity=".5"/>')
+    pebg = s.lin([(0, '#FFC06A', 1), (.45, '#FF9A3D', 1), (1, '#E97E22', 1)])
+    s.layer('pebble')
+    s.add(f'<path d="M152 242 C152 198 198 172 262 168 C342 162 440 162 518 170 '
+          f'C584 176 626 202 626 244 C626 288 582 312 514 318 C436 326 334 326 256 318 '
+          f'C194 312 152 286 152 242 Z" fill="{pebg}" stroke="#C9641A" stroke-width="3"/>'
+          f'<path d="M196 206 C280 184 480 182 576 204" fill="none" stroke="#FFE2B0" '
+          f'stroke-width="7" opacity=".85"/>'
+          f'<path d="M212 294 C320 310 480 308 572 288" fill="none" stroke="#C9641A" '
+          f'stroke-width="6" opacity=".5"/>'
+          f'<circle cx="238" cy="240" r="5" fill="#FFD79A" opacity=".7"/>'
+          f'<circle cx="540" cy="256" r="4" fill="#FFD79A" opacity=".6"/>')
+    sand = s.lin([(0, '#FFF6DE', 1), (1, '#E6CC9C', 1)])
+    s.layer('icon_home2')
+    s.add(f'<path d="M318 300 C316 254 352 222 400 220 C450 218 486 252 484 302 '
+          f'C482 346 448 378 398 378 C352 378 320 344 318 300 Z" fill="{sand}" '
+          f'stroke="#C9AE7C" stroke-width="3.5"/>'
+          f'<path d="M334 262 C352 238 376 226 400 224" fill="none" stroke="#FFFFFF" '
+          f'stroke-width="6" opacity=".8"/>'
+          f'<path d="M348 304 L400 256 L452 304 L436 304 L436 344 C436 350 430 354 424 354 '
+          f'L376 354 C370 354 364 350 364 344 L364 304 Z" fill="#1A3B5C"/>'
+          f'<path d="M392 354 L392 330 C392 322 408 322 408 330 L408 354 Z" fill="{sand}"/>')
+    s.layer('strand')
+    s.add('<path d="M214 282 C300 294 440 294 526 282" fill="none" stroke="#C9A878" stroke-width="6"/>'
+          '<path d="M214 280 C300 292 440 292 526 280" fill="none" stroke="#EEDCB2" stroke-width="2.5"/>')
+    for i in range(10):
+        x = 228 + i * 31.5
+        s.add(f'<ellipse cx="{x:.0f}" cy="286" rx="13.5" ry="12" fill="#C2A878" stroke="#A88E5E" stroke-width="2.5"/>'
+              f'<ellipse cx="{x:.0f}" cy="288.5" rx="9" ry="7" fill="#AE9264"/>'
+              f'<ellipse cx="{x - 3:.0f}" cy="281" rx="4" ry="2.5" fill="#E2CFA4" opacity=".8"/>')
+    s.layer('bubblering')
+    s.add('<path d="M400 228 C444 230 472 262 470 302 C468 344 436 372 398 370 '
+          'C356 368 330 336 332 298 C334 258 362 226 400 228 Z" fill="none" '
+          'stroke="#E4F4F6" stroke-width="7" opacity=".92"/>'
+          '<path d="M352 250 C338 266 332 282 332 298" fill="none" stroke="#FFFFFF" '
+          'stroke-width="5" opacity=".9"/>'
+          '<circle cx="462" cy="246" r="7" fill="none" stroke="#DFF0F2" stroke-width="4" opacity=".85"/>')
+    return {name: s.svg_layer(name) for name in (
+        'bubblepanel', 'bubbletail', 'pebble', 'icon_home2', 'strand', 'bubblering')}
+
+
 from frame import scene_home_layers
 
 SCENES2 = {
@@ -791,9 +851,11 @@ SCENES2 = {
     'journeya': (scene_journeya_layers, dict(bg='bg')),
     'journeyb': (scene_journeyb_layers, dict(bg='bg')),
     'journeyc': (scene_journeyc_layers, dict(bg='bg')),
+    'ui2': (scene_ui2_layers, dict(bubblepanel='prop', bubbletail='prop', pebble='prop',
+                                   icon_home2='prop', strand='prop', bubblering='prop')),
     'lettering': (__import__('lettering').scene_lettering_layers,
                   dict(lt_chewy='prop', lt_lucky='prop', lt_modak='prop', lt_titan='prop',
-                       name_tide='prop', name_coral='prop', name_deep='prop')),
+                       name_tide='prop', name_coral='prop', name_deep='prop', name_grotto='prop')),
     'props': (scene_props_layers, dict(lock='prop', afish='prop', afish_face='vector', whale='piece', whale_face='vector',
                                        whale_face_uhoh='vector', hoard_left='prop', hoard_right='prop',
                                        hoard_floor='prop', hoard_strings='vector',

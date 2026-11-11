@@ -109,11 +109,11 @@ struct GrottoScreen: View {
                     if index < Self.slotLabels.count {
                         let spot = item.slotSpot
                         ZStack {
-                            Circle().fill(Tokens.Palette.midnight.opacity(0.46))
-                            Circle().strokeBorder(
-                                style: StrokeStyle(lineWidth: 3 * s, dash: [8 * s, 6 * s])
-                            )
-                            .foregroundStyle(Tokens.Palette.pearl.opacity(0.95))
+                            Circle()
+                                .fill(Tokens.Palette.midnight.opacity(0.42))
+                                .blur(radius: 3 * s)
+                                .padding(4 * s)
+                            ArtImage("ui/bubble-ring.png")
                             Text(Self.slotLabels[min(index, Self.slotLabels.count - 1)])
                                 .font(baloo(16, weight: 700, scale: s))
                                 .foregroundStyle(Tokens.Palette.pearl)
@@ -138,15 +138,10 @@ struct GrottoScreen: View {
                     .stage(x: 0, y: 0, w: 800, h: 600)
                     .bleed()
 
-                Text("My grotto")
-                    .font(baloo(26, weight: 700, scale: s))
-                    .foregroundStyle(Tokens.Palette.midnight)
-                    .padding(.top, 7 * s)
-                    .padding(.bottom, 3 * s)
-                    .padding(.horizontal, 24 * s)
-                    .background(Capsule().fill(Tokens.Palette.pearl))
-                    .shadow(color: Tokens.Palette.midnight.opacity(0.28), radius: 7 * s, y: 6 * s)
-                    .stageTopLeft(x: 24, y: 24)
+                // The title as a painted lockup, not a pill
+                ArtImage("ui/names/grotto.png")
+                    .allowsHitTesting(false)
+                    .stage(x: 24, y: 16, w: 195, h: 195 * 210 / 532)
 
                 GoldButton(title: "Dive again", scale: s, action: onDiveAgain)
                     .stageTopRight(right: 24, y: 24)

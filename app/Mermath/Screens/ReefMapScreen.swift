@@ -77,10 +77,8 @@ struct ReefMapScreen: View {
                     .frame(width: 76 * s, height: 64 * s)
                     .allowsHitTesting(false)
                     .stage(x: 182, y: 84, w: 76, h: 64)
-                RisingBubble(t: t, duration: 6, delay: 1.5, scale: s)
-                    .stage(x: 148, y: 252, w: 12, h: 12)
-                GlassPill(name: "Tide Pool", t: t, scale: s)
-                    .stage(x: 174, y: 216, w: 0, h: 0)
+                NameLockup(path: "ui/names/tide.png", t: t, scale: s)
+                    .stage(x: 34, y: 177, w: 200, h: 83)
 
                 // Coral Reef on the mid-water ledge: the picked sister floats
                 // over the coral, her sign planted in the seagrass where the
@@ -96,10 +94,8 @@ struct ReefMapScreen: View {
                     .frame(width: 158 * s, height: 181 * s)
                     .allowsHitTesting(false)
                     .stage(x: 388, y: 220, w: 158, h: 181)
-                RisingBubble(t: t, duration: 7, delay: 3.5, scale: s)
-                    .stage(x: 398, y: 492, w: 13, h: 13)
-                GlassPill(name: "Coral Reef", t: t, scale: s, delay: -1.1)
-                    .stage(x: 424, y: 458, w: 0, h: 0)
+                NameLockup(path: "ui/names/coral.png", t: t, scale: s, delay: -1.1)
+                    .stage(x: 306, y: 428, w: 235, h: 84)
 
                 // Deep Sea, down the cliff in the dark corner: the padlock
                 // hangs on its sign until two clean dives open it
@@ -111,19 +107,20 @@ struct ReefMapScreen: View {
                     .stage(x: 602, y: 390, w: 174, h: 186)
                     GlowPulse(t: t, delay: -0.4)
                         .stage(x: 630, y: 468, w: 166, h: 80)
-                    GlassPill(name: "Deep Sea", t: t, scale: s, delay: -2.3)
-                        .stage(x: 672, y: 478, w: 0, h: 0)
+                    NameLockup(path: "ui/names/deep.png", t: t, scale: s, delay: -2.3)
+                        .stage(x: 572, y: 437, w: 200, h: 98)
                 } else {
-                    GlassPill(name: "Deep Sea", t: t, scale: s, delay: -2.3, locked: true)
-                        .stage(x: 672, y: 478, w: 0, h: 0)
-                    // The painted padlock sits locked around the pill's right
-                    // end, bobbing with it
+                    NameLockup(path: "ui/names/deep.png", t: t, scale: s, delay: -2.3)
+                        .opacity(0.88)
+                        .stage(x: 572, y: 437, w: 200, h: 98)
+                    // The painted padlock hangs off the lettering, bobbing
+                    // with it
                     ArtImage("props/padlock-rope.png")
                         .rotationEffect(.degrees(10))
                         .shadow(color: Tokens.Palette.midnight.opacity(0.5), radius: 5 * s, y: 4 * s)
-                        .offset(y: Wave.alternate(t, from: -2.4, to: 2.4, duration: 3.4, delay: -2.3) * s)
+                        .offset(y: Wave.alternate(t, from: -2.2, to: 2.2, duration: 3.6, delay: -2.3) * s)
                         .allowsHitTesting(false)
-                        .stage(x: 729, y: 462, w: 42, h: 75)
+                        .stage(x: 706, y: 484, w: 34, h: 61)
                 }
 
                 Vignette()
@@ -158,36 +155,17 @@ private struct TrailDot: View {
     }
 }
 
-/// The game's floating UI material: sea-glass. A frosted lens of water with a
-/// bright rim where it catches the light from above, drifting buoyantly like
-/// the game's own bubbles. Labels float in it over their places rather than
-/// pretending to be scenery. Locked places get dark glass and pearl ink.
-private struct GlassPill: View {
-    let name: String
+/// A painted name lockup (see art-pipeline/lettering.py) drifting gently in
+/// place: the word as an object of the world, per the brand guidelines.
+private struct NameLockup: View {
+    let path: String
     let t: Double
     let scale: CGFloat
     var delay: Double = 0
-    var locked = false
 
     var body: some View {
-        Text(name)
-            .font(baloo(25, weight: 700, scale: scale))
-            .foregroundStyle(locked ? Tokens.Palette.pearl.opacity(0.92) : Color(hex: 0x1A3B5C))
-            .padding(.top, 9 * scale)
-            .padding(.bottom, 5 * scale)
-            .padding(.horizontal, 24 * scale)
-            .background(SeaGlass(scale: scale, locked: locked))
-            // satellite bubbles break the perfect capsule into something alive
-            .overlay(alignment: .topTrailing) {
-                SeaGlassDot(d: 13, scale: scale).offset(x: 3 * scale, y: -7 * scale)
-            }
-            .overlay(alignment: .bottomLeading) {
-                SeaGlassDot(d: 9, scale: scale).offset(x: -5 * scale, y: 5 * scale)
-            }
-            .shadow(color: Tokens.Palette.midnight.opacity(0.22), radius: 8 * scale, y: 5 * scale)
-            .offset(y: Wave.alternate(t, from: -2.4, to: 2.4, duration: 3.4, delay: delay) * scale)
-            .fixedSize()
-            .frame(width: 0, height: 0, alignment: .top)
+        ArtImage(path)
+            .offset(y: Wave.alternate(t, from: -2.2, to: 2.2, duration: 3.6, delay: delay) * scale)
             .allowsHitTesting(false)
     }
 }

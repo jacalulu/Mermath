@@ -142,6 +142,7 @@ NAMES = {
     'tide': ('Tide Pool', 'light', ('#0F3A55', 0.72)),
     'coral': ('Coral Reef', 'deep', ('#FDF3DC', 0.78)),
     'deep': ('Deep Sea', 'light', ('#0C2A44', 0.75)),
+    'grotto': ('My grotto', 'light', ('#0A1E36', 0.5)),
 }
 
 

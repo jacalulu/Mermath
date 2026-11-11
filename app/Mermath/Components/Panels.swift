@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// The gold "tap me" button: gradient capsule, Baloo 700.
+/// The orange "tap me" pebble: a painted water-worn stone, Baloo 700.
 struct GoldButton: View {
     let title: String
     let scale: CGFloat
@@ -11,10 +11,11 @@ struct GoldButton: View {
             Text(title)
                 .font(baloo(Tokens.TypeScale.button, weight: 700, scale: scale))
                 .foregroundStyle(Tokens.Palette.midnight)
-                .padding(.top, 13 * scale)
-                .padding(.bottom, 9 * scale)
-                .padding(.horizontal, 24 * scale)
-                .background(Capsule().fill(Tokens.Gradients.button))
+                .padding(.top, 15 * scale)
+                .padding(.bottom, 12 * scale)
+                .padding(.horizontal, 30 * scale)
+                .background(ArtImage("ui/pebble-orange.png"))
+                .shadow(color: Tokens.Palette.midnight.opacity(0.3), radius: 6 * scale, y: 5 * scale)
         }
         .buttonStyle(.plain)
     }
@@ -115,25 +116,17 @@ struct SeaGlassDot: View {
     }
 }
 
-/// The corner home button in the sea-glass material, the house glyph in the
-/// same deep-sea ink as the labels.
+/// The corner home button: a painted sand pebble with a navy painted house,
+/// per the brand guidelines' material language.
 struct HomeButton: View {
     let scale: CGFloat
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
-            Image(systemName: "house.fill")
-                .font(.system(size: 29 * scale, weight: .bold))
-                .foregroundStyle(Color(hex: 0x1A3B5C))
-                .offset(y: -1 * scale)
-                .frame(width: 70 * scale, height: 70 * scale)
-                .background(SeaGlass(scale: scale))
-                .overlay(alignment: .topTrailing) {
-                    SeaGlassDot(d: 12, scale: scale)
-                        .offset(x: -1 * scale, y: 1 * scale)
-                }
-                .shadow(color: Tokens.Palette.midnight.opacity(0.22), radius: 8 * scale, y: 5 * scale)
+            ArtImage("ui/icon-home2.png")
+                .frame(width: 72 * scale, height: 72 * scale * 174 / 182)
+                .shadow(color: Tokens.Palette.midnight.opacity(0.35), radius: 6 * scale, y: 5 * scale)
         }
         .buttonStyle(.plain)
     }

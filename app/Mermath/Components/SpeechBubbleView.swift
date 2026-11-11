@@ -37,14 +37,11 @@ struct SpeechBubbleView: View {
                 }
             }
         }
-        .padding(.top, 9 * scale)
-        .padding(.bottom, 9 * scale)
-        .padding(.leading, 12 * scale)
-        .padding(.trailing, 26 * scale)
-        .background(
-            RoundedRectangle(cornerRadius: Tokens.Radius.speechBubble * scale)
-                .fill(Tokens.Palette.pearl)
-        )
+        .padding(.top, 10 * scale)
+        .padding(.bottom, 12 * scale)
+        .padding(.leading, 16 * scale)
+        .padding(.trailing, 34 * scale)
+        .background(ArtImage("ui/bubble-panel.png"))
         .shadow(color: Tokens.Palette.midnight.opacity(0.28), radius: 11 * scale, y: 10 * scale)
         .keyframeAnimator(initialValue: 1.0, trigger: popTrigger) { content, value in
             content.scaleEffect(value)
@@ -57,20 +54,9 @@ struct SpeechBubbleView: View {
     }
 }
 
-/// The small Pearl triangle pointing from the bubble to the crab.
-/// Frame 70x54, path M34 0 L66 0 L4 52 Z.
+/// The painted swoop from the bubble down toward the crab.
 struct SpeechBubbleTail: View {
     var body: some View {
-        GeometryReader { geo in
-            let sx = geo.size.width / 70
-            let sy = geo.size.height / 54
-            Path { p in
-                p.move(to: CGPoint(x: 34 * sx, y: 0))
-                p.addLine(to: CGPoint(x: 66 * sx, y: 0))
-                p.addLine(to: CGPoint(x: 4 * sx, y: 52 * sy))
-                p.closeSubpath()
-            }
-            .fill(Tokens.Palette.pearl)
-        }
+        ArtImage("ui/bubble-tail.png")
     }
 }
