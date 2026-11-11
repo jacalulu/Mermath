@@ -122,6 +122,12 @@ struct RootView: View {
             case .parent:
                 ParentScreen(store: model.store, onClose: { model.closeParent() })
                     .transition(.opacity)
+
+            #if DEBUG
+            case .debugLab:
+                DesignLabScreen()
+                    .transition(.opacity)
+            #endif
             }
         }
         .onAppear {
@@ -138,6 +144,7 @@ struct RootView: View {
                 case "deepSea": model.pick(.ophelia); model.startDive(.deepSea)
                 case "map": model.pick(.daphne)
                 case "chest": model.pick(.violet); model.debugShowChest()
+                case "designLab": model.debugShowLab()
                 case "grotto": model.pick(.violet); model.debugShowGrotto()
                 default: break
                 }

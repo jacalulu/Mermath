@@ -16,6 +16,9 @@ final class AppModel {
         case hunt(GrottoItem?)
         case grotto
         case parent
+        #if DEBUG
+        case debugLab
+        #endif
     }
 
     /// The story plays on launch; with Reduce Motion it is skipped entirely.
@@ -193,6 +196,10 @@ final class AppModel {
 
     func debugShowChest() {
         go(.chest(.starfishLamp))
+    }
+
+    func debugShowLab() {
+        go(.debugLab)
     }
 
     func debugShowGrotto() {
