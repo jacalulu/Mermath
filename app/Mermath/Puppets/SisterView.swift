@@ -61,6 +61,9 @@ struct SisterView: View {
     var armDuration: Double?
     /// The intro's sisters sleep by the shell bed until the sneeze.
     var asleep = false
+    /// 0 = drifting in place; 1 = swimming hard (the intro's entrances): the
+    /// tail and fluke sweep much wider and faster and the hair streams back.
+    var swim: Double = 0
 
     private func art(_ piece: String) -> ArtImage {
         ArtImage("characters/\(spec.folder)/\(piece).png")
@@ -70,7 +73,8 @@ struct SisterView: View {
         ZStack {
             art("hair")
                 .rotationEffect(
-                    .degrees(Wave.alternate(t, from: spec.hairFrom, to: spec.hairTo, duration: spec.hairDuration)),
+                    .degrees(Wave.alternate(t, from: spec.hairFrom, to: spec.hairTo, duration: spec.hairDuration)
+                             + swim * (5 + Wave.alternate(t, from: -3, to: 3, duration: 0.9))),
                     anchor: UnitPoint(x: 0.485, y: 0.359)
                 )
             if spec.hasPigtails {
@@ -88,13 +92,15 @@ struct SisterView: View {
             ZStack {
                 art("fluke")
                     .rotationEffect(
-                        .degrees(Wave.alternate(t, from: -10, to: 9, duration: spec.flukeDuration, delay: spec.flukeDelay)),
+                        .degrees(Wave.alternate(t, from: -10, to: 9, duration: spec.flukeDuration, delay: spec.flukeDelay)
+                                 + swim * Wave.alternate(t, from: -24, to: 22, duration: 0.5, delay: spec.flukeDelay)),
                         anchor: UnitPoint(x: 0.725, y: 0.846)
                     )
                 art("tail")
             }
             .rotationEffect(
-                .degrees(Wave.alternate(t, from: -2.5, to: 2.5, duration: spec.tailDuration, delay: spec.tailDelay)),
+                .degrees(Wave.alternate(t, from: -2.5, to: 2.5, duration: spec.tailDuration, delay: spec.tailDelay)
+                         + swim * Wave.alternate(t, from: -12, to: 12, duration: 0.75, delay: spec.tailDelay)),
                 anchor: UnitPoint(x: 0.485, y: 0.615)
             )
             art("arm")

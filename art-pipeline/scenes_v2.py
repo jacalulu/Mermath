@@ -540,6 +540,87 @@ def scene_props_layers():
         s.add(coral(fr, cx - 40, 600, c1, c2, 420, 5, 24, -92))
         s.add(coral(fr, cx + 80, 614, c1, c2, 280, 4, 18, -80))
 
+    # The big open treasure map for the intro's briefing: a real storybook
+    # chart on torn parchment - sea wash, an island chain carrying the three
+    # zones as little vignettes, a red dashed trail to a circled X, compass
+    # rose, and doodles in the margins. Readable at ~340 wide on screen.
+    import random as _r
+    s.layer('bigmap')
+    parch = s.lin([(0, '#fdf2d8', 1), (.6, '#f3ddb0', 1), (1, '#e2bf8c', 1)])
+    torn = ('M150 140 C200 118 260 132 320 120 C390 108 470 124 540 114 C600 106 644 124 654 144 '
+            'C670 182 652 230 666 280 C678 330 658 380 668 428 C676 470 658 502 638 514 '
+            'C568 530 480 512 400 524 C330 534 250 518 198 526 C164 532 142 508 138 478 '
+            'C128 420 148 360 134 300 C124 250 138 188 150 140 Z')
+    s.add(f'<path d="{torn}" fill="{parch}" stroke="#b8905c" stroke-width="5" stroke-linejoin="round"/>')
+    s.add(f'<path d="{torn}" fill="none" stroke="#8a6a3c" stroke-width="2.5" opacity=".5" transform="translate(4 5)"/>')
+    # Worn stains and a hand-drawn inner border
+    s.add('<ellipse cx="200" cy="180" rx="44" ry="26" fill="#a9834f" opacity=".14"/>'
+          '<ellipse cx="620" cy="470" rx="50" ry="30" fill="#a9834f" opacity=".13"/>'
+          '<ellipse cx="610" cy="160" rx="30" ry="20" fill="#a9834f" opacity=".11"/>'
+          '<ellipse cx="170" cy="470" rx="34" ry="22" fill="#a9834f" opacity=".11"/>')
+    s.add('<path d="M172 162 C300 148 480 150 630 144 M646 166 C636 280 650 380 648 492 '
+          'M630 506 C480 514 300 508 176 508 M158 486 C166 380 152 270 160 164" '
+          'fill="none" stroke="#b8905c" stroke-width="2.5" opacity=".55" stroke-dasharray="1 0"/>')
+    # The sea, washed over the middle of the chart, with wave squiggles
+    sea = s.lin([(0, '#b4e6e6', 1), (1, '#7fc3cf', 1)])
+    s.add(f'<path d="M190 200 C280 170 420 178 540 172 C610 168 638 210 630 270 '
+          f'C622 330 644 380 630 440 C618 486 560 496 480 490 C380 482 300 498 240 484 '
+          f'C196 474 178 440 186 390 C194 330 176 260 190 200 Z" fill="{sea}"/>')
+    for wx, wy in ((230, 220), (560, 200), (600, 330), (210, 420), (470, 470), (250, 330)):
+        s.add(f'<path d="M{wx} {wy} q9 -7 18 0 q9 7 18 0" fill="none" stroke="#5fa8ba" stroke-width="3" stroke-linecap="round"/>')
+    # The island chain, snaking from the tide pool down to the deep
+    sand_f = s.lin([(0, '#f7e6ba', 1), (1, '#dcb87e', 1)])
+    s.add(f'<path d="M226 206 C280 186 330 198 352 226 C372 250 356 276 384 296 '
+          f'C416 318 470 310 496 338 C520 364 506 396 530 418 C552 438 586 436 596 458 '
+          f'C604 476 586 492 556 490 C510 486 470 462 430 452 C390 442 348 420 330 390 '
+          f'C312 360 330 330 300 308 C268 286 232 288 216 258 C204 234 208 214 226 206 Z" '
+          f'fill="{sand_f}" stroke="#c9a05e" stroke-width="3.5"/>')
+    # Vignette 1, the Tide Pool: a bright turquoise pool with sea stars
+    s.add('<ellipse cx="282" cy="248" rx="34" ry="20" fill="#49c6c0"/>'
+          '<ellipse cx="278" cy="244" rx="20" ry="11" fill="#9fe9e2"/>')
+    s.add(f'<polygon points="{star(246, 272, 10, 4.2, -90)}" fill="#ff8f6b"/>'
+          f'<polygon points="{star(320, 238, 9, 3.8, -70)}" fill="#ff9ecb"/>'
+          f'<polygon points="{star(258, 224, 8, 3.4, -50)}" fill="#e85d75"/>')
+    s.add(shell_on_sand(316, 272) + shell_on_sand(238, 244))
+    # Vignette 2, the Coral Reef: a full painted coral garden with seagrass
+    s.add(coral(_r.Random(9), 436, 352, '#b03070', '#ff9ecb', 56, 3, 7, -88)
+          + coral(_r.Random(5), 466, 356, '#b23a2a', '#ffb347', 42, 2, 6, -78)
+          + coral(_r.Random(21), 412, 356, '#2f7c5c', '#7fd8a8', 34, 2, 5, -98)
+          + coral(_r.Random(13), 492, 372, '#7a3d9c', '#c79aea', 38, 2, 5, -82)
+          + coral(_r.Random(33), 390, 344, '#c9512a', '#ff9e6b', 30, 2, 5, -94))
+    s.add('<path d="M380 360 q-4 -14 2 -24 M470 384 q4 -12 -2 -22 M452 378 q-3 -10 2 -18" '
+          'fill="none" stroke="#49a07a" stroke-width="3" stroke-linecap="round"/>')
+    # Vignette 3, the Deep Sea: a jagged dark trench in the open water
+    s.add('<path d="M536 350 C548 328 586 320 612 332 C632 342 630 360 608 370 C580 382 544 372 536 350 Z" fill="#1b3a5c"/>'
+          '<path d="M548 350 C562 340 594 336 608 346" fill="none" stroke="#0d2338" stroke-width="4" stroke-linecap="round"/>'
+          '<circle cx="570" cy="352" r="3" fill="#bfe9ff" opacity=".9"/><circle cx="592" cy="356" r="2.4" fill="#bfe9ff" opacity=".75"/>')
+    # The red dashed trail, pool -> coral -> past the trench -> down to the X
+    s.add('<path d="M300 272 C330 300 356 318 396 330 C434 340 478 336 516 348 C548 358 560 396 570 436" '
+          'fill="none" stroke="#d94a3a" stroke-width="6.5" stroke-dasharray="15 13" stroke-linecap="round"/>')
+    s.add('<circle cx="580" cy="466" r="25" fill="none" stroke="#d94a3a" stroke-width="5"/>'
+          '<path d="M568 454 L592 478 M592 454 L568 478" stroke="#d94a3a" stroke-width="9" stroke-linecap="round"/>')
+    # Compass rose, pearls by the X, and margin doodles: fish, bubbles, kelp
+    s.add(f'<polygon points="{star(205, 450, 32, 8, -90, 4)}" fill="#8a6a3c"/>'
+          f'<polygon points="{star(205, 450, 22, 5.5, -90, 4)}" fill="#f3ddb0"/>'
+          f'<circle cx="205" cy="450" r="6" fill="#8a6a3c"/>'
+          f'<circle cx="205" cy="414" r="4.5" fill="#d94a3a"/>')
+    s.add('<circle cx="616" cy="490" r="6.5" fill="#fff6ea" stroke="#b89a74" stroke-width="2"/>'
+          '<circle cx="631" cy="483" r="5.5" fill="#fff6ea" stroke="#b89a74" stroke-width="2"/>'
+          '<circle cx="625" cy="498" r="4.5" fill="#fff6ea" stroke="#b89a74" stroke-width="2"/>')
+    def _doodlefish(x, y, c, flip=1):
+        return (f'<g transform="translate({x} {y}) scale({flip} 1)">'
+                f'<path d="M0 0 C8 -8 22 -8 28 0 C22 8 8 8 0 0 Z" fill="{c}"/>'
+                f'<path d="M28 0 L38 -7 L36 0 L38 7 Z" fill="{c}"/>'
+                f'<circle cx="7" cy="-1.5" r="1.8" fill="#fdf2d8"/></g>')
+    s.add(_doodlefish(500, 222, '#3a7d9c') + _doodlefish(560, 262, '#b03070', -1) + _doodlefish(222, 376, '#2f7c5c')
+          + _doodlefish(238, 318, '#e0762a') + _doodlefish(266, 342, '#3a7d9c') + _doodlefish(594, 414, '#49a07a', -1))
+    s.add('<circle cx="480" cy="200" r="4" fill="none" stroke="#5fa8ba" stroke-width="2"/>'
+          '<circle cx="492" cy="188" r="3" fill="none" stroke="#5fa8ba" stroke-width="2"/>'
+          '<circle cx="470" cy="186" r="2.4" fill="none" stroke="#5fa8ba" stroke-width="2"/>')
+    s.add('<path d="M606 220 q-8 -16 2 -30 q10 -14 4 -30" fill="none" stroke="#2f7c5c" stroke-width="4" stroke-linecap="round"/>'
+          '<path d="M606 220 q10 -12 6 -26" fill="none" stroke="#49a07a" stroke-width="3.5" stroke-linecap="round"/>'
+          '<path d="M248 486 q8 -14 -2 -26 M248 486 q-8 -10 -4 -22" fill="none" stroke="#2f7c5c" stroke-width="3.5" stroke-linecap="round"/>')
+
     # The pre-sneeze face: eyes squeezed shut, mouth wide open mid "aaah"
     s.layer('whale_face_uhoh').add(
         '<path d="M231 296 Q246 286 261 296" fill="none" stroke="#1b1030" stroke-width="6" stroke-linecap="round"/>'
@@ -580,7 +661,7 @@ def scene_props_layers():
     return {name: s.svg_layer(name) for name in (
         'lock', 'afish', 'afish_face', 'whale', 'whale_face',
         'whale_face_uhoh', 'hoard_left', 'hoard_right', 'hoard_floor', 'hoard_strings',
-        'fgfan_a', 'fgfan_b')}
+        'fgfan_a', 'fgfan_b', 'bigmap')}
 
 from frame import scene_home_layers
 
@@ -603,5 +684,5 @@ SCENES2 = {
     'props': (scene_props_layers, dict(lock='prop', afish='prop', afish_face='vector', whale='piece', whale_face='vector',
                                        whale_face_uhoh='vector', hoard_left='prop', hoard_right='prop',
                                        hoard_floor='prop', hoard_strings='vector',
-                                       fgfan_a='fg', fgfan_b='fg')),
+                                       fgfan_a='fg', fgfan_b='fg', bigmap='prop')),
 }

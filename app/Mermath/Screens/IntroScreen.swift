@@ -132,21 +132,21 @@ struct IntroScreen: View {
                         // bed until the rattling wakes them with a start
                         Group {
                             SisterView(spec: .ophelia, t: t, scale: s, asleep: tl < 18.1)
-                                .frame(width: 120 * s, height: 137 * s)
-                                .stage(x: dx + 224 + rattle, y: 296, w: 120, h: 137)
+                                .frame(width: 162 * s, height: 186 * s)
+                                .stage(x: dx + 203 + rattle, y: 254, w: 162, h: 186)
                             SisterView(spec: .daphne, t: t, scale: s, asleep: tl < 18.3)
-                                .frame(width: 104 * s, height: 119 * s)
-                                .stage(x: dx + 116 + rattle, y: 386, w: 104, h: 119)
+                                .frame(width: 140 * s, height: 160 * s)
+                                .stage(x: dx + 98 + rattle, y: 345, w: 140, h: 160)
                             SisterView(spec: .violet, t: t, scale: s, asleep: tl < 18.2)
-                                .frame(width: 104 * s, height: 119 * s)
+                                .frame(width: 140 * s, height: 160 * s)
                                 .scaleEffect(x: -1)
-                                .stage(x: dx + 354 + rattle, y: 376, w: 104, h: 119)
+                                .stage(x: dx + 336 + rattle, y: 335, w: 140, h: 160)
                         }
                         // Little sleep bubbles rising off each snoozing sister
                         if tl < 18.1 {
                             ForEach(0..<3, id: \.self) { i in
-                                let bx: CGFloat = [300, 190, 416][i]
-                                let by: CGFloat = [330, 410, 400][i]
+                                let bx: CGFloat = [296, 176, 408][i]
+                                let by: CGFloat = [300, 388, 378][i]
                                 let rise = (t * 26 + Double(i) * 53).truncatingRemainder(dividingBy: 120)
                                 ArtImage("props/bubble.png")
                                     .opacity(max(0, 0.8 - rise / 120))
@@ -346,26 +346,65 @@ struct IntroScreen: View {
                             .stage(x: 0, y: 0, w: 800, h: 600)
                     }
                     .bleed()
-                    // The crab pops onto his rock and hops as he talks
-                    let pop = easeOut(beat(tl, 30.1, 30.8))
-                    let hop = tl > 30.9 && tl < 50.6 ? abs(sin((tl - 30.9) * 2.6)) * 6.0 : 0.0
-                    CrabView(t: t, scale: s)
-                        .opacity(pop)
-                        .stage(x: 15, y: 204 + (1 - pop) * 60 - hop, w: 250, h: 211)
-                    // The culprit, peeking in sheepishly from the top corner
+                    // The culprit, peeking down sheepishly in the top-left
                     let peek = easeOut(beat(tl, 31.6, 32.7))
                     if peek > 0 {
                         WhaleIntroView(scale: s, uhoh: false, breathe: 0)
-                            .rotationEffect(.degrees(14))
-                            .scaleEffect(0.62)
-                            .stage(x: 350 + (1 - peek) * 320, y: -150, w: 568, h: 240)
+                            .rotationEffect(.degrees(-12))
+                            .scaleEffect(0.55)
+                            .opacity(peek)
+                            .stage(x: -60, y: -100 - (1 - peek) * 90, w: 568, h: 240)
                     }
-                    // The chest, grounded on the sand with its own shadow
+                    // The sisters SWIM in one by one - off screen to their
+                    // marks on a dipping curve, tails sweeping hard, leaning
+                    // into the motion, then settling into a drift. No fades.
+                    let sistersIn: [(SisterSpec, CGFloat, CGFloat, CGFloat, Double, Double)] = [
+                        (.ophelia, 260, 190, 225, 30.4, 0),
+                        (.daphne, 410, 310, 185, 31.3, -2.1),
+                        (.violet, 240, 340, 180, 32.2, -4.3),
+                    ]
+                    ForEach(0..<3, id: \.self) { i in
+                        let (spec, px, py, w, at, ph) = sistersIn[i]
+                        let travel = easeOut(beat(tl, at, at + 2.2))
+                        let swim = min(1, (1 - travel) * 3)
+                        SisterView(spec: spec, t: t, scale: s, swim: swim)
+                            .frame(width: w * s, height: w * 1.147 * s)
+                            .scaleEffect(x: i == 2 ? -1 : 1)
+                            .rotationEffect(.degrees((1 - travel) * 24 + swim * Wave.alternate(t, from: -4, to: 4, duration: 0.75, delay: ph)))
+                            .stage(x: px + (1 - travel) * -(px + 420) + Wave.alternate(t, from: -10, to: 10, duration: 5.2, delay: ph),
+                                   y: py - sin(travel * .pi) * 70 + (1 - travel) * 46
+                                      + Wave.alternate(t, from: -7, to: 7, duration: 4.1, delay: ph * 1.7),
+                                   w: w, h: w * 1.147)
+                    }
+                    // The ten pearls pop from the crab's claw onto one clean
+                    // arc along the sand, a necklace leading to the chest -
+                    // then sweep one by one INTO the chest, and it answers.
+                    ForEach(0..<10, id: \.self) { i in
+                        BriefingPearl(i: i, t: t, tl: tl, s: s)
+                    }
+                    // The crab, small in the lower-left foreground, hopping as
+                    // he talks and angled up toward the sisters
+                    let pop = easeOut(beat(tl, 30.1, 30.8))
+                    let hop = tl > 30.9 && tl < 50.6 ? abs(sin((tl - 30.9) * 2.6)) * 4.0 : 0.0
+                    CrabView(t: t, scale: s)
+                        .rotationEffect(.degrees(-6))
+                        .opacity(pop)
+                        .stage(x: 62, y: 392 + (1 - pop) * 60 - hop, w: 172, h: 145)
+                    // The chest, closed and grounded lower-right, its magic
+                    // leaking out of the seam as a warm pulsing glow
                     if tl > 38.2 {
                         let c = easeOut(beat(tl, 38.2, 38.8))
+                        // It pulses softly, then flares as the pearls pour in
+                        let feed = beat(tl, 39.0, 40.5)
+                        let pulse = min(1, 0.45 + 0.35 * Wave.alternate(t, from: 0, to: 1, duration: 1.8) + 0.5 * feed)
                         Ellipse()
                             .fill(Tokens.Palette.midnight.opacity(0.3 * c))
                             .stage(x: 592, y: 528, w: 170, h: 26)
+                        Ellipse()
+                            .fill(RadialGradient(colors: [Color(red: 1, green: 0.93, blue: 0.68).opacity(0.85 * pulse * c),
+                                                          Color(red: 1, green: 0.85, blue: 0.5).opacity(0)],
+                                                 center: .center, startRadius: 0, endRadius: 60 * s))
+                            .stage(x: 615, y: 400, w: 120, h: 90)
                         ArtImage("scenes/treasure-chest/chest-box.png")
                             .scaleEffect(0.6 + c * 0.4, anchor: .bottom)
                             .opacity(c)
@@ -373,45 +412,20 @@ struct IntroScreen: View {
                         TwinkleStar(t: t, duration: 1.6).stage(x: 592, y: 430, w: 24, h: 24)
                         TwinkleStar(t: t, duration: 2.0, delay: 0.7).stage(x: 748, y: 480, w: 20, h: 20)
                     }
-                    // Ten pearls arc from the crab's claw down into the chest
-                    ForEach(0..<10, id: \.self) { i in
-                        let at = 34.6 + Double(i) * 0.36
-                        if tl > at {
-                            let a = easeOut(beat(tl, at, at + 0.3))
-                            let f = Double(i) / 9
-                            ArtImage("ui/pearl.png")
-                                .shadow(color: Tokens.Palette.pearl.opacity(0.8), radius: 5 * s)
-                                .scaleEffect(0.5 + a * 0.5)
-                                .opacity(a)
-                                .stage(x: 215 + CGFloat(f) * 445,
-                                       y: 290 - sin(.pi * f) * 130 + CGFloat(f) * 160, w: 26, h: 26)
-                        }
-                    }
-                    // The map unfurls up out of the chest when he names it
-                    if tl > 40.2 {
-                        let mp = easeOut(beat(tl, 40.2, 40.8))
-                        ArtImage("ui/icon-map.png")
-                            .scaleEffect(0.4 + mp * 0.6, anchor: .bottom)
-                            .opacity(mp)
-                            .offset(y: Wave.bob(t, from: 0, to: -6, duration: 2.6) * s)
-                            .stage(x: 630, y: 340 + (1 - mp) * 70, w: 92, h: 92)
-                    }
-                    // The sisters swim in one by one and drift while they listen
-                    let sistersIn: [(SisterSpec, CGFloat, CGFloat, CGFloat, Double, Double)] = [
-                        (.ophelia, 330, 220, 172, 30.6, 0),
-                        (.daphne, 470, 330, 152, 31.2, -2.1),
-                        (.violet, 282, 360, 152, 31.8, -4.3),
-                    ]
-                    ForEach(0..<3, id: \.self) { i in
-                        let (spec, px, py, w, at, ph) = sistersIn[i]
-                        let arrive = easeOut(beat(tl, at, at + 1.1))
-                        SisterView(spec: spec, t: t, scale: s)
-                            .frame(width: w * s, height: w * 1.147 * s)
-                            .scaleEffect(x: i == 2 ? -1 : 1)
-                            .opacity(arrive)
-                            .stage(x: px + (1 - arrive) * -240 + Wave.alternate(t, from: -14, to: 14, duration: 5.2, delay: ph),
-                                   y: py + Wave.alternate(t, from: -8, to: 8, duration: 4.1, delay: ph * 1.7),
-                                   w: w, h: w * 1.147)
+                    // A foreground coral fan anchors the lower-right corner
+                    ArtImage("props/coral-fan-a.png")
+                        .stage(x: 665, y: 475, w: 230, h: 180)
+                        .opacity(0.95)
+                    // The treasure map - the real, open parchment - bursts out
+                    // of the chest when he names it and hangs big in the sky
+                    if tl > 40.5 {
+                        let mp = easeOut(beat(tl, 40.5, 41.3))
+                        ArtImage("props/big-map.png")
+                            .scaleEffect(0.18 + mp * 0.82)
+                            .opacity(min(1, mp * 2))
+                            .rotationEffect(.degrees((1 - mp) * -14 + Wave.alternate(t, from: -1.4, to: 1.4, duration: 3.4)))
+                            .offset(y: Wave.bob(t, from: 0, to: -7, duration: 2.6) * s)
+                            .stage(x: 448 + (1 - mp) * 180, y: 54 + (1 - mp) * 358, w: 330, h: 258)
                     }
                 }
 
@@ -424,7 +438,7 @@ struct IntroScreen: View {
             .onChange(of: Int(t * 10)) {
                 if start == nil { start = t }
                 for (i, at, prompt) in [(1, 0.6, PromptScript.intro1),
-                                        (2, 12.9, PromptScript.intro2),
+                                        (2, 12.45, PromptScript.intro2),
                                         (3, 22.4, PromptScript.intro3),
                                         (4, 30.4, PromptScript.rally1),
                                         (5, 33.9, PromptScript.rally2),
@@ -449,6 +463,42 @@ struct IntroScreen: View {
             guard !finished else { return }
             finished = true
             onDone(spoken.contains(7))
+        }
+    }
+}
+
+/// One pearl of the briefing's chain. It pops out of the crab's claw and arcs
+/// to its slot on a necklace line along the sand that leads the eye to the
+/// chest; when the crab names the chest, it arcs on into the lock and is
+/// swallowed (the chest is drawn over it).
+private struct BriefingPearl: View {
+    static let slots: [(x: CGFloat, y: CGFloat)] = [
+        (212, 448), (258, 476), (308, 496), (362, 508), (418, 513),
+        (474, 511), (528, 501), (576, 487), (616, 472), (648, 460),
+    ]
+    static let claw = (x: CGFloat(206), y: CGFloat(426))
+    static let lock = (x: CGFloat(672), y: CGFloat(486))
+    let i: Int
+    let t: Double
+    let tl: Double
+    let s: CGFloat
+
+    private func ease(_ v: Double) -> Double { 1 - pow(1 - min(max(v, 0), 1), 3) }
+
+    var body: some View {
+        let slot = Self.slots[i]
+        let f1 = ease((tl - (34.6 + Double(i) * 0.36)) / 0.55)
+        let f2 = ease((tl - (39.0 + Double(i) * 0.13)) / 0.45)
+        if f1 > 0 && f2 < 1 {
+            let fly = f2 > 0 ? f2 : f1
+            let fx = f2 > 0 ? slot.x + (Self.lock.x - slot.x) * fly : Self.claw.x + (slot.x - Self.claw.x) * fly
+            let fy = (f2 > 0 ? slot.y + (Self.lock.y - slot.y) * fly : Self.claw.y + (slot.y - Self.claw.y) * fly)
+                     - sin(.pi * fly) * 46
+            ArtImage("ui/pearl.png")
+                .shadow(color: Tokens.Palette.pearl.opacity(0.8), radius: 5 * s)
+                .scaleEffect(0.4 + 0.6 * f1 - 0.2 * f2)
+                .offset(y: Wave.alternate(t, from: -3, to: 3, duration: 2.8, delay: Double(i) * -0.35) * s * f1 * (1 - f2))
+                .stage(x: fx, y: fy, w: 26, h: 26)
         }
     }
 }

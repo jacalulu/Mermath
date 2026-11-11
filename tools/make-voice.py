@@ -91,7 +91,7 @@ def prompts():
 
 # ---------------- ElevenLabs (SDK; reads ELEVENLABS_API_KEY from the env) ----------------
 
-ELEVEN_CAST = {'crab': 'Shelly the Crab', 'narrator': 'Shelly the Crab'}  # one voice: Shelly tells the whole story
+ELEVEN_CAST = {'crab': 'Shelly Sunny', 'narrator': 'Shelly Sunny'}  # one voice: sunny, calm delivery
 ELEVEN_MODEL = 'eleven_v4'  # v4 supports only stability/similarity settings
 
 
@@ -119,7 +119,7 @@ def eleven_tts(client, voice_id, text, path_mp3):
         voice_id=voice_id,
         model_id=ELEVEN_MODEL,
         output_format='mp3_44100_128',
-        voice_settings=VoiceSettings(stability=0.5, similarity_boost=0.75),
+        voice_settings=VoiceSettings(stability=0.68, similarity_boost=0.75),  # higher stability = no yelling
     )
     with open(path_mp3, 'wb') as f:
         for chunk in audio:

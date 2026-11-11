@@ -91,10 +91,10 @@ struct GrottoScreen: View {
                         .transition(.opacity)
                 }
 
-                // The visiting mermaid
+                // The visiting mermaid, big - this is her home
                 SisterView(spec: child.puppet, t: t, scale: s)
-                    .frame(width: 226 * s, height: 259 * s)
-                    .stage(x: 118, y: 226, w: 226, h: 259)
+                    .frame(width: 280 * s, height: 321 * s)
+                    .stage(x: 80, y: 210, w: 280, h: 321)
 
                 // Dashed circles for what is still to come
                 let remaining = GrottoItem.allCases.filter { !progress.grottoItems.contains($0) }
