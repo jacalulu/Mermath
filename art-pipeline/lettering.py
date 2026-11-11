@@ -21,10 +21,23 @@ DEFS = (
     '<linearGradient id="creamg" x1="0" y1="0" x2="0" y2="1">'
     '<stop offset="0" stop-color="#FFFBEA"/><stop offset=".72" stop-color="#F6E2B2"/>'
     '<stop offset="1" stop-color="#EBCE96"/></linearGradient>'
+    '<linearGradient id="navyg" x1="0" y1="0" x2="0" y2="1">'
+    '<stop offset="0" stop-color="#23506E"/><stop offset=".75" stop-color="#16324E"/>'
+    '<stop offset="1" stop-color="#102640"/></linearGradient>'
     '<radialGradient id="pearlg" cx=".35" cy=".3" r=".85">'
     '<stop offset="0" stop-color="#FFFFFF"/><stop offset=".55" stop-color="#FFF0E0"/>'
     '<stop offset="1" stop-color="#E2BFA0"/></radialGradient>'
+    '<filter id="pocketb" x="-40%" y="-40%" width="180%" height="180%">'
+    '<feGaussianBlur stdDeviation="11"/></filter>'
 )
+
+# Two inks, chosen by the value of the ground a name sits on: cream letters
+# with a navy shadow for dark-to-mid grounds, navy letters with a warm halo
+# for light grounds (sand, sky). Picking per placement is the contrast rule.
+INKS = {
+    'light': dict(fill='url(#creamg)', sh='#0E2C42', shop=0.4),
+    'deep': dict(fill='url(#navyg)', sh='#FFF4D8', shop=0.6),
+}
 
 
 def _glyphs(path, text):
@@ -64,21 +77,38 @@ def _letters(gl, k, baseline, cx, tracking=0.97):
     return out, x
 
 
-def _lockup(key, text='Coral Reef', cap=74.0, baseline=330.0, cx=400.0):
+def _lockup(key, text='Coral Reef', cap=74.0, baseline=330.0, cx=400.0, ink='light',
+            pocket=None):
     from fontTools.pens.boundsPen import BoundsPen
     path = os.path.join(FDIR, FONTS[key])
     gl, upem = _glyphs(path, text)
     k = cap / (upem * 0.7)
     letters, xend = _letters(gl, k, baseline, cx)
+    style = INKS[ink]
+    parts = []
+
+    # Pass 0: the quiet pocket - a soft zone-tinted wash that guarantees the
+    # worst part of any ground stays far enough from the ink (the scrim every
+    # shipping game hides behind its labels, painted instead of digital)
+    if pocket:
+        color, op = pocket
+        tw = sum(w for _, _, w in gl) * k * 0.97
+        pcx, pcy = cx, baseline - cap * 0.38
+        parts.append(
+            f'<g filter="url(#pocketb)" opacity="{op}">'
+            f'<ellipse cx="{pcx:.0f}" cy="{pcy:.0f}" rx="{tw / 2 + 34:.0f}" ry="{cap * 0.98:.0f}" fill="{color}"/>'
+            f'<ellipse cx="{pcx + 14:.0f}" cy="{pcy + 10:.0f}" rx="{tw / 2 + 10:.0f}" ry="{cap * 0.74:.0f}" '
+            f'fill="{color}" transform="rotate(-2 {pcx:.0f} {pcy:.0f})"/></g>')
 
     def glyph_el(d, x, y, rot, fill, opacity=1.0, dx=0.0, dyo=0.0):
         return (f'<g transform="translate({x + dx:.1f} {y + dyo:.1f}) rotate({rot})" opacity="{opacity}">'
                 f'<path transform="scale({k:.5f} {-k:.5f})" d="{d}" fill="{fill}"/></g>')
 
     # Pass 1: one soft painted shadow under the whole word (no contour lines)
-    parts = [glyph_el(d, x, y, rot, '#0E2C42', 0.4, 4.0, 7.0) for _, d, x, y, rot, _ in letters]
-    # Pass 2: the letters themselves, cream with a deeper foot
-    parts += [glyph_el(d, x, y, rot, 'url(#creamg)') for _, d, x, y, rot, _ in letters]
+    parts += [glyph_el(d, x, y, rot, style['sh'], style['shop'], 4.0, 7.0)
+              for _, d, x, y, rot, _ in letters]
+    # Pass 2: the letters themselves
+    parts += [glyph_el(d, x, y, rot, style['fill']) for _, d, x, y, rot, _ in letters]
 
     # The gag, kept light: a small pearl nested in the first o's counter
     font = TTFont(path)
@@ -106,5 +136,17 @@ def _lockup(key, text='Coral Reef', cap=74.0, baseline=330.0, cx=400.0):
             f'height="600"><defs>{DEFS}</defs>{"".join(parts)}</svg>')
 
 
+# The game's place names: ink chosen by the ground's value, pocket tinted by
+# the zone's own palette (teal shallows, warm sand, deep navy).
+NAMES = {
+    'tide': ('Tide Pool', 'light', ('#0F3A55', 0.72)),
+    'coral': ('Coral Reef', 'deep', ('#FDF3DC', 0.78)),
+    'deep': ('Deep Sea', 'light', ('#0C2A44', 0.75)),
+}
+
+
 def scene_lettering_layers():
-    return {f'lt_{key}': _lockup(key) for key in FONTS}
+    layers = {f'lt_{key}': _lockup(key) for key in FONTS}
+    layers.update({f'name_{n}': _lockup('chewy', text=t, ink=i, pocket=p)
+                   for n, (t, i, p) in NAMES.items()})
+    return layers
