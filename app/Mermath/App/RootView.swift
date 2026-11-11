@@ -127,6 +127,12 @@ struct RootView: View {
             case .debugLab:
                 DesignLabScreen()
                     .transition(.opacity)
+            case .debugCompA:
+                MapConceptA()
+                    .transition(.opacity)
+            case .debugCompB:
+                MapConceptB()
+                    .transition(.opacity)
             #endif
             }
         }
@@ -145,6 +151,8 @@ struct RootView: View {
                 case "map": model.pick(.daphne)
                 case "chest": model.pick(.violet); model.debugShowChest()
                 case "designLab": model.debugShowLab()
+                case "compA": model.debugShowComp(false)
+                case "compB": model.debugShowComp(true)
                 case "grotto": model.pick(.violet); model.debugShowGrotto()
                 default: break
                 }

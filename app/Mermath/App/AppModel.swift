@@ -18,6 +18,8 @@ final class AppModel {
         case parent
         #if DEBUG
         case debugLab
+        case debugCompA
+        case debugCompB
         #endif
     }
 
@@ -200,6 +202,10 @@ final class AppModel {
 
     func debugShowLab() {
         go(.debugLab)
+    }
+
+    func debugShowComp(_ b: Bool) {
+        go(b ? .debugCompB : .debugCompA)
     }
 
     func debugShowGrotto() {
