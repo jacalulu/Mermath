@@ -60,7 +60,9 @@ def prompts():
     out.append(('intro-4', 'Oh no! The treasures washed away! Who is diving today?', 'crab'))
     out.append(('intro-rally-1', 'Oh no! We have to win the treasures back!', 'crab'))
     out.append(('intro-rally-2', 'Dive down and find the right numbers to earn pearls. Ten pearls open a treasure chest!', 'crab'))
-    out.append(('intro-rally-3', 'Who is diving today?', 'crab'))
+    out.append(('intro-rally-2b', 'Dive down and find the right numbers to earn pearls. Ten pearls, and the magic chest will show you a map to a lost treasure. Follow it, and bring the treasure home!', 'crab'))
+    out.append(('intro-rally-ask', 'Can you help rescue all the treasures?', 'crab'))
+    out.append(('intro-rally-3', 'So, who is diving today?', 'crab'))
     # Treasure hunt
     out.append(('chest-map', 'And look! A treasure map!', 'narrator'))
     out.append(('hunt-intro', 'Follow the map! Can you find all the treasures?', 'crab'))
@@ -89,7 +91,7 @@ def prompts():
 
 # ---------------- ElevenLabs (SDK; reads ELEVENLABS_API_KEY from the env) ----------------
 
-ELEVEN_CAST = {'crab': 'Jessica', 'narrator': 'Sarah'}  # premade voices, by first name
+ELEVEN_CAST = {'crab': 'Shelly the Crab', 'narrator': 'Shelly the Crab'}  # one voice: Shelly tells the whole story
 ELEVEN_MODEL = 'eleven_v4'  # v4 supports only stability/similarity settings
 
 
@@ -99,10 +101,15 @@ def eleven_client():
 
 
 def eleven_voices(client):
-    """Premade voices only (Voice Library voices 402 on free plans), keyed by
-    first name: the dashboard lists them as 'Jessica - Playful, Bright, Warm'."""
-    return {v.name.split(' - ')[0].strip(): v.voice_id
-            for v in client.voices.get_all().voices if v.category == 'premade'}
+    """The account's own designed voices (by full name) plus the premade ones
+    (keyed by first name: the dashboard lists 'Sarah - Mature, Reassuring...')."""
+    out = {}
+    for v in client.voices.get_all().voices:
+        if v.category == 'premade':
+            out[v.name.split(' - ')[0].strip()] = v.voice_id
+        else:
+            out[v.name] = v.voice_id
+    return out
 
 
 def eleven_tts(client, voice_id, text, path_mp3):

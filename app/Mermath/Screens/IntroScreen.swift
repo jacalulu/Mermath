@@ -53,58 +53,49 @@ struct IntroScreen: View {
                         ArtImage("scenes/intro/home-bg.jpg")
                             .stage(x: dx - 1, y: 0, w: 802, h: 600)
 
-                        // The whale: approaches outside, squeezes IN through
-                        // the window, sniffs the shelves, inflates - and the
-                        // sneeze recoil rockets it backward out again.
-                        // Drawn twice: once behind the wall (seen through the
-                        // hole), once in front, clipped at the window's rim,
-                        // so it truly comes through.
-                        let whaleOn = tl > 12.5 && tl < 21.6
-                        let approach = easeOut(beat(tl, 12.5, 15.2))
-                        let through = smooth(beat(tl, 15.2, 16.8))
-                        let inflate = beat(tl, 17.8, 20.0)
-                        let lunge = beat(tl, 20.05, 20.3)
-                        let recoil = easeOut(beat(tl, 20.3, 21.5))
-                        // Through the hole it shrinks a touch so its body fits
-                        // the opening - squeezing, cartoon style, not clipping.
-                        let scaleW = 0.62 + through * 0.12 + inflate * 0.08 + lunge * 0.05 - recoil * 0.28
-                        let wx = dx + 900 - approach * 340 - through * 270 - lunge * 60 + recoil * 980
-                        let wy = 172 + through * 8 + Wave.alternate(t, from: -6, to: 6, duration: 3.1)
-                        let whaleBody = WhaleIntroView(
-                            scale: s,
-                            uhoh: tl > 16.6 && tl < 20.6,
-                            breathe: inflate > 0 ? sin(inflate * 3.4 * .pi) * 0.05 : 0,
-                            facingRight: false
-                        )
-                        if whaleOn {
-                            whaleBody
-                                .scaleEffect(scaleW)
-                                .rotationEffect(.degrees(recoil * 10))
-                                .stage(x: wx, y: wy, w: 568, h: 240)
+                        // Fish drift past outside the window while all is calm
+                        if tl < 17.8 {
+                            FishSwim(t: t, travel: 920, bobDown: 6, bobUp: 7, duration: 26, delay: -6, scale: s)
+                                .stage(x: dx + 830, y: 240, w: 40, h: 25)
+                            FishSwim(t: t, travel: 920, bobDown: 6, bobUp: 7, duration: 31, delay: -19, scale: s)
+                                .stage(x: dx + 850, y: 330, w: 30, h: 19)
+                        }
+
+                        // The whale LEANS INTO the window - it never crosses
+                        // the plane, so the painted rim does all the
+                        // occlusion and no layer ever has to split. Its face
+                        // grows to fill the opening like a giant peering
+                        // into a dollhouse, and the sneeze recoil throws it
+                        // back into the open water.
+                        if tl > 12.5 && tl < 21.6 {
+                            let approach = easeOut(beat(tl, 12.5, 15.2))
+                            let lean = smooth(beat(tl, 15.2, 16.8))
+                            let inflate = beat(tl, 17.8, 20.0)
+                            let lunge = beat(tl, 20.05, 20.3)
+                            let recoil = easeOut(beat(tl, 20.3, 21.5))
+                            let scaleW = 0.55 + lean * 0.3 + inflate * 0.1 + lunge * 0.08 - recoil * 0.3
+                            let wx = dx + 860 - approach * 160 - lean * 150 - lunge * 30 + recoil * 900
+                            let wy = 172 + Wave.alternate(t, from: -6, to: 6, duration: 3.1)
+                            WhaleIntroView(
+                                scale: s,
+                                uhoh: tl > 16.6 && tl < 20.6,
+                                breathe: inflate > 0 ? sin(inflate * 3.4 * .pi) * 0.05 : 0,
+                                facingRight: false
+                            )
+                            .scaleEffect(scaleW)
+                            .rotationEffect(.degrees(recoil * 10))
+                            .stage(x: wx, y: wy, w: 568, h: 240)
+                        }
+                        // The tickling frond at the window's lower rim,
+                        // in front of the whale, behind the wall
+                        if tl > 16.2 && tl < 20.1 {
+                            KelpLayer(t: t, path: "scenes/tide-pool/seagrass.png",
+                                      from: -16, to: 16, duration: 0.5, pivot: UnitPoint(x: 0.5, y: 1))
+                                .stage(x: dx + 580, y: 428, w: 120, h: 56)
                         }
 
                         ArtImage("scenes/intro/home-wall.png")
                             .stage(x: dx - 1, y: 0, w: 802, h: 600)
-
-                        // The front half of the whale, inside the room - only
-                        // once it has actually crossed the window plane, so
-                        // the approach stays properly behind the rim
-                        if whaleOn && tl > 15.35 && tl < 20.95 {
-                            ZStack {
-                                whaleBody
-                                    .scaleEffect(scaleW)
-                                    .rotationEffect(.degrees(recoil * 10))
-                                    .stage(x: wx, y: wy, w: 568, h: 240)
-                            }
-                            .stage(x: 0, y: 0, w: 800, h: 600)
-                            .clipShape(InsideRoom(dx: dx, scale: s))
-                        }
-                        // The tickling frond, by the shelves it sniffs
-                        if tl > 16.2 && tl < 20.1 {
-                            KelpLayer(t: t, path: "scenes/tide-pool/seagrass.png",
-                                      from: -16, to: 16, duration: 0.5, pivot: UnitPoint(x: 0.5, y: 1))
-                                .stage(x: dx + 120, y: 420, w: 120, h: 56)
-                        }
 
                         // The shelf treasures (gone once the sneeze hits)
                         ArtImage("scenes/intro/home-items.png")
@@ -135,6 +126,32 @@ struct IntroScreen: View {
                                 .stage(x: dx + 212 + rattle - sc * 800,
                                        y: 442 + Wave.keyframes(sc, [(0, 0), (0.35, 230), (0.52, 150), (1, 480)]),
                                        w: 220, h: 148)
+                        }
+
+                        // The sisters themselves, asleep around their shell
+                        // bed until the rattling wakes them with a start
+                        Group {
+                            SisterView(spec: .ophelia, t: t, scale: s, asleep: tl < 18.1)
+                                .frame(width: 104 * s, height: 119 * s)
+                                .stage(x: dx + 236 + rattle, y: 314, w: 104, h: 119)
+                            SisterView(spec: .daphne, t: t, scale: s, asleep: tl < 18.3)
+                                .frame(width: 92 * s, height: 105 * s)
+                                .stage(x: dx + 126 + rattle, y: 398, w: 92, h: 105)
+                            SisterView(spec: .violet, t: t, scale: s, asleep: tl < 18.2)
+                                .frame(width: 92 * s, height: 105 * s)
+                                .stage(x: dx + 352 + rattle, y: 388, w: 92, h: 105)
+                        }
+                        // Little sleep bubbles rising off each snoozing sister
+                        if tl < 18.1 {
+                            ForEach(0..<3, id: \.self) { i in
+                                let bx: CGFloat = [300, 190, 416][i]
+                                let by: CGFloat = [330, 410, 400][i]
+                                let rise = (t * 26 + Double(i) * 53).truncatingRemainder(dividingBy: 120)
+                                ArtImage("props/bubble.png")
+                                    .opacity(max(0, 0.8 - rise / 120))
+                                    .stage(x: dx + bx + sin(t * 2 + Double(i)) * 5,
+                                           y: by - rise, w: 11 + CGFloat(i) * 2, h: 11 + CGFloat(i) * 2)
+                            }
                         }
 
                         // THE BLAST: shock rings, debris waves, pearls on
@@ -326,16 +343,19 @@ struct IntroScreen: View {
                     }
                     .bleed()
                     let pop = easeOut(beat(tl, 30.1, 30.8))
+                    // The crab hops a little with excitement as he talks
+                    let hop = tl > 30.9 && tl < 50.6 ? abs(sin((tl - 30.9) * 2.6)) * 7.0 : 0.0
                     CrabView(t: t, scale: s)
-                        .stage(x: 275, y: 620 - pop * 310, w: 250, h: 211)
+                        .stage(x: 275, y: 620 - pop * 310 - hop, w: 250, h: 211)
                     // The culprit, peeking in sheepishly while the crab talks
                     let peek = easeOut(beat(tl, 31.6, 32.7))
                     if peek > 0 {
                         WhaleIntroView(scale: s, uhoh: false, breathe: 0)
                             .rotationEffect(.degrees(10))
-                            .stage(x: -560 + peek * 200, y: 40, w: 568, h: 240)
+                            .scaleEffect(0.72)
+                            .stage(x: -620 + peek * 190, y: 0, w: 568, h: 240)
                     }
-                    // Ten pearls arc up as he counts them out...
+                    // Ten pearls arc up one by one, leading right to the chest
                     ForEach(0..<10, id: \.self) { i in
                         let at = 34.6 + Double(i) * 0.36
                         if tl > at {
@@ -344,20 +364,50 @@ struct IntroScreen: View {
                                 .shadow(color: Tokens.Palette.pearl.opacity(0.8), radius: 5 * s)
                                 .scaleEffect(0.5 + a * 0.5)
                                 .opacity(a)
-                                .stage(x: 190 + CGFloat(i) * 38,
-                                       y: 170 - sin(.pi * Double(i) / 9) * 56, w: 26, h: 26)
+                                .stage(x: 282 + CGFloat(i) * 34,
+                                       y: 200 - sin(.pi * Double(i) / 11) * 62, w: 26, h: 26)
                         }
                     }
-                    // ...and the chest they open
-                    if tl > 38.6 {
-                        let c = easeOut(beat(tl, 38.6, 39.2))
+                    // ...the chest they open...
+                    if tl > 38.2 {
+                        let c = easeOut(beat(tl, 38.2, 38.8))
                         ArtImage("scenes/treasure-chest/chest-box.png")
                             .scaleEffect(0.6 + c * 0.4)
                             .opacity(c)
-                            .stage(x: 600, y: 120, w: 120, h: 77)
-                        TwinkleStar(t: t, duration: 1.6).stage(x: 590, y: 110, w: 24, h: 24)
-                        TwinkleStar(t: t, duration: 1.9, delay: 0.6).stage(x: 722, y: 160, w: 20, h: 20)
+                            .stage(x: 588, y: 112, w: 120, h: 77)
+                        TwinkleStar(t: t, duration: 1.6).stage(x: 578, y: 102, w: 24, h: 24)
                     }
+                    // ...the map it shows...
+                    if tl > 40.2 {
+                        let mp = easeOut(beat(tl, 40.2, 40.8))
+                        ArtImage("ui/icon-map.png")
+                            .scaleEffect(0.5 + mp * 0.5)
+                            .opacity(mp)
+                            .offset(y: Wave.bob(t, from: 0, to: -5, duration: 2.6) * s)
+                            .stage(x: 604, y: 206 + (1 - mp) * -24, w: 88, h: 88)
+                    }
+                    // ...and the lost treasure it leads home
+                    if tl > 42.2 {
+                        let gh = easeOut(beat(tl, 42.2, 42.9))
+                        ArtImage("scenes/grotto/starfish-lamp.png")
+                            .saturation(0.55)
+                            .opacity(gh * 0.9)
+                            .stage(x: 700, y: 330, w: 72, h: 69)
+                        TwinkleStar(t: t, duration: 1.7, delay: 0.3).stage(x: 690, y: 318, w: 22, h: 22)
+                    }
+                    // The sisters, gathered to hear the plan
+                    Group {
+                        SisterView(spec: .ophelia, t: t, scale: s)
+                            .frame(width: 118 * s, height: 135 * s)
+                            .stage(x: 56, y: 300, w: 118, h: 135)
+                        SisterView(spec: .daphne, t: t, scale: s)
+                            .frame(width: 104 * s, height: 119 * s)
+                            .stage(x: 152, y: 376, w: 104, h: 119)
+                        SisterView(spec: .violet, t: t, scale: s)
+                            .frame(width: 104 * s, height: 119 * s)
+                            .stage(x: 30, y: 420, w: 104, h: 119)
+                    }
+                    .opacity(easeOut(beat(tl, 30.6, 31.4)))
                 }
 
                 // Skip hint, quietly in the corner
@@ -369,11 +419,12 @@ struct IntroScreen: View {
             .onChange(of: Int(t * 10)) {
                 if start == nil { start = t }
                 for (i, at, prompt) in [(1, 0.6, PromptScript.intro1),
-                                        (2, 12.5, PromptScript.intro2),
+                                        (2, 12.9, PromptScript.intro2),
                                         (3, 22.4, PromptScript.intro3),
                                         (4, 30.4, PromptScript.rally1),
-                                        (5, 34.0, PromptScript.rally2),
-                                        (6, 40.6, PromptScript.rally3)] where tl >= at && !spoken.contains(i) {
+                                        (5, 33.9, PromptScript.rally2),
+                                        (6, 45.3, PromptScript.rallyAsk),
+                                        (7, 48.6, PromptScript.rally3)] where tl >= at && !spoken.contains(i) {
                     spoken.insert(i)
                     speak(prompt)
                 }
@@ -382,7 +433,7 @@ struct IntroScreen: View {
                     spoken.insert(i)
                     play(effect)
                 }
-                if tl >= 43.0 && !finished {
+                if tl >= 51.6 && !finished {
                     finished = true
                     onDone(true)
                 }
@@ -392,29 +443,8 @@ struct IntroScreen: View {
         .onTapGesture {
             guard !finished else { return }
             finished = true
-            onDone(spoken.contains(6))
+            onDone(spoken.contains(7))
         }
-    }
-}
-
-/// Clips to the inside of the room: everything left of the window, plus the
-/// window opening itself (an ellipse matching the painted hole), so the
-/// whale's front half renders through the hole with the cut hidden along the
-/// rim instead of a straight line across its body.
-struct InsideRoom: Shape {
-    /// The entrance segment's x offset and the stage scale, in points.
-    var dx: CGFloat
-    var scale: CGFloat
-
-    func path(in rect: CGRect) -> Path {
-        var p = Path()
-        p.addRect(CGRect(x: rect.minX - 400, y: rect.minY - 200,
-                         width: (dx + 462) * scale + 400, height: rect.height + 400))
-        // Inset INSIDE the painted rim (hole 470..796 x 102..486, stroke 16),
-        // so even the inflated whale never paints over the frame.
-        p.addEllipse(in: CGRect(x: (dx + 476) * scale, y: 114 * scale,
-                                width: 308 * scale, height: 360 * scale))
-        return p
     }
 }
 

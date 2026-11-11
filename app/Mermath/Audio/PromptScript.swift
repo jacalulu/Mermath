@@ -88,8 +88,9 @@ enum PromptScript {
     static let intro2 = Prompt(id: "intro-2", text: "One day, a great big whale swam by. And then. Aaah. Aaah. AAACHOO!")
     static let intro3 = Prompt(id: "intro-3", text: "The sneeze swept the treasures all across the sea!")
     static let rally1 = Prompt(id: "intro-rally-1", text: "Oh no! We have to win the treasures back!")
-    static let rally2 = Prompt(id: "intro-rally-2", text: "Dive down and find the right numbers to earn pearls. Ten pearls open a treasure chest!")
-    static let rally3 = Prompt(id: "intro-rally-3", text: "Who is diving today?")
+    static let rally2 = Prompt(id: "intro-rally-2b", text: "Dive down and find the right numbers to earn pearls. Ten pearls, and the magic chest will show you a map to a lost treasure. Follow it, and bring the treasure home!")
+    static let rallyAsk = Prompt(id: "intro-rally-ask", text: "Can you help rescue all the treasures?")
+    static let rally3 = Prompt(id: "intro-rally-3", text: "So, who is diving today?")
 
     /// The crab inviting the tollbooth play, once per dive.
     static let popBubbles = Prompt(id: "pop-bubbles", text: "Pop the bubbles!")

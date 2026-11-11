@@ -59,6 +59,8 @@ struct SisterView: View {
     let scale: CGFloat
     /// The treasure chest page waves faster (1.1s); nil keeps the spec's pace.
     var armDuration: Double?
+    /// The intro's sisters sleep by the shell bed until the sneeze.
+    var asleep = false
 
     private func art(_ piece: String) -> ArtImage {
         ArtImage("characters/\(spec.folder)/\(piece).png")
@@ -102,9 +104,9 @@ struct SisterView: View {
                 )
             art("body")
             art("eyes-open")
-                .opacity(1 - Wave.blink(t, cycle: spec.blinkCycle, delay: spec.blinkDelay))
+                .opacity(asleep ? 0 : 1 - Wave.blink(t, cycle: spec.blinkCycle, delay: spec.blinkDelay))
             art("eyes-shut")
-                .opacity(Wave.blink(t, cycle: spec.blinkCycle, delay: spec.blinkDelay))
+                .opacity(asleep ? 1 : Wave.blink(t, cycle: spec.blinkCycle, delay: spec.blinkDelay))
         }
         .offset(y: Wave.bob(t, from: 0, to: -7, duration: spec.floatDuration, delay: spec.floatDelay) * scale)
     }
