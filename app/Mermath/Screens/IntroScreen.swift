@@ -355,6 +355,11 @@ struct IntroScreen: View {
                             .opacity(peek)
                             .stage(x: -60, y: -100 - (1 - peek) * 90, w: 568, h: 240)
                     }
+                    // The pearls' flight happens BEHIND the sisters (so they
+                    // never cross a face); they land in front, on the sand row
+                    ForEach(0..<10, id: \.self) { i in
+                        BriefingPearl(i: i, t: t, tl: tl, s: s, front: false)
+                    }
                     // The sisters SWIM in one by one - off screen to their
                     // marks on a dipping curve, tails sweeping hard, leaning
                     // into the motion, then settling into a drift. No fades.
@@ -376,11 +381,10 @@ struct IntroScreen: View {
                                       + Wave.alternate(t, from: -7, to: 7, duration: 4.1, delay: ph * 1.7),
                                    w: w, h: w * 1.147)
                     }
-                    // The ten pearls pop from the crab's claw onto one clean
-                    // arc along the sand, a necklace leading to the chest -
-                    // then sweep one by one INTO the chest, and it answers.
+                    // Once landed, the pearls (their piles and puffs) live on
+                    // the foreground sand, and roll from there into the chest.
                     ForEach(0..<10, id: \.self) { i in
-                        BriefingPearl(i: i, t: t, tl: tl, s: s)
+                        BriefingPearl(i: i, t: t, tl: tl, s: s, front: true)
                     }
                     // The crab, small in the lower-left foreground, hopping as
                     // he talks and angled up toward the sisters
@@ -480,12 +484,12 @@ struct IntroScreen: View {
 /// chest's lock (nearest first) and are swallowed - the chest is drawn over
 /// them - which pops it open.
 private struct BriefingPearl: View {
-    static let slots: [(x: CGFloat, y: CGFloat)] = [
-        (212, 448), (258, 476), (308, 496), (362, 508), (418, 513),
-        (474, 511), (528, 501), (576, 487), (616, 472), (648, 460),
-    ]
+    /// A straight, evenly spaced row across the open sand at the bottom.
+    static let slots: [(x: CGFloat, y: CGFloat)] = (0..<10).map {
+        (210 + CGFloat($0) * 48, 545)
+    }
     static let claw = (x: CGFloat(206), y: CGFloat(426))
-    static let lock = (x: CGFloat(672), y: CGFloat(486))
+    static let lock = (x: CGFloat(668), y: CGFloat(516))
     /// When pearl `i` hits the sand (the thud sounds are scheduled off this).
     static func landTime(_ i: Int) -> Double { 34.6 + Double(i) * 0.36 + 0.6 }
     /// All ten are inside the chest by here; the lid pops right after.
@@ -495,6 +499,9 @@ private struct BriefingPearl: View {
     let t: Double
     let tl: Double
     let s: CGFloat
+    /// false = the flight pass, drawn behind the sisters; true = the grounded
+    /// pass (pile, puff, landed pearl, roll), drawn in front of them.
+    let front: Bool
 
     private func clamp01(_ v: Double) -> Double { min(max(v, 0), 1) }
 
@@ -517,33 +524,37 @@ private struct BriefingPearl: View {
         // nearest pearl rolls first; farther ones roll longer
         let f2raw = clamp01((tl - (39.0 + Double(9 - i) * 0.1)) / (0.4 + Double(9 - i) * 0.045))
         let f2 = f2raw * f2raw * (3 - 2 * f2raw)
-        if f1 > 0 {
-            // the little sand pile the thud makes - it stays behind
-            if tl > land {
-                Ellipse().fill(Color(red: 0.84, green: 0.73, blue: 0.52))
-                    .stage(x: slot.x - 8, y: slot.y + 15, w: 42, h: 12)
-                Ellipse().fill(Color(red: 0.95, green: 0.88, blue: 0.70))
-                    .stage(x: slot.x - 5, y: slot.y + 14, w: 36, h: 9)
+        if !front {
+            // The flight pass: airborne only, behind the sisters
+            if f1 > 0 && tl < land {
+                ArtImage("ui/pearl.png")
+                    .shadow(color: Tokens.Palette.pearl.opacity(0.8), radius: 5 * s)
+                    .scaleEffect(0.45 + 0.55 * f1)
+                    .stage(x: Self.claw.x + (slot.x - Self.claw.x) * (1 - pow(1 - f1, 2)),
+                           y: Self.claw.y + (slot.y - Self.claw.y) * f1 * f1 - sin(.pi * f1) * 64,
+                           w: 26, h: 26)
             }
+        } else if tl >= land {
+            // The grounded pass: the little sand pile the thud makes stays
+            Ellipse().fill(Color(red: 0.84, green: 0.73, blue: 0.52))
+                .stage(x: slot.x - 8, y: slot.y + 15, w: 42, h: 12)
+            Ellipse().fill(Color(red: 0.95, green: 0.88, blue: 0.70))
+                .stage(x: slot.x - 5, y: slot.y + 14, w: 36, h: 9)
             // the puff of sand kicked up at the thud
             let pt = clamp01((tl - land) / 0.45)
-            if pt > 0 && pt < 1 {
+            if pt < 1 {
                 Ellipse()
                     .fill(Color(red: 0.93, green: 0.85, blue: 0.65).opacity(0.75 * (1 - pt)))
                     .stage(x: slot.x - 10 - 26 * pt, y: slot.y + 8 - 10 * pt,
                            w: 46 + 52 * pt, h: 14 + 12 * pt)
             }
             if f2raw < 1 {
-                // the flight: eased across, gravity down, squash on impact
-                let pos = f2raw > 0
-                    ? rolled(f2)
-                    : (x: Self.claw.x + (slot.x - Self.claw.x) * (1 - pow(1 - f1, 2)),
-                       y: Self.claw.y + (slot.y - Self.claw.y) * f1 * f1 - sin(.pi * f1) * 64)
-                let sq = tl > land && f2raw == 0 ? max(0, 1 - (tl - land) / 0.18) : 0
+                // sitting in its pile (squashing for a beat), then rolling
+                let pos = f2raw > 0 ? rolled(f2) : (x: slot.x, y: slot.y)
+                let sq = f2raw == 0 ? max(0, 1 - (tl - land) / 0.18) : 0
                 ArtImage("ui/pearl.png")
                     .shadow(color: Tokens.Palette.pearl.opacity(0.8), radius: 5 * s)
-                    .scaleEffect(x: (0.45 + 0.55 * f1) * (1 + 0.22 * sq),
-                                 y: (0.45 + 0.55 * f1) * (1 - 0.3 * sq))
+                    .scaleEffect(x: 1 + 0.22 * sq, y: 1 - 0.3 * sq)
                     .opacity(1 - max(0, (f2 - 0.82) / 0.18))
                     .stage(x: pos.x, y: pos.y, w: 26, h: 26)
             }
