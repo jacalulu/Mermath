@@ -159,17 +159,39 @@ def scene_map_layers():
     WATERLINE = 168  # the surface break: sky above, ocean below
     # SKY above the waterline: warm and clearly not water (peach horizon)
     s.layer('bg')
-    s.add(f'<rect x="-20" y="-20" width="840" height="{WATERLINE + 20}" fill="{s.lin([(0, "#a8d8ee", 1), (.5, "#dff0ea", 1), (1, "#ffd9b4", 1)])}"/>')
-    s.add(f'<ellipse cx="620" cy="30" rx="150" ry="60" fill="#fff3d6" opacity=".7" filter="url(#b6)"/>')
+    s.add(f'<rect x="-20" y="-20" width="840" height="{WATERLINE + 20}" fill="{s.lin([(0, "#9cd2ec", 1), (.5, "#dff0ea", 1), (1, "#ffd9b4", 1)])}"/>')
+    # the sun lives upper-left (every shadow in the game falls lower-right)
+    s.add(f'<ellipse cx="150" cy="14" rx="110" ry="46" fill="#fff3d6" opacity=".6" filter="url(#b6)"/>'
+          f'<ellipse cx="140" cy="6" rx="46" ry="22" fill="#fffbe8" opacity=".85" filter="url(#b3)"/>')
+    # painted clouds drifting off to the right
+    s.add(f'<path d="M470 54 C488 38 532 34 556 46 C586 36 626 42 636 58 C620 70 500 72 478 64 '
+          f'C466 60 464 58 470 54 Z" fill="#ffffff" opacity=".85" filter="url(#b1)"/>'
+          f'<path d="M640 106 C654 96 686 94 702 102 C722 98 744 102 750 112 C736 120 662 122 646 114 Z" '
+          f'fill="#ffffff" opacity=".7" filter="url(#b1)"/>')
     # OCEAN below: pale shallows to navy depth
     s.add(f'<rect x="-20" y="{WATERLINE}" width="840" height="{620 - WATERLINE}" fill="{s.lin([(0, "#9fe9da", 1), (.3, "#3db5be", 1), (.68, "#15718f", 1), (1, "#0a3c60", 1)])}"/>')
     # the sunlit shallows bloom, light rays fanning DOWN from the surface,
     # and the depth sinking to navy toward the bottom-right
     s.add(f'<g clip-path="{s.clip(f"M-20 {WATERLINE} L820 {WATERLINE} L820 620 L-20 620 Z")}">'
+          # a distant reef, hazed but readable, for a real middle distance
+          f'<path d="M470 320 C540 268 640 262 720 300 C770 324 800 330 820 332 L820 420 L470 420 Z" '
+          f'fill="#23809a" opacity=".62" filter="url(#b6)"/>'
+          f'<path d="M360 356 C410 330 470 328 520 348 L520 420 L360 420 Z" '
+          f'fill="#2a8fa4" opacity=".5" filter="url(#b6)"/>'
+          # the water darkens toward the deep side before the drop
+          f'<rect x="520" y="{WATERLINE}" width="300" height="452" '
+          f'fill="{s.lin([(0, "#0a3c60", 0), (1, "#0a3c60", .4)], x1=0, y1=0, x2=1, y2=0)}"/>'
+          # the luminous turquoise heart of the frame, where the reef lives
+          f'<ellipse cx="460" cy="330" rx="260" ry="170" fill="#8ff2e2" opacity=".32" filter="url(#b6)"/>'
           f'<ellipse cx="210" cy="250" rx="300" ry="130" fill="#bffbee" opacity=".3" filter="url(#b6)"/>'
-          + ''.join(f'<polygon points="{x},{WATERLINE + 8} {x + w},{WATERLINE + 8} {x + w + 150},620 {x + 60},620" fill="#ffffff" opacity=".08" filter="url(#b6)"/>'
-                    for x, w in ((120, 46), (260, 70), (420, 52), (560, 66)))
-          + f'<rect width="{W}" height="{H}" fill="{s.lin([(0, "#07284a", 0), (.5, "#07284a", 0), (1, "#07284a", .6)], x1=0, y1=0, x2=1, y2=1)}"/></g>')
+          # surface seen from below: bright ripple squiggles under the line
+          + ''.join(f'<path d="M{x} {WATERLINE + 22 + i * 13} q22 -6 44 0 q22 6 44 0" fill="none" '
+                    f'stroke="#d8fff8" stroke-width="{4 - i}" opacity="{0.5 - i * 0.13}"/>'
+                    for i, x in enumerate((310, 420, 540, 360)))
+          # god rays, slanting down-right from the upper-left sun
+          + ''.join(f'<polygon points="{x},{WATERLINE + 8} {x + w},{WATERLINE + 8} {x + w + 170},620 {x + 80},620" fill="#ffffff" opacity="{o}" filter="url(#b6)"/>'
+                    for x, w, o in ((84, 38, .24), (226, 96, .14), (404, 48, .19), (520, 26, .1), (578, 74, .08)))
+          + f'<rect width="{W}" height="{H}" fill="{s.lin([(0, "#07284a", 0), (.5, "#07284a", 0), (1, "#07284a", .66)], x1=0, y1=0, x2=1, y2=1)}"/></g>')
     # THE WATERLINE: thick scumbled white with a cyan underline and sparkle
     s.add(f'<rect x="-20" y="{WATERLINE + 2}" width="840" height="14" fill="#d8f8f4" opacity=".45"/>'
           f'<path d="M-20 {WATERLINE} C60 {WATERLINE - 6} 140 {WATERLINE + 6} 220 {WATERLINE} C300 {WATERLINE - 6} 380 {WATERLINE + 6} 460 {WATERLINE} '
@@ -201,10 +223,21 @@ def scene_map_layers():
     rockd = ('M-20 104 C30 94 86 92 134 100 C180 108 216 124 232 154 '
              'C246 182 242 214 254 248 C264 276 280 296 300 310 '
              'C240 324 110 328 -20 320 Z')
-    rockfill = s.lin([(0, '#c2b098', 1), (.45, '#8a7a66', 1), (1, '#5d5042', 1)])
+    rockfill = s.lin([(0, '#d2b48e', 1), (.45, '#96785a', 1), (1, '#54432f', 1)])
     s.add(f'<path d="{rockd}" fill="{rockfill}"/>')
-    # the submerged part of the rock reads colder and darker
-    s.add(f'<g clip-path="{s.clip(rockd)}"><rect x="-20" y="{WATERLINE + 4}" width="840" height="500" fill="#0f3a55" opacity=".3"/></g>')
+    # warm strata and a mossy crown give the shore rock some life
+    s.add(f'<g clip-path="{s.clip(rockd)}">'
+          f'<path d="M-20 196 C80 190 180 196 250 208 M-20 240 C80 236 170 242 246 254 '
+          f'M-20 284 C90 280 190 286 268 296" fill="none" stroke="#6a543c" stroke-width="5" opacity=".4"/>'
+          f'<path d="M-20 116 C40 106 100 104 150 110" fill="none" stroke="#e8cfa2" stroke-width="7" opacity=".7"/>'
+          f'<ellipse cx="60" cy="108" rx="34" ry="8" fill="#5f8a4e" opacity=".55" filter="url(#b3)"/>'
+          f'<ellipse cx="196" cy="120" rx="22" ry="6" fill="#5f8a4e" opacity=".45" filter="url(#b3)"/></g>')
+    # the submerged part of the rock reads colder and darker, and the rock's
+    # right-facing plane falls into shadow (sun upper-left) so the mass turns
+    s.add(f'<g clip-path="{s.clip(rockd)}">'
+          f'<rect x="-20" y="{WATERLINE + 4}" width="840" height="500" fill="#0f3a55" opacity=".3"/>'
+          f'<path d="M232 154 C246 182 242 214 254 248 C264 276 280 296 300 310 L300 340 L180 340 '
+          f'C208 280 196 200 232 154 Z" fill="#241a10" opacity=".38" filter="url(#b6)"/></g>')
     # foam where the rock meets the surface
     s.add(f'<ellipse cx="236" cy="{WATERLINE + 2}" rx="18" ry="5" fill="#ffffff" opacity=".9"/>'
           f'<ellipse cx="252" cy="{WATERLINE + 6}" rx="10" ry="3.5" fill="#ffffff" opacity=".7"/>')
@@ -216,9 +249,21 @@ def scene_map_layers():
     s.add(boulder(s, 84, 146, 54, 26, lit='#c2b098', base='#8a7a66', dark='#5d5042', moss=False)
           + boulder(s, 218, 148, 50, 24, lit='#c2b098', base='#8a7a66', dark='#5d5042', moss=False))
     s.add(seastar(206, 150, 9, '#ff7eb6', -80) + shell_on_sand(120, 154))
-    # 2. CORAL REEF on the mid-water ledge
+    # 2. CORAL REEF on the mid-water ledge: a real garden now, dense above the
+    # label's quiet sand, nothing inside it
+    # cool cast shadows anchor the corals to the sand (light upper-left)
+    s.add(f'<ellipse cx="452" cy="416" rx="56" ry="10" fill="#1d4a62" opacity=".35" filter="url(#b3)"/>'
+          f'<ellipse cx="548" cy="418" rx="52" ry="9" fill="#1d4a62" opacity=".32" filter="url(#b3)"/>'
+          f'<ellipse cx="400" cy="420" rx="34" ry="7" fill="#1d4a62" opacity=".3" filter="url(#b3)"/>')
     s.add(coral(r, 426, 404, '#b23a2a', '#ffb347', 148, 4, 16, -93) + coral(r, 522, 406, '#5a3aa8', '#d2b4ff', 158, 4, 16, -86) + coral(r, 472, 412, '#b03070', '#ff9ecb', 114, 4, 14, -90))
-    s.add(mound(s, 392, 414, 30, 24, '#35c6a8', '#12788c') + mound(s, 560, 416, 26, 20, '#ffb347', '#c9562b') + shell_on_sand(456, 428))
+    s.add(coral(r, 386, 410, '#c9512a', '#ff9e6b', 84, 3, 10, -98) + coral(r, 566, 412, '#2f7c5c', '#7fd8a8', 72, 3, 9, -80))
+    # rim light catching the sunward edges of the tall corals
+    s.add('<path d="M414 320 C408 296 412 276 424 262 M506 306 C498 282 502 262 514 250 '
+          'M462 344 C456 326 458 310 466 298" fill="none" stroke="#ffe9c4" stroke-width="4" '
+          'stroke-linecap="round" opacity=".75"/>')
+    s.add(mound(s, 392, 414, 30, 24, '#35c6a8', '#12788c') + mound(s, 560, 416, 26, 20, '#ffb347', '#c9562b')
+          + mound(s, 600, 422, 20, 15, '#e07898', '#9c3a60') + shell_on_sand(456, 428))
+    s.add(seastar(366, 424, 8, '#ffd27a', -60) + shell_on_sand(584, 430))
     # 3. DEEP SEA at the bottom of the cliff: cold dark rock, a glowing cave
     # mouth, crystals - sunk in navy shade
     s.add(boulder(s, 672, 556, 150, 84, lit='#5f93a8', base='#1c4a62', dark='#081f38', moss=False) + boulder(s, 786, 552, 120, 66, lit='#5f93a8', base='#1c4a62', dark='#081f38', moss=False))
@@ -227,9 +272,30 @@ def scene_map_layers():
           '<ellipse cx="736" cy="540" rx="12" ry="9" fill="#bdf4ff" opacity=".8" filter="url(#b3)"/>')
     s.add(''.join(f'<g transform="translate({x} {y}) rotate({rot})"><path d="M0 0 L{-h*.2:.0f} {-h*.7:.0f} L0 {-h} L{h*.2:.0f} {-h*.7:.0f} Z" fill="{c}"/><path d="M0 0 L0 {-h} L{h*.2:.0f} {-h*.7:.0f} Z" fill="#ffffff" opacity=".45"/></g>' for x, y, h, c, rot in ((708, 562, 34, '#8ff0ff', -16), (756, 564, 28, '#b79cff', 14), (732, 566, 20, '#8ff0ff', 2))))
     s.add(shell_on_sand(330, 358) + seastar(306, 344, 8, '#ffd27a', -70))
+    # ghost kelp in the dark behind the deep boulders
+    s.add(f'<g opacity=".5">{kelp(r, 652, 7, "#0d3350", (36, 60), (7, 11), (22, 36), top=470)}</g>')
     s.layer('grass').add(grass(r, 316, 330, 5, 14, 30, '#1f9c7c', '#3fc79a') + grass(r, 408, 404, 6, 18, 38, '#1f9c7c', '#3fc79a') + grass(r, 588, 420, 5, 16, 32, '#1f9c7c', '#3fc79a'))
+    # THE FRAME: shadowed foreground silhouettes hugging the bottom-left
+    # corner and the right edge, so the bright heart sits inside a dark ring
+    import random as _r
+    s.layer('frame')
+    # a shadowed boulder hugging the corner, with a branched coral silhouette
+    # and slim kelp blades rising off it - clear shapes, kept off the bright sand
+    fr = _r.Random(23)
+    s.add(f'<path d="M-20 620 L-20 540 C30 524 110 528 162 556 C196 574 200 600 188 620 Z" fill="#0c2838"/>'
+          f'<path d="M-20 556 C20 544 70 546 110 560" fill="none" stroke="#1d5668" stroke-width="6" opacity=".6"/>'
+          # branched coral silhouette, rim-lit on its left where the sun is
+          f'<path d="M58 548 C54 512 60 486 50 462 C46 452 54 444 62 450 C74 460 72 486 76 506 '
+          f'M76 506 C86 486 84 466 96 452 C102 444 112 448 110 458 C106 478 92 496 84 514 '
+          f'M58 548 C48 528 34 516 20 510 C12 507 8 516 14 522 C26 534 40 544 50 556 Z" '
+          f'fill="none" stroke="#0e3346" stroke-width="13" stroke-linecap="round"/>'
+          f'<path d="M50 462 C46 452 54 444 62 450 M96 452 C102 444 112 448 110 458" '
+          f'fill="none" stroke="#2a7488" stroke-width="4" opacity=".9"/>'
+          + ''.join(kelp(fr, x, 3, '#0d3350', (40, 72), (8, 12), (22, 34), lean=l, top=500)
+                    for x, l in ((128, 8), (156, -6))))
+    s.add(f'<g opacity=".92">{kelp(_r.Random(41), 814, 9, "#0d3350", (50, 90), (10, 16), (26, 44), lean=-16, top=330)}</g>')
     s.layer('bg'); s.finish(mott=.26, streak=.14, vig=0, grain=0)
-    return {n: s.svg_layer(n) for n in ('bg', 'kelp_far', 'kelp_mid', 'floor', 'grass')}
+    return {n: s.svg_layer(n) for n in ('bg', 'kelp_far', 'kelp_mid', 'floor', 'grass', 'frame')}
 
 def scene_hunt_layers():
     """The treasure garden for the hidden-object hunt: a sunken rowboat on a
@@ -840,7 +906,7 @@ SCENES2 = {
     'coral': (scene_coral_layers, dict(bg='bg', kelp_far='far', fan_left='mid', fan_right='mid', fg='fg', grass='grass')),
     'chest': (scene_chest_layers, dict(bg='bg', kelp_far='far', kelp_mid='mid', fg='fg', chest_lid='piece', chest_box='piece', lamp='prop', lamp_face='vector', grass='grass')),
     'grotto': (scene_grotto_layers, dict(bg='bg', floor='fg', walls='fg', curtain='mid', bed='piece', lights='prop', lamp='prop', lamp_face='vector')),
-    'map': (scene_map_layers, dict(bg='bg', kelp_far='far', kelp_mid='mid', floor='fg', grass='grass')),
+    'map': (scene_map_layers, dict(bg='bg', kelp_far='far', kelp_mid='mid', floor='fg', grass='grass', frame='mid')),
     'hunt': (scene_hunt_layers, dict(bg='bg', kelp_far='far', fg='fg', grass='grass')),
     'deep': (scene_deep_layers, dict(bg='bg', kelp_far='far', fg='fg', grass='grass')),
     'iwalla': (scene_iwalla_layers, dict(bg='bg')),

@@ -18,8 +18,8 @@ ROOT = __file__.rsplit('/', 2)[0]
 # (lockup png, ink kind, design-space center x, y, target design width)
 PLACEMENTS = [
     ('lettering_name_tide', 'light', 134, 218, 200),
-    ('lettering_name_coral', 'deep', 424, 470, 235),
-    ('lettering_name_deep', 'light', 672, 486, 200),
+    ('lettering_name_coral', 'deep', 424, 478, 235),
+    ('lettering_name_deep', 'light', 672, 498, 200),
 ]
 
 
@@ -33,7 +33,8 @@ def plate():
     base = Image.open(f'{ROOT}/assets/scenes/reef-map/bg.jpg').convert('RGB').resize((1600, 1200))
     base = base.convert('RGBA')
     for name, (x, y) in (('kelp-far.webp', (288, 194)), ('kelp-mid.webp', (648, 192)),
-                         ('seabed.webp', (0, 88)), ('seagrass.png', (294, 296))):
+                         ('seabed.webp', (0, 88)), ('seagrass.png', (292, 298)),
+                         ('frame.webp', (0, 318))):
         im = Image.open(f'{ROOT}/assets/scenes/reef-map/{name}').convert('RGBA')
         base.alpha_composite(im, (x * 2, y * 2))
     return base

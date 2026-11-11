@@ -44,11 +44,14 @@ struct ReefMapScreen: View {
                         .stage(x: 0, y: 88, w: 800, h: 512)
                     // The grass spans two ledges, so it holds still here
                     ArtImage("scenes/reef-map/seagrass.png")
-                        .stage(x: 294, y: 296, w: 324, h: 130)
+                        .stage(x: 292, y: 298, w: 324, h: 128)
                     RisingBubble(t: t, duration: 9, scale: s)
                         .stage(x: 330, y: 430, w: 20, h: 20)
                     RisingBubble(t: t, duration: 12, delay: 3, scale: s)
                         .stage(x: 730, y: 540, w: 22, h: 22)
+                    // Shadowed foreground framing from the key-art pass
+                    ArtImage("scenes/reef-map/frame.png")
+                        .stage(x: 0, y: 318, w: 800, h: 282)
                 }
                 .bleed()
 
@@ -95,7 +98,7 @@ struct ReefMapScreen: View {
                     .allowsHitTesting(false)
                     .stage(x: 388, y: 220, w: 158, h: 181)
                 NameLockup(path: "ui/names/coral.png", t: t, scale: s, delay: -1.1)
-                    .stage(x: 306, y: 428, w: 235, h: 84)
+                    .stage(x: 306, y: 436, w: 235, h: 84)
 
                 // Deep Sea, down the cliff in the dark corner: the padlock
                 // hangs on its sign until two clean dives open it
@@ -108,11 +111,11 @@ struct ReefMapScreen: View {
                     GlowPulse(t: t, delay: -0.4)
                         .stage(x: 630, y: 468, w: 166, h: 80)
                     NameLockup(path: "ui/names/deep.png", t: t, scale: s, delay: -2.3)
-                        .stage(x: 572, y: 437, w: 200, h: 98)
+                        .stage(x: 572, y: 449, w: 200, h: 98)
                 } else {
                     NameLockup(path: "ui/names/deep.png", t: t, scale: s, delay: -2.3)
                         .opacity(0.88)
-                        .stage(x: 572, y: 437, w: 200, h: 98)
+                        .stage(x: 572, y: 449, w: 200, h: 98)
                     // The painted padlock hangs off the lettering, bobbing
                     // with it
                     ArtImage("props/padlock-rope.png")
@@ -120,7 +123,7 @@ struct ReefMapScreen: View {
                         .shadow(color: Tokens.Palette.midnight.opacity(0.5), radius: 5 * s, y: 4 * s)
                         .offset(y: Wave.alternate(t, from: -2.2, to: 2.2, duration: 3.6, delay: -2.3) * s)
                         .allowsHitTesting(false)
-                        .stage(x: 706, y: 484, w: 34, h: 61)
+                        .stage(x: 706, y: 496, w: 34, h: 61)
                 }
 
                 Vignette()
