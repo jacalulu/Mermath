@@ -24,33 +24,33 @@ struct ReefMapScreen: View {
                     ArtImage("scenes/reef-map/bg.jpg")
                         .stage(x: 0, y: 0, w: 800, h: 600)
                     LightShimmer(t: t)
-                        .stage(x: 0, y: 0, w: 800, h: 340)
+                        .stage(x: 0, y: 152, w: 800, h: 240)
                     KelpLayer(t: t, path: "scenes/reef-map/kelp-far.png",
                               from: -0.8, to: 0.9, duration: 7, pivot: UnitPoint(x: 0.5, y: 1))
                         .opacity(0.75)
-                        .stage(x: 276, y: 0, w: 414, h: 600)
+                        .stage(x: 288, y: 194, w: 368, h: 406)
                     KelpLayer(t: t, path: "scenes/reef-map/kelp-mid.png",
                               from: 1.3, to: -1.4, duration: 6, pivot: UnitPoint(x: 0.5, y: 1))
-                        .stage(x: 664, y: 0, w: 136, h: 600)
+                        .stage(x: 648, y: 192, w: 152, h: 408)
                     FishSwim(t: t, travel: 940, bobDown: 5, bobUp: 6, duration: 32, delay: -4, scale: s)
-                        .stage(x: 830, y: 86, w: 40, h: 25)
+                        .stage(x: 830, y: 212, w: 40, h: 25)
                     FishSwim(t: t, travel: 940, bobDown: 5, bobUp: 6, duration: 36, delay: -18, scale: s)
-                        .stage(x: 830, y: 104, w: 30, h: 19)
+                        .stage(x: 830, y: 238, w: 30, h: 19)
                     ArtImage("scenes/reef-map/seabed.png")
-                        .stage(x: 0, y: 120, w: 800, h: 480)
-                    // The grass spans pool to ledge, so it holds still here
+                        .stage(x: 0, y: 88, w: 800, h: 512)
+                    // The grass spans two ledges, so it holds still here
                     ArtImage("scenes/reef-map/seagrass.png")
-                        .stage(x: 68, y: 170, w: 538, h: 260)
+                        .stage(x: 294, y: 296, w: 324, h: 130)
                     RisingBubble(t: t, duration: 9, scale: s)
-                        .stage(x: 148, y: 200, w: 20, h: 20)
+                        .stage(x: 330, y: 430, w: 20, h: 20)
                     RisingBubble(t: t, duration: 12, delay: 3, scale: s)
                         .stage(x: 730, y: 540, w: 22, h: 22)
                 }
                 .bleed()
 
-                // Pearl trail: pool to reef it swoops through open water and
-                // twinkles; the locked drop down the cliff sits dim and still
-                ForEach(Array([(234.0, 300.0), (272, 340), (310, 380), (346, 418), (378, 450)].enumerated()), id: \.offset) { i, dot in
+                // Pearl trail: it leaves the pool, crosses the waterline, and
+                // swoops down open water to the reef; the locked drop is dim
+                ForEach(Array([(212.0, 150.0), (238, 186), (268, 230), (300, 276), (332, 322), (362, 364)].enumerated()), id: \.offset) { i, dot in
                     TrailDot(opacity: Wave.alternate(t, from: 0.55, to: 1, duration: 1, delay: Double(i) * 0.25), scale: s)
                         .stage(x: dot.0, y: dot.1, w: 17, h: 17)
                 }
@@ -59,21 +59,22 @@ struct ReefMapScreen: View {
                         .stage(x: dot.0, y: dot.1, w: 17, h: 17)
                 }
 
-                // Tide Pool, in the shore shelf at the surface: the crab waits
-                // on the rocks beside the pool, label on the slope below
+                // Tide Pool, hollowed into the DRY shore rock above the
+                // waterline: the crab perches on its rim against the sky,
+                // label floating in the shallows just under the line
                 Button(action: { onDive(.tidePool) }) {
                     Color.clear.contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .stage(x: 14, y: 110, w: 270, h: 196)
+                .stage(x: 14, y: 80, w: 266, h: 190)
                 GlowPulse(t: t)
-                    .stage(x: 52, y: 148, w: 195, h: 76)
+                    .stage(x: 86, y: 116, w: 150, h: 56)
                 CrabView(t: t, scale: s, blinkCycle: 5.1, bobTo: -3)
-                    .frame(width: 104 * s, height: 88 * s)
+                    .frame(width: 76 * s, height: 64 * s)
                     .allowsHitTesting(false)
-                    .stage(x: 34, y: 94, w: 104, h: 88)
+                    .stage(x: 182, y: 84, w: 76, h: 64)
                 ZoneLabel(name: "Tide Pool", subtitle: "Find the number", scale: s)
-                    .stage(x: 120, y: 262, w: 0, h: 0)
+                    .stage(x: 134, y: 200, w: 0, h: 0)
 
                 // Coral Reef on the mid-water ledge: the picked sister floats
                 // over the coral
@@ -81,15 +82,15 @@ struct ReefMapScreen: View {
                     Color.clear.contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .stage(x: 336, y: 186, w: 264, h: 296)
+                .stage(x: 340, y: 210, w: 260, h: 280)
                 GlowPulse(t: t, delay: -0.8)
-                    .stage(x: 392, y: 346, w: 205, h: 88)
+                    .stage(x: 398, y: 346, w: 195, h: 82)
                 SisterView(spec: child.puppet, t: t, scale: s)
                     .frame(width: 158 * s, height: 181 * s)
                     .allowsHitTesting(false)
-                    .stage(x: 396, y: 148, w: 158, h: 181)
+                    .stage(x: 388, y: 220, w: 158, h: 181)
                 ZoneLabel(name: "Coral Reef", subtitle: "Adding to 10", scale: s)
-                    .stage(x: 428, y: 474, w: 0, h: 0)
+                    .stage(x: 424, y: 466, w: 0, h: 0)
 
                 // Deep Sea, down the cliff in the dark corner: padlocked until
                 // two clean dives open it

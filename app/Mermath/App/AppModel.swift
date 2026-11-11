@@ -142,7 +142,7 @@ final class AppModel {
                 if let dive = self.session {
                     if dive.diveComplete {
                         self.openChest()
-                    } else if ticks % 4 == 0 && !dive.solved {
+                    } else if ticks % 7 == 0 && !dive.solved {
                         dive.debugAnswerWrong()
                     } else if !dive.solved {
                         dive.debugAnswerRight()
@@ -207,6 +207,7 @@ final class AppModel {
         v.showHint = dive.showHint
         v.solvedText = dive.solvedText
         v.popTrigger = dive.popTrigger
+        v.partyTrigger = dive.partyTrigger
         if case .count = dive.question.presentation { v.countIcons = dive.question.target }
         return v
     }

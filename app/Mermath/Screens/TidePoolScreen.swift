@@ -12,6 +12,7 @@ struct TidePoolViewState {
     var showHint = false
     var solvedText = ""
     var popTrigger = 0
+    var partyTrigger = 0
     /// Count level: how many little bubbles to count in the speech bubble.
     var countIcons: Int?
 }
@@ -172,18 +173,8 @@ struct TidePoolScreen: View {
                 )
                 .stage(x: 0, y: 0, w: 800, h: 600)
 
-                // The tollbooth reward: a shower of poppable bonus bubbles
-                let bonusLane = state.choices.firstIndex(of: state.target) ?? 1
-                BonusBubbleField(
-                    t: t,
-                    trigger: state.pearls,
-                    origin: CGPoint(
-                        x: FishLanes.x(bonusLane, caughtAt ?? t),
-                        y: FishLanes.centerY[bonusLane]
-                    ),
-                    scale: s,
-                    playNote: onBonusPop
-                )
+                // Three in a row: the surprise bubble party rises from below
+                BonusBubbleField(t: t, trigger: state.partyTrigger, scale: s, onPop: onBonusPop)
                 .stage(x: 0, y: 0, w: 800, h: 600)
 
                 if state.diveComplete {

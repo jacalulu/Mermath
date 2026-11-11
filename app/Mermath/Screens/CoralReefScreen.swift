@@ -155,13 +155,7 @@ struct CoralReefScreen: View {
                 .stage(x: 0, y: 0, w: 800, h: 600)
 
                 // The tollbooth payout, here too
-                BonusBubbleField(
-                    t: t,
-                    trigger: dive.pearls,
-                    origin: bubbleCenter(goldLane),
-                    scale: s,
-                    playNote: { dive.playBonusNote($0) }
-                )
+                BonusBubbleField(t: t, trigger: dive.partyTrigger, scale: s, onPop: { dive.bubblePopped($0) })
                 .stage(x: 0, y: 0, w: 800, h: 600)
 
                 if dive.diveComplete {

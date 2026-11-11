@@ -15,6 +15,8 @@ final class DiveSession {
     private(set) var diveComplete = false  // tenth pearl: solved panel with the chest button
     private(set) var showHint = false
     private(set) var popTrigger = 0
+    /// Rises when three right answers in a row break into the bubble party.
+    private(set) var partyTrigger = 0
 
     private var progress: ChildProgress
     private let store: ProgressStore
@@ -22,7 +24,7 @@ final class DiveSession {
     private let sounds: SoundPlayer
     private var hintsThisDive = 0
     private var hintThisQuestion = false
-    private var saidPopBubbles = false
+    private var streak = 0
     private var askedAt = Date()
     private var advanceTask: Task<Void, Never>?
 
@@ -129,15 +131,20 @@ final class DiveSession {
         }
         speaker.speak(praisePrompt())
 
-        // The tollbooth pause: the praise finishes, the bonus bubbles get
-        // popped, and only then does the next question arrive. The Tide Pool
-        // gets the longest window; the crab invites the popping once per dive.
-        let pause: UInt64 = zone == .tidePool ? 6_000_000_000 : 4_000_000_000
-        if zone == .tidePool && !saidPopBubbles && pearls < 10 {
-            saidPopBubbles = true
-            Task { [speaker] in
-                try? await Task.sleep(nanoseconds: 1_700_000_000)
-                speaker.speak(PromptScript.popBubbles)
+        // Three right answers IN A ROW break into the bubble party - never
+        // announced: the music starting and the shower of bubbles say it.
+        // Otherwise just a short praise beat before the next question.
+        streak += 1
+        var pause: UInt64 = 3_500_000_000
+        if streak >= 3 {
+            streak = 0
+            partyTrigger += 1
+            pause = 11_000_000_000
+            sounds.play(.bubbleMusic)
+            let sounds = self.sounds
+            Task {
+                try? await Task.sleep(nanoseconds: 10_600_000_000)
+                sounds.stop(.bubbleMusic)
             }
         }
         advanceTask?.cancel()
@@ -155,6 +162,7 @@ final class DiveSession {
         }
         hintsThisDive += 1
         hintThisQuestion = true
+        streak = 0
         switch question.presentation {
         case let .addition(a, b, _):
             progress.reefQuickStreak = 0
@@ -197,9 +205,13 @@ final class DiveSession {
         begin()
     }
 
-    /// The tollbooth reward: popping a bonus bubble plays the next rising note.
-    func playBonusNote(_ index: Int) {
-        sounds.play(SoundPlayer.Effect.notes[index % SoundPlayer.Effect.notes.count])
+    /// A party bubble popped: the next rising note plays and the running
+    /// count is said out loud - popping IS counting practice.
+    func bubblePopped(_ n: Int) {
+        sounds.play(SoundPlayer.Effect.notes[n % SoundPlayer.Effect.notes.count])
+        if n < 10 {
+            speaker.speak(PromptScript.countWord(n + 1))
+        }
     }
 
     /// Tapping the reef's shells counts them aloud, one by one.

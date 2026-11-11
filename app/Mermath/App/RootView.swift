@@ -58,7 +58,7 @@ struct RootView: View {
                             onReplay: { dive.replay() },
                             onMap: { model.leaveDive() },
                             onOpenChest: { model.openChest() },
-                            onBonusPop: { dive.playBonusNote($0) }
+                            onBonusPop: { dive.bubblePopped($0) }
                         )
                         .transition(.opacity)
                     }

@@ -11,6 +11,7 @@ final class SoundPlayer {
         case musicbox
         case rumble
         case introMusic = "intro-music"
+        case bubbleMusic = "bubble-music"
         case note1, note2, note3, note4, note5
 
         /// The bonus-bubble melody, lowest to highest.
@@ -31,7 +32,11 @@ final class SoundPlayer {
                let player = try? AVAudioPlayer(contentsOf: url) {
                 player.prepareToPlay()
                 // Music sits well under the voice
-                player.volume = effect == .introMusic ? 0.24 : 0.6
+                player.volume = switch effect {
+                case .introMusic: 0.24
+                case .bubbleMusic: 0.34
+                default: 0.6
+                }
                 players[effect] = player
             }
         }
