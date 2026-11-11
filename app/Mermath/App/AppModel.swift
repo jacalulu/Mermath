@@ -44,14 +44,13 @@ final class AppModel {
         go(.intro)
     }
 
-    /// The intro ended (or was tapped away). The crab's last line already asks
-    /// who is diving, so only ask again when it never played.
-    func finishIntro(saidWho: Bool) {
+    /// The intro ended (or was tapped away). The story's closing ask - "So,
+    /// who is diving today?" - is spoken HERE, over the three named sisters;
+    /// a skipped story gets the plain question instead.
+    func finishIntro(finishedStory: Bool) {
         sounds.stop(.introMusic)
         go(.pick)
-        if !saidWho {
-            speaker.speak(PromptScript.whoIsDiving)
-        }
+        speaker.speak(finishedStory ? PromptScript.rally3 : PromptScript.whoIsDiving)
     }
 
     func pick(_ child: ChildID) {

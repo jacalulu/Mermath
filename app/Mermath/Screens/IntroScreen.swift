@@ -449,8 +449,7 @@ struct IntroScreen: View {
                                         (3, 22.4, PromptScript.intro3),
                                         (4, 30.4, PromptScript.rally1),
                                         (5, 33.9, PromptScript.rally2),
-                                        (6, 45.3, PromptScript.rallyAsk),
-                                        (7, 48.6, PromptScript.rally3)] where tl >= at && !spoken.contains(i) {
+                                        (6, 45.3, PromptScript.rallyAsk)] where tl >= at && !spoken.contains(i) {
                     spoken.insert(i)
                     speak(prompt)
                 }
@@ -462,7 +461,8 @@ struct IntroScreen: View {
                     spoken.insert(i)
                     play(effect)
                 }
-                if tl >= 51.6 && !finished {
+                // "So, who is diving today?" waits for the pick screen itself
+                if tl >= 48.6 && !finished {
                     finished = true
                     onDone(true)
                 }
@@ -472,7 +472,7 @@ struct IntroScreen: View {
         .onTapGesture {
             guard !finished else { return }
             finished = true
-            onDone(spoken.contains(7))
+            onDone(spoken.contains(6))
         }
     }
 }
@@ -494,6 +494,15 @@ private struct BriefingPearl: View {
     static func landTime(_ i: Int) -> Double { 34.6 + Double(i) * 0.36 + 0.6 }
     /// All ten are inside the chest by here; the lid pops right after.
     static let allIn = 40.7
+    /// The roll toward the chest: nearest pearl first, farther ones longer.
+    static func rollStart(_ j: Int) -> Double { 39.0 + Double(9 - j) * 0.1 }
+    static func rollDur(_ j: Int) -> Double { 0.4 + Double(9 - j) * 0.045 }
+    /// When the pile at slot `i` is smeared flat: the moment the pearl behind
+    /// rolls through it (the last pearl smears its own pile as it leaves).
+    static func pileFlattens(_ i: Int) -> Double {
+        i == 0 ? rollStart(0) + 0.2
+               : rollStart(i - 1) + rollDur(i - 1) / Double(11 - i) + 0.05
+    }
 
     let i: Int
     let t: Double
@@ -522,7 +531,7 @@ private struct BriefingPearl: View {
         let land = Self.landTime(i)
         let f1 = clamp01((tl - (34.6 + Double(i) * 0.36)) / 0.6)
         // nearest pearl rolls first; farther ones roll longer
-        let f2raw = clamp01((tl - (39.0 + Double(9 - i) * 0.1)) / (0.4 + Double(9 - i) * 0.045))
+        let f2raw = clamp01((tl - Self.rollStart(i)) / Self.rollDur(i))
         let f2 = f2raw * f2raw * (3 - 2 * f2raw)
         if !front {
             // The flight pass: airborne only, behind the sisters
@@ -535,11 +544,19 @@ private struct BriefingPearl: View {
                            w: 26, h: 26)
             }
         } else if tl >= land {
-            // The grounded pass: the little sand pile the thud makes stays
-            Ellipse().fill(Color(red: 0.84, green: 0.73, blue: 0.52))
-                .stage(x: slot.x - 8, y: slot.y + 15, w: 42, h: 12)
-            Ellipse().fill(Color(red: 0.95, green: 0.88, blue: 0.70))
-                .stage(x: slot.x - 5, y: slot.y + 14, w: 36, h: 9)
+            // The grounded pass: the little sand pile the thud makes stays -
+            // until a rolling pearl ploughs through it and smears it flat
+            let flat = clamp01((tl - Self.pileFlattens(i)) / 0.4)
+            if flat < 1 {
+                Ellipse().fill(Color(red: 0.84, green: 0.73, blue: 0.52))
+                    .opacity(1 - flat)
+                    .stage(x: slot.x - 8 - 12 * flat, y: slot.y + 15 + 4 * flat,
+                           w: 42 + 24 * flat, h: 12 * (1 - 0.65 * flat))
+                Ellipse().fill(Color(red: 0.95, green: 0.88, blue: 0.70))
+                    .opacity(1 - flat)
+                    .stage(x: slot.x - 5 - 10 * flat, y: slot.y + 14 + 4 * flat,
+                           w: 36 + 20 * flat, h: 9 * (1 - 0.65 * flat))
+            }
             // the puff of sand kicked up at the thud
             let pt = clamp01((tl - land) / 0.45)
             if pt < 1 {
