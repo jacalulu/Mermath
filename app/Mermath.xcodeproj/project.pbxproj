@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		F1000054 /* Art in Resources */ = {isa = PBXBuildFile; fileRef = F1000002 /* Art */; };
+		F1000055 /* InjectionLite in Frameworks */ = {isa = PBXBuildFile; productRef = F1000081 /* InjectionLite */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F1000055 /* InjectionLite in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -71,6 +73,7 @@
 			);
 			name = Mermath;
 			packageProductDependencies = (
+				F1000081 /* InjectionLite */,
 			);
 			productName = Mermath;
 			productReference = F1000021 /* Mermath.app */;
@@ -101,6 +104,9 @@
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F1000020 /* Products */;
+			packageReferences = (
+				F1000080 /* XCRemoteSwiftPackageReference "InjectionLite" */,
+			);
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -154,7 +160,13 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
+				EMIT_FRONTEND_COMMAND_LINES = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-Xlinker",
+					"-interposable",
+				);
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -254,6 +266,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F1000080 /* XCRemoteSwiftPackageReference "InjectionLite" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/johnno1962/InjectionLite";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F1000081 /* InjectionLite */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F1000080 /* XCRemoteSwiftPackageReference "InjectionLite" */;
+			productName = InjectionLite;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F1000060 /* Project object */;
 }

@@ -57,6 +57,6 @@ The design space is 800x600 (4:3, landscape), which scales cleanly to a tablet. 
 - `assets/characters/`: the three sisters and the crab, as stackable pieces.
 - `assets/props/`, `assets/ui/`, `assets/brand/`, `assets/fonts/`: small painted objects, icons, the wordmark and app icon, Baloo 2.
 - `design/tokens.json` and `design/tokens.css`: palette, type, spacing and motion values.
-- `app/`: the shipped native iPad app (SwiftUI), built from this handoff. `tools/sync-art.sh` copies `assets/` into its bundle; `tools/make-voice.py` generates the spoken prompts.
+- `app/`: the shipped native iPad app (SwiftUI), built from this handoff. `tools/sync-art.sh` copies `assets/` into its bundle; `tools/make-voice.py` generates the spoken prompts. Debug builds hot-reload Swift edits into the running simulator (InjectionLite: save a file, ~1s, watch the app console for 🔥) — rebuild only for new files, assets, or stored-property changes.
 - `reference/storyboard/`: the original storyboard source files, with `blob-map.json` mapping their image ids to files in `assets/`.
 - `art-pipeline/`: the scripts that draw and paint everything.

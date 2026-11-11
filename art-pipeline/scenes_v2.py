@@ -736,8 +736,29 @@ def scene_props_layers():
           f'L536 292 C548 290 554 276 548 262 C554 244 548 228 536 226 Z" fill="{wood}" stroke="#8a6038" stroke-width="4.5"/>'
           f'<path d="M272 240 C340 234 470 236 528 244 M280 268 C350 274 460 276 522 270" '
           f'fill="none" stroke="#b08a54" stroke-width="3.5" opacity=".6"/>'
+          # light from the upper left: warm catch along the plank top and the
+          # post's left edge, cool shade along the bottom-right edges
+          f'<path d="M266 223 C330 217 470 215 530 223" fill="none" stroke="#f7e0ae" stroke-width="5" stroke-linecap="round" opacity=".85"/>'
+          f'<path d="M270 283 C340 289 468 290 532 286" fill="none" stroke="#6a4828" stroke-width="4" stroke-linecap="round" opacity=".5"/>'
+          f'<path d="M391 288 L396 438" stroke="#f2d49c" stroke-width="6" stroke-linecap="round" opacity=".9"/>'
+          f'<path d="M408 288 L403 440" stroke="#5e3e22" stroke-width="6" stroke-linecap="round" opacity=".6"/>'
+          # bury the base: chunky sand strokes lapping over the post's foot
+          f'<path d="M376 442 Q400 430 424 442 Q412 450 400 449 Q388 450 376 442 Z" fill="#edd4a0"/>'
+          f'<path d="M380 446 q10 -6 20 -2 M402 444 q9 -3 17 2" fill="none" stroke="#f7e6ba" stroke-width="5" stroke-linecap="round"/>'
+          f'<ellipse cx="424" cy="448" rx="8" ry="5" fill="#b98f5c"/>'
           f'<circle cx="400" cy="231" r="4.5" fill="#6a4828"/>'
           f'<polygon points="{star(276, 286, 14, 6.2, -78)}" fill="#ff9ecb"/>')
+    # A painted padlock on a rope, to hang over a locked sign's plank edge
+    # (replaces the shiny vector padlock there).
+    s.layer('padlock2')
+    s.add(f'<path d="M366 130 L410 130" stroke="#e2cba2" stroke-width="9" stroke-linecap="round"/>'
+          f'<path d="M368 134 C372 158 378 174 386 192 M406 134 C400 158 394 176 388 192" '
+          f'fill="none" stroke="#e2cba2" stroke-width="9" stroke-linecap="round"/>'
+          f'<path d="M371 196 V180 a16 16 0 0 1 32 0 V196" fill="none" stroke="#e0aa42" stroke-width="9" stroke-linecap="round"/>'
+          f'<path d="M371 196 V180 a16 16 0 0 1 32 0 V196" fill="none" stroke="#fff0b0" stroke-width="3" stroke-linecap="round" opacity=".7"/>'
+          f'<rect x="358" y="194" width="58" height="48" rx="10" fill="{gold}" stroke="#a86a14" stroke-width="2.5"/>'
+          f'<circle cx="387" cy="212" r="6" fill="#3a1a0a"/><path d="M383.5 213 L390.5 213 L388.5 228 L385.5 228 Z" fill="#3a1a0a"/>'
+          f'<ellipse cx="372" cy="202" rx="9" ry="4" fill="#ffffff" opacity=".5"/>')
     roofg = s.lin([(0, '#ffb3d4', 1), (1, '#e85d8a', 1)])
     wallg = s.lin([(0, '#fff6e0', 1), (1, '#f0d8a8', 1)])
     s.layer('icon_home')
@@ -750,7 +771,7 @@ def scene_props_layers():
     return {name: s.svg_layer(name) for name in (
         'lock', 'afish', 'afish_face', 'whale', 'whale_face',
         'whale_face_uhoh', 'hoard_left', 'hoard_right', 'hoard_floor', 'hoard_strings',
-        'fgfan_a', 'fgfan_b', 'bigmap', 'digmound', 'digx', 'sign', 'icon_home')}
+        'fgfan_a', 'fgfan_b', 'bigmap', 'digmound', 'digx', 'sign', 'icon_home', 'padlock2')}
 
 from frame import scene_home_layers
 
@@ -775,5 +796,5 @@ SCENES2 = {
                                        hoard_floor='prop', hoard_strings='vector',
                                        fgfan_a='fg', fgfan_b='fg', bigmap='prop',
                                        digmound='prop', digx='vector',
-                                       sign='prop', icon_home='prop')),
+                                       sign='prop', icon_home='prop', padlock2='prop')),
 }

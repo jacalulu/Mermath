@@ -4,8 +4,24 @@ import SwiftUI
 /// can swipe to escape. Cross-dissolves between screens.
 struct RootView: View {
     @State private var model = AppModel()
+    #if DEBUG
+    /// Hot reload (InjectionLite): bumping this id rebuilds the whole view
+    /// tree with the freshly injected implementations.
+    @State private var injectionTick = 0
+    #endif
 
     var body: some View {
+        stage
+            #if DEBUG
+            .id(injectionTick)
+            .onReceive(NotificationCenter.default.publisher(
+                for: Notification.Name("INJECTION_BUNDLE_NOTIFICATION"))) { _ in
+                injectionTick += 1
+            }
+            #endif
+    }
+
+    private var stage: some View {
         StageView {
             switch model.route {
             case .intro:

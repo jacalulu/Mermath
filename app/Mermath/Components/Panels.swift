@@ -70,17 +70,30 @@ struct SolvedPanel: View {
     }
 }
 
-/// The little painted shell-roofed house, back to the home (pick) screen:
-/// the corner home button every kids' game uses, no words needed.
+/// The corner home button every kids' game uses: a chunky geometric circle in
+/// the tap-me orange with a plain white house glyph and a hard offset shadow,
+/// deliberately crisp UI against the painted world behind it.
 struct HomeButton: View {
     let scale: CGFloat
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
-            ArtImage("ui/icon-home.png")
-                .frame(width: 56 * scale, height: 68 * scale)
-                .shadow(color: Tokens.Palette.midnight.opacity(0.4), radius: 4 * scale, y: 5 * scale)
+            ZStack {
+                Circle()
+                    .fill(Color(hex: 0xC9641A))
+                    .offset(y: 5 * scale)
+                Circle()
+                    .fill(Color(hex: 0xFF9A3D))
+                Circle()
+                    .strokeBorder(.white.opacity(0.85), lineWidth: 3 * scale)
+                    .padding(3.5 * scale)
+                Image(systemName: "house.fill")
+                    .font(.system(size: 30 * scale, weight: .bold))
+                    .foregroundStyle(.white)
+                    .offset(y: -1.5 * scale)
+            }
+            .frame(width: 72 * scale, height: 72 * scale)
         }
         .buttonStyle(.plain)
     }

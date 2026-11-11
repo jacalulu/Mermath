@@ -73,12 +73,13 @@ struct ReefMapScreen: View {
                 .stage(x: 14, y: 40, w: 330, h: 230)
                 GlowPulse(t: t)
                     .stage(x: 86, y: 116, w: 150, h: 56)
+                // Sign first, crab after: his claw rests against the post
+                SignPost(name: "Tide Pool", w: 126, t: t, scale: s, tilt: 2)
+                    .stage(x: 196, y: 64, w: 126, h: 102)
                 CrabView(t: t, scale: s, blinkCycle: 5.1, bobTo: -3)
                     .frame(width: 76 * s, height: 64 * s)
                     .allowsHitTesting(false)
                     .stage(x: 182, y: 84, w: 76, h: 64)
-                SignPost(name: "Tide Pool", w: 126, t: t, scale: s, tilt: 3.5)
-                    .stage(x: 246, y: 84, w: 126, h: 102)
 
                 // Coral Reef on the mid-water ledge: the picked sister floats
                 // over the coral, her sign planted in the seagrass where the
@@ -94,8 +95,11 @@ struct ReefMapScreen: View {
                     .frame(width: 158 * s, height: 181 * s)
                     .allowsHitTesting(false)
                     .stage(x: 388, y: 220, w: 158, h: 181)
-                SignPost(name: "Coral Reef", w: 140, t: t, scale: s, tilt: 2, delay: -0.9)
-                    .stage(x: 248, y: 316, w: 140, h: 113)
+                SignPost(name: "Coral Reef", w: 140, t: t, scale: s, tilt: -2, delay: -0.9)
+                    .stage(x: 252, y: 352, w: 140, h: 113)
+                ArtImage("props/sea-star-pink.png")
+                    .allowsHitTesting(false)
+                    .stage(x: 328, y: 446, w: 26, h: 24)
 
                 // Deep Sea, down the cliff in the dark corner: the padlock
                 // hangs on its sign until two clean dives open it
@@ -107,15 +111,16 @@ struct ReefMapScreen: View {
                     .stage(x: 602, y: 390, w: 174, h: 186)
                     GlowPulse(t: t, delay: -0.4)
                         .stage(x: 630, y: 468, w: 166, h: 80)
-                    SignPost(name: "Deep Sea", w: 140, t: t, scale: s, tilt: -2, delay: -1.7)
+                    SignPost(name: "Deep Sea", w: 140, t: t, scale: s, tilt: -2, delay: -1.7, cool: true)
                         .stage(x: 628, y: 406, w: 140, h: 113)
                 } else {
-                    SignPost(name: "Deep Sea", w: 140, t: t, scale: s, tilt: -2, delay: -1.7, locked: true)
+                    SignPost(name: "Deep Sea", w: 140, t: t, scale: s, tilt: -2, delay: -1.7, locked: true, cool: true)
                         .stage(x: 628, y: 406, w: 140, h: 113)
-                    ArtImage("ui/padlock.png")
-                        .shadow(color: Tokens.Palette.midnight.opacity(0.5), radius: 4 * s, y: 4 * s)
+                    // The painted padlock hangs from its rope over the plank
+                    ArtImage("props/padlock-rope.png")
+                        .shadow(color: Tokens.Palette.midnight.opacity(0.45), radius: 4 * s, y: 4 * s)
                         .allowsHitTesting(false)
-                        .stage(x: 678, y: 428, w: 42, h: 54)
+                        .stage(x: 679, y: 434, w: 38, h: 68)
                 }
 
                 Vignette()
@@ -162,24 +167,41 @@ private struct SignPost: View {
     var tilt: Double = 0
     var delay: Double = 0
     var locked = false
+    /// Deep-water color grade: cools and darkens the wood to sit at depth.
+    var cool = false
 
     var body: some View {
         let h = w * 258 / 320
+        let ink = Color(hex: cool ? 0x2E2418 : 0x4A2C12)
         ZStack {
+            // Contact shadow cast to the bottom-right (light from upper left)
+            Ellipse()
+                .fill(Tokens.Palette.midnight.opacity(cool ? 0.4 : 0.26))
+                .blur(radius: 3.5 * scale)
+                .frame(width: w * 0.5 * scale, height: h * 0.08 * scale)
+                .position(x: w * 0.6 * scale, y: h * 0.955 * scale)
             ArtImage("props/sign.png")
                 .frame(width: w * scale, height: h * scale)
-            Text(name)
-                .font(baloo(21, weight: 700, scale: scale))
-                .foregroundStyle(Color(hex: 0x5A3418).opacity(locked ? 0.55 : 0.92))
-                .lineLimit(1)
-                .minimumScaleFactor(0.65)
-                .frame(width: w * 0.76 * scale)
-                .position(x: w * 0.5 * scale, y: h * 0.19 * scale)
+                .colorMultiply(cool ? Color(hex: 0xAEBACF) : .white)
+            // Carved lettering: a light chisel catch under the walnut ink
+            ZStack {
+                carvedText.foregroundStyle(Color(hex: 0xF7E7C0).opacity(cool ? 0.4 : 0.75))
+                    .offset(y: 1.6 * scale)
+                carvedText.foregroundStyle(ink.opacity(locked ? 0.65 : 0.95))
+            }
+            .frame(width: w * 0.76 * scale)
+            .position(x: w * 0.5 * scale, y: h * 0.19 * scale)
         }
         .frame(width: w * scale, height: h * scale)
         .rotationEffect(.degrees(tilt), anchor: .bottom)
         .scaleEffect(Wave.alternate(t, from: 1.0, to: 1.03, duration: 2.6, delay: delay), anchor: .bottom)
-        .shadow(color: Tokens.Palette.midnight.opacity(0.3), radius: 5 * scale, y: 4 * scale)
         .allowsHitTesting(false)
+    }
+
+    private var carvedText: some View {
+        Text(name)
+            .font(baloo(21, weight: 700, scale: scale))
+            .lineLimit(1)
+            .minimumScaleFactor(0.65)
     }
 }
