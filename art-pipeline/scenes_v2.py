@@ -182,6 +182,8 @@ def scene_map_layers():
           f'<path d="M-20 300 C90 290 190 296 260 310 M-20 420 C100 408 220 416 300 432 M20 530 C140 518 280 526 380 544" '
           f'fill="none" stroke="#c9a06c" stroke-width="7" opacity=".5" filter="url(#b6)"/>'
           + boulder(s, 120, 372, 88, 40, moss=False) + boulder(s, 258, 492, 104, 48)
+          # a structural corner where the slope drops to the reef ledge
+          + boulder(s, 336, 394, 122, 54)
           # depth shading: everything right of the second cliff sinks into navy
           + f'<rect width="{W}" height="{H}" fill="{s.lin([(.4, "#0b2e57", 0), (.72, "#0b2e57", .4), (1, "#0b2e57", .68)], x1=0, y1=0, x2=1, y2=0)}"/>'
           f'<rect width="{W}" height="{H}" fill="{s.lin([(.42, "#07284a", 0), (1, "#07284a", .55)], x1=0, y1=0, x2=0, y2=1)}"/></g>')
@@ -190,7 +192,9 @@ def scene_map_layers():
     s.add(boulder(s, 36, 176, 96, 46) + boulder(s, 224, 180, 86, 42, moss=False))
     s.add('<ellipse cx="132" cy="178" rx="74" ry="17" fill="#e9fffa"/><ellipse cx="132" cy="180" rx="64" ry="12.5" fill="#9ee9de"/>'
           '<ellipse cx="114" cy="176" rx="26" ry="4.5" fill="#ffffff" opacity=".75"/>')
-    s.add(seastar(198, 196, 10, '#ff7eb6', -80) + grass(r, 70, 200, 4, 12, 26, '#1f9c7c', '#3fc79a') + shell_on_sand(158, 206))
+    # a low rock lip ACROSS the pool's front edge, so the water sits in a basin
+    s.add(boulder(s, 108, 212, 110, 32, moss=False) + boulder(s, 186, 214, 76, 26))
+    s.add(seastar(198, 196, 10, '#ff7eb6', -80) + grass(r, 70, 200, 4, 12, 26, '#1f9c7c', '#3fc79a') + shell_on_sand(158, 224))
     s.add(seastar(258, 206, 8, '#ffd27a', 24))
     # 2. CORAL REEF on the mid-water ledge
     s.add(coral(r, 420, 408, '#b23a2a', '#ffb347', 150, 4, 16, -93) + coral(r, 520, 410, '#5a3aa8', '#d2b4ff', 160, 4, 16, -86) + coral(r, 468, 418, '#b03070', '#ff9ecb', 116, 4, 14, -90))

@@ -37,7 +37,7 @@ struct ReefMapScreen: View {
                     FishSwim(t: t, travel: 940, bobDown: 5, bobUp: 6, duration: 36, delay: -18, scale: s)
                         .stage(x: 830, y: 104, w: 30, h: 19)
                     ArtImage("scenes/reef-map/seabed.png")
-                        .stage(x: 0, y: 122, w: 800, h: 478)
+                        .stage(x: 0, y: 120, w: 800, h: 480)
                     // The grass spans pool to ledge, so it holds still here
                     ArtImage("scenes/reef-map/seagrass.png")
                         .stage(x: 68, y: 170, w: 538, h: 260)
@@ -48,14 +48,15 @@ struct ReefMapScreen: View {
                 }
                 .bleed()
 
-                // Pearl trail down the slope twinkles; the locked drop sits still
-                ForEach(Array([(218.0, 238.0), (248, 262), (278, 288), (308, 314)].enumerated()), id: \.offset) { i, dot in
+                // Pearl trail: pool to reef it swoops through open water and
+                // twinkles; the locked drop down the cliff sits dim and still
+                ForEach(Array([(234.0, 300.0), (272, 340), (310, 380), (346, 418), (378, 450)].enumerated()), id: \.offset) { i, dot in
                     TrailDot(opacity: Wave.alternate(t, from: 0.55, to: 1, duration: 1, delay: Double(i) * 0.25), scale: s)
-                        .stage(x: dot.0, y: dot.1, w: 11, h: 11)
+                        .stage(x: dot.0, y: dot.1, w: 17, h: 17)
                 }
-                ForEach(Array([(584.0, 430.0), (610, 452), (636, 474), (660, 494)].enumerated()), id: \.offset) { _, dot in
+                ForEach(Array([(578.0, 444.0), (606, 464), (634, 482), (660, 498)].enumerated()), id: \.offset) { _, dot in
                     TrailDot(opacity: 0.4, scale: s, shadow: false)
-                        .stage(x: dot.0, y: dot.1, w: 11, h: 11)
+                        .stage(x: dot.0, y: dot.1, w: 17, h: 17)
                 }
 
                 // Tide Pool, in the shore shelf at the surface: the crab waits
@@ -70,9 +71,9 @@ struct ReefMapScreen: View {
                 CrabView(t: t, scale: s, blinkCycle: 5.1, bobTo: -3)
                     .frame(width: 104 * s, height: 88 * s)
                     .allowsHitTesting(false)
-                    .stage(x: 16, y: 86, w: 104, h: 88)
+                    .stage(x: 34, y: 94, w: 104, h: 88)
                 ZoneLabel(name: "Tide Pool", subtitle: "Find the number", scale: s)
-                    .stage(x: 140, y: 246, w: 0, h: 0)
+                    .stage(x: 120, y: 262, w: 0, h: 0)
 
                 // Coral Reef on the mid-water ledge: the picked sister floats
                 // over the coral
@@ -88,7 +89,7 @@ struct ReefMapScreen: View {
                     .allowsHitTesting(false)
                     .stage(x: 396, y: 148, w: 158, h: 181)
                 ZoneLabel(name: "Coral Reef", subtitle: "Adding to 10", scale: s)
-                    .stage(x: 474, y: 448, w: 0, h: 0)
+                    .stage(x: 428, y: 474, w: 0, h: 0)
 
                 // Deep Sea, down the cliff in the dark corner: padlocked until
                 // two clean dives open it
