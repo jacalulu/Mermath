@@ -132,14 +132,15 @@ struct IntroScreen: View {
                         // bed until the rattling wakes them with a start
                         Group {
                             SisterView(spec: .ophelia, t: t, scale: s, asleep: tl < 18.1)
-                                .frame(width: 104 * s, height: 119 * s)
-                                .stage(x: dx + 236 + rattle, y: 314, w: 104, h: 119)
+                                .frame(width: 120 * s, height: 137 * s)
+                                .stage(x: dx + 224 + rattle, y: 296, w: 120, h: 137)
                             SisterView(spec: .daphne, t: t, scale: s, asleep: tl < 18.3)
-                                .frame(width: 92 * s, height: 105 * s)
-                                .stage(x: dx + 126 + rattle, y: 398, w: 92, h: 105)
+                                .frame(width: 104 * s, height: 119 * s)
+                                .stage(x: dx + 116 + rattle, y: 386, w: 104, h: 119)
                             SisterView(spec: .violet, t: t, scale: s, asleep: tl < 18.2)
-                                .frame(width: 92 * s, height: 105 * s)
-                                .stage(x: dx + 352 + rattle, y: 388, w: 92, h: 105)
+                                .frame(width: 104 * s, height: 119 * s)
+                                .scaleEffect(x: -1)
+                                .stage(x: dx + 354 + rattle, y: 376, w: 104, h: 119)
                         }
                         // Little sleep bubbles rising off each snoozing sister
                         if tl < 18.1 {
@@ -329,85 +330,89 @@ struct IntroScreen: View {
                     .opacity(min(beat(tl, 21.4, 22.0), 1 - beat(tl, 29.8, 30.4)))
                 }
 
-                // ---- The mission briefing: the crab explains the game while
-                // ten pearls pop up one by one and a chest appears - dive,
-                // find the numbers, win pearls, open the chest.
+                // ---- The mission briefing, staged like a scene, not a
+                // diagram: the crab on his own rock, the chest grounded on
+                // the sand, the map unfurling from it, and the sisters -
+                // big, drifting, arriving one by one - gathered between.
                 if tl >= 30.0 {
                     Group {
-                        ArtImage("scenes/home/bg.jpg")
+                        ArtImage("scenes/tide-pool/bg.jpg")
                             .stage(x: 0, y: 0, w: 800, h: 600)
-                        ArtImage("scenes/home/foreground.png")
-                            .stage(x: 0, y: 440, w: 800, h: 160)
+                        LightShimmer(t: t)
+                            .stage(x: 0, y: 0, w: 800, h: 340)
+                        ArtImage("scenes/tide-pool/foreground.png")
+                            .stage(x: 0, y: 350, w: 800, h: 250)
                         Vignette()
                             .stage(x: 0, y: 0, w: 800, h: 600)
                     }
                     .bleed()
+                    // The crab pops onto his rock and hops as he talks
                     let pop = easeOut(beat(tl, 30.1, 30.8))
-                    // The crab hops a little with excitement as he talks
-                    let hop = tl > 30.9 && tl < 50.6 ? abs(sin((tl - 30.9) * 2.6)) * 7.0 : 0.0
+                    let hop = tl > 30.9 && tl < 50.6 ? abs(sin((tl - 30.9) * 2.6)) * 6.0 : 0.0
                     CrabView(t: t, scale: s)
-                        .stage(x: 275, y: 620 - pop * 310 - hop, w: 250, h: 211)
-                    // The culprit, peeking in sheepishly while the crab talks
+                        .opacity(pop)
+                        .stage(x: 15, y: 204 + (1 - pop) * 60 - hop, w: 250, h: 211)
+                    // The culprit, peeking in sheepishly from the top corner
                     let peek = easeOut(beat(tl, 31.6, 32.7))
                     if peek > 0 {
                         WhaleIntroView(scale: s, uhoh: false, breathe: 0)
-                            .rotationEffect(.degrees(10))
-                            .scaleEffect(0.72)
-                            .stage(x: -620 + peek * 190, y: 0, w: 568, h: 240)
+                            .rotationEffect(.degrees(14))
+                            .scaleEffect(0.62)
+                            .stage(x: 350 + (1 - peek) * 320, y: -150, w: 568, h: 240)
                     }
-                    // Ten pearls arc up one by one, leading right to the chest
+                    // The chest, grounded on the sand with its own shadow
+                    if tl > 38.2 {
+                        let c = easeOut(beat(tl, 38.2, 38.8))
+                        Ellipse()
+                            .fill(Tokens.Palette.midnight.opacity(0.3 * c))
+                            .stage(x: 592, y: 528, w: 170, h: 26)
+                        ArtImage("scenes/treasure-chest/chest-box.png")
+                            .scaleEffect(0.6 + c * 0.4, anchor: .bottom)
+                            .opacity(c)
+                            .stage(x: 600, y: 440, w: 150, h: 97)
+                        TwinkleStar(t: t, duration: 1.6).stage(x: 592, y: 430, w: 24, h: 24)
+                        TwinkleStar(t: t, duration: 2.0, delay: 0.7).stage(x: 748, y: 480, w: 20, h: 20)
+                    }
+                    // Ten pearls arc from the crab's claw down into the chest
                     ForEach(0..<10, id: \.self) { i in
                         let at = 34.6 + Double(i) * 0.36
                         if tl > at {
                             let a = easeOut(beat(tl, at, at + 0.3))
+                            let f = Double(i) / 9
                             ArtImage("ui/pearl.png")
                                 .shadow(color: Tokens.Palette.pearl.opacity(0.8), radius: 5 * s)
                                 .scaleEffect(0.5 + a * 0.5)
                                 .opacity(a)
-                                .stage(x: 282 + CGFloat(i) * 34,
-                                       y: 200 - sin(.pi * Double(i) / 11) * 62, w: 26, h: 26)
+                                .stage(x: 215 + CGFloat(f) * 445,
+                                       y: 290 - sin(.pi * f) * 130 + CGFloat(f) * 160, w: 26, h: 26)
                         }
                     }
-                    // ...the chest they open...
-                    if tl > 38.2 {
-                        let c = easeOut(beat(tl, 38.2, 38.8))
-                        ArtImage("scenes/treasure-chest/chest-box.png")
-                            .scaleEffect(0.6 + c * 0.4)
-                            .opacity(c)
-                            .stage(x: 588, y: 112, w: 120, h: 77)
-                        TwinkleStar(t: t, duration: 1.6).stage(x: 578, y: 102, w: 24, h: 24)
-                    }
-                    // ...the map it shows...
+                    // The map unfurls up out of the chest when he names it
                     if tl > 40.2 {
                         let mp = easeOut(beat(tl, 40.2, 40.8))
                         ArtImage("ui/icon-map.png")
-                            .scaleEffect(0.5 + mp * 0.5)
+                            .scaleEffect(0.4 + mp * 0.6, anchor: .bottom)
                             .opacity(mp)
-                            .offset(y: Wave.bob(t, from: 0, to: -5, duration: 2.6) * s)
-                            .stage(x: 604, y: 206 + (1 - mp) * -24, w: 88, h: 88)
+                            .offset(y: Wave.bob(t, from: 0, to: -6, duration: 2.6) * s)
+                            .stage(x: 630, y: 340 + (1 - mp) * 70, w: 92, h: 92)
                     }
-                    // ...and the lost treasure it leads home
-                    if tl > 42.2 {
-                        let gh = easeOut(beat(tl, 42.2, 42.9))
-                        ArtImage("scenes/grotto/starfish-lamp.png")
-                            .saturation(0.55)
-                            .opacity(gh * 0.9)
-                            .stage(x: 700, y: 330, w: 72, h: 69)
-                        TwinkleStar(t: t, duration: 1.7, delay: 0.3).stage(x: 690, y: 318, w: 22, h: 22)
+                    // The sisters swim in one by one and drift while they listen
+                    let sistersIn: [(SisterSpec, CGFloat, CGFloat, CGFloat, Double, Double)] = [
+                        (.ophelia, 330, 220, 172, 30.6, 0),
+                        (.daphne, 470, 330, 152, 31.2, -2.1),
+                        (.violet, 282, 360, 152, 31.8, -4.3),
+                    ]
+                    ForEach(0..<3, id: \.self) { i in
+                        let (spec, px, py, w, at, ph) = sistersIn[i]
+                        let arrive = easeOut(beat(tl, at, at + 1.1))
+                        SisterView(spec: spec, t: t, scale: s)
+                            .frame(width: w * s, height: w * 1.147 * s)
+                            .scaleEffect(x: i == 2 ? -1 : 1)
+                            .opacity(arrive)
+                            .stage(x: px + (1 - arrive) * -240 + Wave.alternate(t, from: -14, to: 14, duration: 5.2, delay: ph),
+                                   y: py + Wave.alternate(t, from: -8, to: 8, duration: 4.1, delay: ph * 1.7),
+                                   w: w, h: w * 1.147)
                     }
-                    // The sisters, gathered to hear the plan
-                    Group {
-                        SisterView(spec: .ophelia, t: t, scale: s)
-                            .frame(width: 118 * s, height: 135 * s)
-                            .stage(x: 56, y: 300, w: 118, h: 135)
-                        SisterView(spec: .daphne, t: t, scale: s)
-                            .frame(width: 104 * s, height: 119 * s)
-                            .stage(x: 152, y: 376, w: 104, h: 119)
-                        SisterView(spec: .violet, t: t, scale: s)
-                            .frame(width: 104 * s, height: 119 * s)
-                            .stage(x: 30, y: 420, w: 104, h: 119)
-                    }
-                    .opacity(easeOut(beat(tl, 30.6, 31.4)))
                 }
 
                 // Skip hint, quietly in the corner

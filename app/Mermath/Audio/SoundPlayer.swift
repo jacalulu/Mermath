@@ -29,7 +29,8 @@ final class SoundPlayer {
             if let url,
                let player = try? AVAudioPlayer(contentsOf: url) {
                 player.prepareToPlay()
-                player.volume = effect == .introMusic ? 0.42 : 0.6
+                // Music sits well under the voice
+                player.volume = effect == .introMusic ? 0.24 : 0.6
                 players[effect] = player
             }
         }
