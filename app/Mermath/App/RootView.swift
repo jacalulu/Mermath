@@ -30,7 +30,8 @@ struct RootView: View {
                         child: child,
                         deepSeaUnlocked: model.store.progress(for: child).cleanDives >= 2,
                         onDive: { model.startDive($0) },
-                        onSwitchMermaid: { model.switchMermaid() }
+                        onHome: { model.switchMermaid() },
+                        speak: { model.speaker.speak($0) }
                     )
                     .transition(.opacity)
                 }

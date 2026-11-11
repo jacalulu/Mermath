@@ -720,10 +720,37 @@ def scene_props_layers():
         + pearls([(150 + i * 25, 140 + 76 * (1 - abs(i - 4) / 4) ** 1.2) for i in range(9)], 7)
         + '<path d="M470 130 Q560 210 650 140" fill="none" stroke="#e8d8c0" stroke-width="2"/>'
         + pearls([(470 + i * 22.5, 130 + 74 * (1 - abs(i - 4) / 4) ** 1.2) for i in range(9)], 7))
+
+    # The reef map's in-world place markers: a blank driftwood signpost (the
+    # app paints each place name onto the plank, so the wood stays reusable)
+    # and the little shell-roofed house for the "back home" corner button.
+    wood = s.lin([(0, '#eccf9a', 1), (.55, '#d4a96e', 1), (1, '#a97c48', 1)])
+    postg = s.lin([(0, '#c59a62', 1), (1, '#8a6038', 1)], x2=1, y2=0)
+    s.layer('sign')
+    s.add(f'<path d="M386 282 L414 282 L409 446 L393 446 Z" fill="{postg}" stroke="#7a5430" stroke-width="3.5"/>'
+          f'<path d="M399 300 L401 400" stroke="#7a5430" stroke-width="2.5" opacity=".5"/>'
+          f'<circle cx="394" cy="420" r="3.2" fill="#e8d8b0" opacity=".8"/><circle cx="406" cy="408" r="2.6" fill="#e8d8b0" opacity=".7"/>'
+          f'<path d="M348 446 Q400 430 452 446 L444 458 L356 458 Z" fill="{s.lin(SAND2)}" stroke="#c9a05e" stroke-width="2.5"/>'
+          f'<ellipse cx="366" cy="452" rx="9" ry="4" fill="#b98f5c" opacity=".7"/>')
+    s.add(f'<path d="M262 218 C250 220 246 236 252 252 C246 268 252 284 264 286 '
+          f'L536 292 C548 290 554 276 548 262 C554 244 548 228 536 226 Z" fill="{wood}" stroke="#8a6038" stroke-width="4.5"/>'
+          f'<path d="M272 240 C340 234 470 236 528 244 M280 268 C350 274 460 276 522 270" '
+          f'fill="none" stroke="#b08a54" stroke-width="3.5" opacity=".6"/>'
+          f'<circle cx="400" cy="231" r="4.5" fill="#6a4828"/>'
+          f'<polygon points="{star(276, 286, 14, 6.2, -78)}" fill="#ff9ecb"/>')
+    roofg = s.lin([(0, '#ffb3d4', 1), (1, '#e85d8a', 1)])
+    wallg = s.lin([(0, '#fff6e0', 1), (1, '#f0d8a8', 1)])
+    s.layer('icon_home')
+    s.add(f'<path d="M602 166 L678 166 L673 228 Q640 237 607 228 Z" fill="{wallg}" stroke="#b8905c" stroke-width="4"/>'
+          f'<path d="M590 170 C594 132 624 108 640 106 C656 108 686 132 690 170 Z" fill="{roofg}" stroke="#c04a72" stroke-width="4.5"/>'
+          f'<path d="M616 166 C618 142 630 120 640 110 M664 166 C662 142 650 120 640 110" fill="none" stroke="#c04a72" stroke-width="3" opacity=".65"/>'
+          f'<circle cx="640" cy="141" r="9.5" fill="#fff6e0" stroke="#c04a72" stroke-width="3"/>'
+          f'<path d="M626 229 L626 198 A14 14 0 0 1 654 198 L654 229 Z" fill="#49c6c0" stroke="#2f8c86" stroke-width="3"/>'
+          f'<circle cx="648" cy="212" r="2.6" fill="#fff6e0"/>')
     return {name: s.svg_layer(name) for name in (
         'lock', 'afish', 'afish_face', 'whale', 'whale_face',
         'whale_face_uhoh', 'hoard_left', 'hoard_right', 'hoard_floor', 'hoard_strings',
-        'fgfan_a', 'fgfan_b', 'bigmap', 'digmound', 'digx')}
+        'fgfan_a', 'fgfan_b', 'bigmap', 'digmound', 'digx', 'sign', 'icon_home')}
 
 from frame import scene_home_layers
 
@@ -747,5 +774,6 @@ SCENES2 = {
                                        whale_face_uhoh='vector', hoard_left='prop', hoard_right='prop',
                                        hoard_floor='prop', hoard_strings='vector',
                                        fgfan_a='fg', fgfan_b='fg', bigmap='prop',
-                                       digmound='prop', digx='vector')),
+                                       digmound='prop', digx='vector',
+                                       sign='prop', icon_home='prop')),
 }

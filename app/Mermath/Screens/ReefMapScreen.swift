@@ -11,13 +11,17 @@ struct ReefMapScreen: View {
     /// Two clean dives (no hints) open the Deep Sea.
     var deepSeaUnlocked = false
     var onDive: (Zone) -> Void = { _ in }
-    var onSwitchMermaid: () -> Void = {}
+    var onHome: () -> Void = {}
+    var speak: (Prompt) -> Void = { _ in }
 
     @Environment(\.stage) private var m
+    @State private var start: Double?
+    @State private var invited = false
 
     var body: some View {
         let s = m.scale
         MotionClock { t in
+            let tl = t - (start ?? t)
             ZStack {
                 // Scenery (bleeds to the physical edges)
                 Group {
@@ -49,96 +53,84 @@ struct ReefMapScreen: View {
                 .bleed()
 
                 // Pearl trail: it leaves the pool, crosses the waterline, and
-                // swoops down open water to the reef; the locked drop is dim
-                ForEach(Array([(212.0, 150.0), (238, 186), (268, 230), (300, 276), (332, 322), (362, 364)].enumerated()), id: \.offset) { i, dot in
+                // swoops down to the Coral Reef signpost; the locked drop is dim
+                ForEach(Array([(212.0, 150.0), (238, 186), (268, 230), (300, 276)].enumerated()), id: \.offset) { i, dot in
                     TrailDot(opacity: Wave.alternate(t, from: 0.55, to: 1, duration: 1, delay: Double(i) * 0.25), scale: s)
                         .stage(x: dot.0, y: dot.1, w: 17, h: 17)
                 }
-                ForEach(Array([(578.0, 444.0), (606, 464), (634, 482), (660, 498)].enumerated()), id: \.offset) { _, dot in
+                ForEach(Array([(578.0, 444.0), (606, 464)].enumerated()), id: \.offset) { _, dot in
                     TrailDot(opacity: 0.4, scale: s, shadow: false)
                         .stage(x: dot.0, y: dot.1, w: 17, h: 17)
                 }
 
                 // Tide Pool, hollowed into the DRY shore rock above the
-                // waterline: the crab perches on its rim against the sky,
-                // label floating in the shallows just under the line
+                // waterline: the crab perches on its rim against the sky, and
+                // a driftwood sign stands on the rock beside it
                 Button(action: { onDive(.tidePool) }) {
                     Color.clear.contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .stage(x: 14, y: 80, w: 266, h: 190)
+                .stage(x: 14, y: 40, w: 330, h: 230)
                 GlowPulse(t: t)
                     .stage(x: 86, y: 116, w: 150, h: 56)
                 CrabView(t: t, scale: s, blinkCycle: 5.1, bobTo: -3)
                     .frame(width: 76 * s, height: 64 * s)
                     .allowsHitTesting(false)
                     .stage(x: 182, y: 84, w: 76, h: 64)
-                ZoneLabel(name: "Tide Pool", subtitle: "Find the number", scale: s)
-                    .stage(x: 134, y: 200, w: 0, h: 0)
+                SignPost(name: "Tide Pool", w: 126, t: t, scale: s, tilt: 3.5)
+                    .stage(x: 246, y: 84, w: 126, h: 102)
 
                 // Coral Reef on the mid-water ledge: the picked sister floats
-                // over the coral
+                // over the coral, her sign planted in the seagrass where the
+                // pearl trail ends
                 Button(action: { onDive(.coralReef) }) {
                     Color.clear.contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .stage(x: 340, y: 210, w: 260, h: 280)
+                .stage(x: 250, y: 210, w: 350, h: 280)
                 GlowPulse(t: t, delay: -0.8)
                     .stage(x: 398, y: 346, w: 195, h: 82)
                 SisterView(spec: child.puppet, t: t, scale: s)
                     .frame(width: 158 * s, height: 181 * s)
                     .allowsHitTesting(false)
                     .stage(x: 388, y: 220, w: 158, h: 181)
-                ZoneLabel(name: "Coral Reef", subtitle: "Adding to 10", scale: s)
-                    .stage(x: 424, y: 466, w: 0, h: 0)
+                SignPost(name: "Coral Reef", w: 140, t: t, scale: s, tilt: 2, delay: -0.9)
+                    .stage(x: 248, y: 316, w: 140, h: 113)
 
-                // Deep Sea, down the cliff in the dark corner: padlocked until
-                // two clean dives open it
+                // Deep Sea, down the cliff in the dark corner: the padlock
+                // hangs on its sign until two clean dives open it
                 if deepSeaUnlocked {
                     Button(action: { onDive(.deepSea) }) {
                         Color.clear.contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
-                    .stage(x: 602, y: 400, w: 194, h: 176)
+                    .stage(x: 602, y: 390, w: 174, h: 186)
                     GlowPulse(t: t, delay: -0.4)
                         .stage(x: 630, y: 468, w: 166, h: 80)
-                    ZoneLabel(name: "Deep Sea", subtitle: "Counting by 2s and 5s", scale: s)
-                        .stage(x: 692, y: 506, w: 0, h: 0)
+                    SignPost(name: "Deep Sea", w: 140, t: t, scale: s, tilt: -2, delay: -1.7)
+                        .stage(x: 628, y: 406, w: 140, h: 113)
                 } else {
+                    SignPost(name: "Deep Sea", w: 140, t: t, scale: s, tilt: -2, delay: -1.7, locked: true)
+                        .stage(x: 628, y: 406, w: 140, h: 113)
                     ArtImage("ui/padlock.png")
                         .shadow(color: Tokens.Palette.midnight.opacity(0.5), radius: 4 * s, y: 4 * s)
-                        .stage(x: 702, y: 420, w: 52, h: 67)
-                    ZoneLabel(name: "Deep Sea", subtitle: "Counting by 2s and 5s", scale: s, locked: true)
-                        .stage(x: 692, y: 506, w: 0, h: 0)
+                        .allowsHitTesting(false)
+                        .stage(x: 678, y: 428, w: 42, h: 54)
                 }
 
                 Vignette()
                     .stage(x: 0, y: 0, w: 800, h: 600)
                     .bleed()
 
-                // Title and switch
-                Button(action: onSwitchMermaid) {
-                    Text("Switch mermaid")
-                        .font(baloo(18, weight: 600, scale: s))
-                        .foregroundStyle(Tokens.Palette.midnight)
-                        .padding(.top, 7 * s)
-                        .padding(.bottom, 3 * s)
-                        .padding(.horizontal, 18 * s)
-                        .background(Capsule().fill(Tokens.Palette.pearl))
-                        .shadow(color: Tokens.Palette.midnight.opacity(0.28), radius: 7 * s, y: 6 * s)
+                HomeButton(scale: s, action: onHome)
+                    .stageTopLeft(x: 24, y: 24)
+            }
+            .onChange(of: Int(t * 10)) {
+                if start == nil { start = t }
+                if !invited && tl >= 6.5 {
+                    invited = true
+                    speak(PromptScript.tapAPlace)
                 }
-                .buttonStyle(.plain)
-                .stageTopLeft(x: 24, y: 24)
-
-                Text("Where shall we dive?")
-                    .font(baloo(24, weight: 700, scale: s))
-                    .foregroundStyle(Tokens.Palette.midnight)
-                    .padding(.top, 6 * s)
-                    .padding(.bottom, 2 * s)
-                    .padding(.horizontal, 24 * s)
-                    .background(Capsule().fill(Tokens.Palette.pearl))
-                    .shadow(color: Tokens.Palette.midnight.opacity(0.28), radius: 7 * s, y: 6 * s)
-                    .stageTopCenter(y: 24)
             }
         }
     }
@@ -158,33 +150,36 @@ private struct TrailDot: View {
     }
 }
 
-/// The two-line place pill, centered on its stage point. Locked places get the
-/// Midnight panel treatment instead of Pearl.
-private struct ZoneLabel: View {
+/// A driftwood signpost planted in the scenery, the place name painted on its
+/// plank in walnut ink. It breathes a gentle tap-me swell from its base. A
+/// locked place keeps its sign but the ink fades (the padlock hangs on top).
+private struct SignPost: View {
     let name: String
-    let subtitle: String
+    /// Design-space width; height follows the painted plank's 320:258 aspect.
+    let w: CGFloat
+    let t: Double
     let scale: CGFloat
+    var tilt: Double = 0
+    var delay: Double = 0
     var locked = false
 
     var body: some View {
-        VStack(spacing: 0) {
+        let h = w * 258 / 320
+        ZStack {
+            ArtImage("props/sign.png")
+                .frame(width: w * scale, height: h * scale)
             Text(name)
-                .font(baloo(locked ? 22 : 24, weight: 700, scale: scale))
-                .foregroundStyle(locked ? Tokens.Palette.pearl : Tokens.Palette.midnight)
-            Text(subtitle)
-                .font(baloo(locked ? 14 : 15, weight: 500, scale: scale))
-                .foregroundStyle(locked ? Tokens.Palette.pearl.opacity(0.85) : Color(hex: 0x17617A))
+                .font(baloo(21, weight: 700, scale: scale))
+                .foregroundStyle(Color(hex: 0x5A3418).opacity(locked ? 0.55 : 0.92))
+                .lineLimit(1)
+                .minimumScaleFactor(0.65)
+                .frame(width: w * 0.76 * scale)
+                .position(x: w * 0.5 * scale, y: h * 0.19 * scale)
         }
-        .padding(.top, 7 * scale)
-        .padding(.bottom, 4 * scale)
-        .padding(.horizontal, (locked ? 18 : 20) * scale)
-        .background(
-            RoundedRectangle(cornerRadius: 22 * scale)
-                .fill(locked ? Color(hex: 0x061A33, opacity: 0.8) : Tokens.Palette.pearl)
-        )
-        .shadow(color: Tokens.Palette.midnight.opacity(0.28), radius: 7 * scale, y: 6 * scale)
-        .fixedSize()
-        .frame(width: 0, height: 0, alignment: .top)
+        .frame(width: w * scale, height: h * scale)
+        .rotationEffect(.degrees(tilt), anchor: .bottom)
+        .scaleEffect(Wave.alternate(t, from: 1.0, to: 1.03, duration: 2.6, delay: delay), anchor: .bottom)
+        .shadow(color: Tokens.Palette.midnight.opacity(0.3), radius: 5 * scale, y: 4 * scale)
         .allowsHitTesting(false)
     }
 }

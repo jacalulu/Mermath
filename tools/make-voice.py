@@ -88,6 +88,7 @@ def prompts():
         out.append((f'deep-praise-{t2}', f"That's it! {WORD[t2].capitalize()}!", 'crab'))
         out.append((f'deep-tenth-{t2}', f'{WORD[t2].capitalize()}! That makes ten pearls! Open the chest!', 'crab'))
     out.append(('who-is-diving', 'Who is diving today?', 'narrator'))
+    out.append(('tap-a-place', 'Tap a place on the map, and off we go!', 'narrator'))
     for key, name in CHILDREN.items():
         out.append((f'hello-{key}', f'Hello {name}! Where shall we dive?', 'narrator'))
     out.append(('chest-open', 'Ten pearls! The chest is open!', 'narrator'))

@@ -70,6 +70,22 @@ struct SolvedPanel: View {
     }
 }
 
+/// The little painted shell-roofed house, back to the home (pick) screen:
+/// the corner home button every kids' game uses, no words needed.
+struct HomeButton: View {
+    let scale: CGFloat
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            ArtImage("ui/icon-home.png")
+                .frame(width: 56 * scale, height: 68 * scale)
+                .shadow(color: Tokens.Palette.midnight.opacity(0.4), radius: 4 * scale, y: 5 * scale)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
 /// The painted rolled-map icon, back to the reef map.
 struct MapButton: View {
     let scale: CGFloat

@@ -139,6 +139,7 @@ enum PromptScript {
     // MARK: Screens
 
     static let whoIsDiving = Prompt(id: "who-is-diving", text: "Who is diving today?")
+    static let tapAPlace = Prompt(id: "tap-a-place", text: "Tap a place on the map, and off we go!")
     static func hello(_ child: ChildID) -> Prompt {
         Prompt(id: "hello-\(child.rawValue)", text: "Hello \(child.displayName)! Where shall we dive?")
     }
