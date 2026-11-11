@@ -56,12 +56,26 @@ def _glyphs(path, text):
         pen = SVGPathPen(gs)
         g = gs[cmap[ord(ch)]]
         g.draw(pen)
-        out.append((ch, pen.getCommands(), g.width))
+        d = pen.getCommands()
+        if ch == '1':
+            # A numeral in a math game must be unmistakable: give the one a
+            # proper flag so it can never read as a capital I.
+            from fontTools.pens.boundsPen import BoundsPen
+            bp = BoundsPen(gs)
+            g.draw(bp)
+            x0, y0, x1, y1 = bp.bounds
+            h = y1 - y0
+            w = x1 - x0
+            d += (f' M{x0 + w * 0.58:.0f} {y1:.0f}'
+                  f' L{x0 - h * 0.30:.0f} {y1 - h * 0.30:.0f}'
+                  f' L{x0 + w * 0.52:.0f} {y1 - h * 0.46:.0f} Z')
+        out.append((ch, d, g.width))
     return out, upem
 
 
-def _letters(gl, k, baseline, cx, tracking=0.97):
-    """Per-letter placement: a whisper of bounce, not a jig."""
+def _letters(gl, k, baseline, cx, tracking=0.97, amp=1.0):
+    """Per-letter placement: a whisper of bounce, not a jig. The bounce
+    scales with the letter size so sentence-length titles stay calm."""
     total = sum(w for _, _, w in gl) * k * tracking
     x = cx - total / 2
     out = []
@@ -70,7 +84,7 @@ def _letters(gl, k, baseline, cx, tracking=0.97):
         wpx = w * k * tracking
         if d is not None:
             rot = -1.5 if i % 2 == 0 else 1.2
-            dy = -2.0 if i % 2 == 0 else 2.0
+            dy = (-2.0 if i % 2 == 0 else 2.0) * amp
             out.append((ch, d, x, baseline + dy, rot, wpx))
         x += wpx
         i += 1
@@ -78,12 +92,17 @@ def _letters(gl, k, baseline, cx, tracking=0.97):
 
 
 def _lockup(key, text='Coral Reef', cap=74.0, baseline=330.0, cx=400.0, ink='light',
-            pocket=None):
+            pocket=None, maxw=740.0):
     from fontTools.pens.boundsPen import BoundsPen
     path = os.path.join(FDIR, FONTS[key])
     gl, upem = _glyphs(path, text)
     k = cap / (upem * 0.7)
-    letters, xend = _letters(gl, k, baseline, cx)
+    # A sentence-length title fits the stage: shrink until it fits maxw
+    tw0 = sum(w for _, _, w in gl) * k * 0.97
+    if maxw and tw0 > maxw:
+        k *= maxw / tw0
+    cap = k * upem * 0.7
+    letters, xend = _letters(gl, k, baseline, cx, amp=cap / 74.0)
     style = INKS[ink]
     parts = []
 
@@ -143,6 +162,9 @@ NAMES = {
     'coral': ('Coral Reef', 'deep', ('#FDF3DC', 0.78)),
     'deep': ('Deep Sea', 'light', ('#0C2A44', 0.75)),
     'grotto': ('My grotto', 'light', ('#0A1E36', 0.5)),
+    # Screen titles: the hunt's sunlit open water and the chest cave's blue
+    'hunt': ('X marks the spot!', 'light', ('#0F4C64', 0.45)),
+    'chest': ('10 pearls! The chest is open.', 'light', ('#0C2A46', 0.7)),
 }
 
 

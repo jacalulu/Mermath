@@ -108,15 +108,13 @@ struct HuntScreen: View {
                     .stage(x: 0, y: 0, w: 800, h: 600)
                     .bleed()
 
-                Text("X marks the spot!")
-                    .font(baloo(Tokens.TypeScale.nameTag, weight: 700, scale: s))
-                    .foregroundStyle(Tokens.Palette.midnight)
-                    .padding(.top, 6 * s)
-                    .padding(.bottom, 2 * s)
-                    .padding(.horizontal, 24 * s)
-                    .background(Capsule().fill(Tokens.Palette.pearl))
-                    .shadow(color: Tokens.Palette.midnight.opacity(0.28), radius: 7 * s, y: 6 * s)
-                    .stageTopCenter(y: 24)
+                // Painted title lockup (art-pipeline/lettering.py), drifting
+                // gently like the map's place names
+                ArtImage("ui/names/hunt.png")
+                    .frame(width: 380 * s, height: 380 * 420 / 1600 * s)
+                    .offset(y: Wave.alternate(t, from: -2.2, to: 2.2, duration: 3.6) * s)
+                    .allowsHitTesting(false)
+                    .stageTopCenter(y: 2)
 
                 // Dug free: the lost treasure rises sparkling over its hole
                 if revealed, let earned {

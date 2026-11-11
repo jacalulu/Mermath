@@ -143,15 +143,12 @@ struct ChestScreen: View {
 
                 // Only true - and only shown - once the lid has swung open
                 if ov >= 0.95 {
-                    Text("10 pearls! The chest is open.")
-                        .font(baloo(26, weight: 700, scale: s))
-                        .foregroundStyle(Tokens.Palette.midnight)
-                        .padding(.top, 7 * s)
-                        .padding(.bottom, 3 * s)
-                        .padding(.horizontal, 26 * s)
-                        .background(Capsule().fill(Tokens.Palette.pearl))
-                        .shadow(color: Tokens.Palette.midnight.opacity(0.28), radius: 7 * s, y: 6 * s)
-                        .stageTopCenter(y: 26)
+                    // Painted title lockup (art-pipeline/lettering.py)
+                    ArtImage("ui/names/chest.png")
+                        .frame(width: 460 * s, height: 460 * 340 / 1600 * s)
+                        .offset(y: Wave.alternate(t, from: -2.2, to: 2.2, duration: 3.6) * s)
+                        .allowsHitTesting(false)
+                        .stageTopCenter(y: 2)
                         .transition(.opacity)
                 }
 
